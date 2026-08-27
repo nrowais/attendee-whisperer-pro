@@ -120,3 +120,107 @@ export const recentActivities: { id: string; kind: ActivityKind; detail: string;
   { id: "a5", kind: "تنفيذ طلب خاص", detail: "تم توفير مترجم فوري للدكتورة Amina Kone", time: "قبل 54 دقيقة" },
   { id: "a6", kind: "وصول متحدث", detail: "وصول د. هند الزهراني إلى موقع الفعالية", time: "قبل ساعة" },
 ];
+
+/* ---------- بيانات تجريبية لأقسام البوابة ---------- */
+
+export type SpeakerRow = {
+  id: string;
+  name: string;
+  photo: string;
+  title: string;
+  org: string;
+  country: string;
+  session: string;
+  status: "لم يصل" | "في المطار" | "بالطريق" | "في الفندق" | "في موقع الفعالية" | "غادر";
+};
+
+const av = (s: string) =>
+  `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(s)}&backgroundType=gradientLinear`;
+
+export const speakerRows: SpeakerRow[] = [
+  { id: "s1", name: "د. سلطان الغامدي", photo: av("SG"), title: "أستاذ الذكاء الاصطناعي", org: "جامعة الملك سعود", country: "السعودية", session: "مستقبل المدن الذكية", status: "لم يصل" },
+  { id: "s2", name: "أ. ليلى المنصور", photo: av("LM"), title: "رئيس الابتكار", org: "مجموعة أفق", country: "الإمارات", session: "الاقتصاد الرقمي", status: "في المطار" },
+  { id: "s3", name: "Prof. Daniel Reyes", photo: av("DR"), title: "Research Director", org: "MIT Media Lab", country: "الولايات المتحدة", session: "Human-Centered AI", status: "بالطريق" },
+  { id: "s4", name: "د. هند الزهراني", photo: av("HZ"), title: "استشاري سياسات صحية", org: "وزارة الصحة", country: "السعودية", session: "الصحة الرقمية", status: "في الفندق" },
+  { id: "s5", name: "م. يوسف بن عمر", photo: av("YO"), title: "رئيس تقنية", org: "شركة بُنيان", country: "قطر", session: "البنية التحتية السحابية", status: "في موقع الفعالية" },
+  { id: "s6", name: "Dr. Amina Kone", photo: av("AK"), title: "Climate Economist", org: "UNDP", country: "فرنسا", session: "التحول الأخضر", status: "لم يصل" },
+  { id: "s7", name: "أ. مشاري العتيبي", photo: av("MA"), title: "مدير استثمار", org: "صندوق النماء", country: "السعودية", session: "تمويل الشركات الناشئة", status: "غادر" },
+  { id: "s8", name: "Dr. Sofia Bianchi", photo: av("SB"), title: "Urban Designer", org: "Politecnico di Milano", country: "إيطاليا", session: "تصميم المساحات العامة", status: "في الفندق" },
+];
+
+export type InviteeRow = {
+  id: string;
+  name: string;
+  org: string;
+  category: "شخصية رسمية" | "قطاع خاص" | "إعلام" | "أكاديمي";
+  email: string;
+  phone: string;
+  status: "أكد الحضور" | "اعتذر" | "لم يرد";
+};
+
+export const inviteeRows: InviteeRow[] = [
+  { id: "g1", name: "م. عبدالعزيز الشهري", org: "وزارة الاتصالات", category: "شخصية رسمية", email: "a.alshehri@gov.sa", phone: "0555 120 334", status: "أكد الحضور" },
+  { id: "g2", name: "أ. ريما الدوسري", org: "قناة الاقتصادية", category: "إعلام", email: "rima@aleqt.sa", phone: "0533 887 210", status: "أكد الحضور" },
+  { id: "g3", name: "م. تركي القحطاني", org: "شركة تقنية المستقبل", category: "قطاع خاص", email: "turki@futuretech.sa", phone: "0501 442 909", status: "لم يرد" },
+  { id: "g4", name: "د. نوف السبيعي", org: "جامعة الأميرة نورة", category: "أكاديمي", email: "n.alsubaie@pnu.edu.sa", phone: "0544 771 002", status: "اعتذر" },
+  { id: "g5", name: "أ. فيصل الحربي", org: "مجموعة الرياض القابضة", category: "قطاع خاص", email: "faisal@rhg.sa", phone: "0566 330 118", status: "أكد الحضور" },
+  { id: "g6", name: "أ. سارة العنزي", org: "صحيفة اليوم", category: "إعلام", email: "sara@alyaum.sa", phone: "0577 909 445", status: "لم يرد" },
+  { id: "g7", name: "د. ماجد الرشيد", org: "هيئة البيانات والذكاء الاصطناعي", category: "شخصية رسمية", email: "m.alrashid@sdaia.gov.sa", phone: "0509 111 663", status: "أكد الحضور" },
+];
+
+export type AttendanceRow = {
+  id: string;
+  name: string;
+  type: "متحدث" | "مدعو" | "إعلام";
+  badge: string;
+  gate: "البوابة الرئيسية" | "بوابة كبار الشخصيات" | "بوابة الإعلام";
+  checkIn: string;
+  status: "حضر" | "لم يسجل";
+};
+
+export const attendanceRows: AttendanceRow[] = [
+  { id: "at1", name: "م. يوسف بن عمر", type: "متحدث", badge: "SPK-0045", gate: "بوابة كبار الشخصيات", checkIn: "09:12", status: "حضر" },
+  { id: "at2", name: "م. عبدالعزيز الشهري", type: "مدعو", badge: "GST-0312", gate: "البوابة الرئيسية", checkIn: "09:26", status: "حضر" },
+  { id: "at3", name: "أ. ريما الدوسري", type: "إعلام", badge: "MED-0071", gate: "بوابة الإعلام", checkIn: "09:31", status: "حضر" },
+  { id: "at4", name: "د. هند الزهراني", type: "متحدث", badge: "SPK-0022", gate: "بوابة كبار الشخصيات", checkIn: "—", status: "لم يسجل" },
+  { id: "at5", name: "أ. فيصل الحربي", type: "مدعو", badge: "GST-0518", gate: "البوابة الرئيسية", checkIn: "10:04", status: "حضر" },
+  { id: "at6", name: "أ. سارة العنزي", type: "إعلام", badge: "MED-0090", gate: "بوابة الإعلام", checkIn: "—", status: "لم يسجل" },
+];
+
+export type StaffRow = {
+  id: string;
+  name: string;
+  role: "مسؤول استقبال" | "منسق نقل" | "منسق إقامة" | "منسق متحدثين" | "دعم تشغيلي";
+  zone: "المطار" | "الفندق" | "موقع الفعالية" | "غرفة العمليات";
+  phone: string;
+  shift: "صباحي" | "مسائي";
+  status: "متاح" | "في مهمة" | "خارج الدوام";
+};
+
+export const staffRows: StaffRow[] = [
+  { id: "st1", name: "نورة العتيبي", role: "مسؤول استقبال", zone: "المطار", phone: "0551 220 114", shift: "صباحي", status: "في مهمة" },
+  { id: "st2", name: "عبدالله القحطاني", role: "مسؤول استقبال", zone: "المطار", phone: "0553 771 208", shift: "صباحي", status: "متاح" },
+  { id: "st3", name: "ريم الحربي", role: "منسق متحدثين", zone: "موقع الفعالية", phone: "0509 664 331", shift: "مسائي", status: "متاح" },
+  { id: "st4", name: "خالد السبيعي", role: "منسق نقل", zone: "غرفة العمليات", phone: "0566 118 990", shift: "صباحي", status: "في مهمة" },
+  { id: "st5", name: "منى الصالح", role: "منسق إقامة", zone: "الفندق", phone: "0544 330 887", shift: "مسائي", status: "متاح" },
+  { id: "st6", name: "بندر الرشيد", role: "دعم تشغيلي", zone: "موقع الفعالية", phone: "0577 442 116", shift: "مسائي", status: "خارج الدوام" },
+];
+
+export type RequestRow = {
+  id: string;
+  guest: string;
+  category: "تغذية" | "نقل خاص" | "ترجمة" | "تجهيزات تقنية" | "احتياج طبي";
+  detail: string;
+  priority: "عالية" | "متوسطة" | "منخفضة";
+  owner: string;
+  status: "جديد" | "قيد التنفيذ" | "منفذ" | "مرفوض";
+};
+
+export const requestRows: RequestRow[] = [
+  { id: "r1", guest: "Dr. Amina Kone", category: "ترجمة", detail: "مترجم فوري فرنسي-عربي خلال الجلسة الافتتاحية", priority: "عالية", owner: "ريم الحربي", status: "منفذ" },
+  { id: "r2", guest: "د. سلطان الغامدي", category: "نقل خاص", detail: "سيارة مخصصة للتنقل بين الفندق والموقع", priority: "متوسطة", owner: "خالد السبيعي", status: "قيد التنفيذ" },
+  { id: "r3", guest: "Prof. Daniel Reyes", category: "تغذية", detail: "وجبات نباتية طوال فترة الإقامة", priority: "منخفضة", owner: "منى الصالح", status: "منفذ" },
+  { id: "r4", guest: "أ. ليلى المنصور", category: "تجهيزات تقنية", detail: "شاشة عرض إضافية وميكروفون لاصق", priority: "عالية", owner: "بندر الرشيد", status: "جديد" },
+  { id: "r5", guest: "د. هند الزهراني", category: "احتياج طبي", detail: "ثلاجة صغيرة لحفظ دواء في الغرفة", priority: "عالية", owner: "منى الصالح", status: "قيد التنفيذ" },
+  { id: "r6", guest: "أ. مشاري العتيبي", category: "نقل خاص", detail: "توصيل إلى المطار الساعة 06:00", priority: "متوسطة", owner: "خالد السبيعي", status: "مرفوض" },
+];
