@@ -78,30 +78,15 @@ function PortalLayout() {
       ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-border bg-background/85 px-5 py-3 backdrop-blur">
-          <button className="lg:hidden" onClick={() => setOpenNav(true)} aria-label="القائمة">
-            <Menu className="size-5" />
-          </button>
-          <div className="flex flex-1 items-center justify-end gap-3">
-            <div className="text-end">
-              <p className="text-sm font-medium text-foreground">{user.email}</p>
-              <Badge variant="secondary" className="mt-0.5">
-                {roleLabel}
-              </Badge>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={async () => {
-                await supabase.auth.signOut();
-                navigate({ to: "/auth" });
-              }}
-              aria-label="تسجيل الخروج"
-            >
-              <LogOut className="size-4" />
-            </Button>
-          </div>
-        </header>
+        <Topbar
+          email={user.email ?? ""}
+          roleLabel={roleLabel}
+          onMenu={() => setOpenNav(true)}
+          onSignOut={async () => {
+            await supabase.auth.signOut();
+            navigate({ to: "/auth" });
+          }}
+        />
 
         <main className="flex-1 p-5 lg:p-8">
           <Outlet />
