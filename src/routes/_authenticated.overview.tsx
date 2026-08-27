@@ -133,7 +133,11 @@ function useOverview() {
             "id, status, trip_type, scheduled_at, pickup_location, dropoff_location, speakers(full_name), drivers(full_name)",
           )
           .order("scheduled_at", { ascending: true }),
-        supabase.from("hotel_bookings").select("id, status, check_in, check_out"),
+        supabase
+          .from("hotel_bookings")
+          .select(
+            "id, status, check_in, check_out, speakers(full_name), hotels(name)",
+          ),
         supabase
           .from("speaker_requests")
           .select("id, title, status, priority, created_at, speakers(full_name)")
