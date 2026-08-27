@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useRoles, roleLabels } from "@/hooks/useAuth";
-import { navItems } from "@/lib/nav";
+import { navGroups } from "@/lib/nav";
 import { Topbar } from "@/components/portal/Topbar";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -48,25 +48,32 @@ function PortalLayout() {
           </button>
         </div>
 
-        <nav className="space-y-1 px-3 py-5">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpenNav(false)}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-sidebar-foreground/85 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                activeProps={{
-                  className:
-                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm bg-sidebar-primary text-sidebar-primary-foreground font-semibold",
-                }}
-              >
-                <Icon className="size-4 shrink-0" />
-                {item.label}
-              </Link>
-            );
-          })}
+        <nav className="space-y-5 px-3 py-5">
+          {navGroups.map((group) => (
+            <div key={group.label} className="space-y-1">
+              <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide text-sidebar-foreground/50">
+                {group.label}
+              </p>
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setOpenNav(false)}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-sidebar-foreground/85 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    activeProps={{
+                      className:
+                        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm bg-sidebar-primary text-sidebar-primary-foreground font-semibold",
+                    }}
+                  >
+                    <Icon className="size-4 shrink-0" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
       </aside>
 
