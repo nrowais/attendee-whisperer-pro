@@ -167,7 +167,7 @@ export function StatusPill({ label, tone = "muted" }: { label: string; tone?: st
     muted: "bg-muted text-muted-foreground",
   };
   return (
-    <span className={`whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium ${tones[tone] ?? tones.muted}`}>
+    <span className={`whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium ${tones[tone] ?? tones["muted"]}`}>
       {label}
     </span>
   );
