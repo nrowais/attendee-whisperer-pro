@@ -508,6 +508,9 @@ function OverviewPage() {
         </Button>
       </header>
 
+      <AlertsPanel data={data} />
+
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((k) => (
           <Link key={k.label} to={k.to as never}>
