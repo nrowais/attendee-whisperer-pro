@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAirportRouteImport } from './routes/_authenticated.airport'
 import { Route as AuthenticatedArrivalsRouteImport } from './routes/_authenticated.arrivals'
 import { Route as AuthenticatedAssignmentsRouteImport } from './routes/_authenticated.assignments'
 import { Route as AuthenticatedAttendanceRouteImport } from './routes/_authenticated.attendance'
@@ -49,6 +50,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAirportRoute = AuthenticatedAirportRouteImport.update({
+  id: '/airport',
+  path: '/airport',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedArrivalsRoute = AuthenticatedArrivalsRouteImport.update({
   id: '/arrivals',
@@ -172,6 +178,7 @@ const AuthenticatedVehiclesRoute = AuthenticatedVehiclesRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/airport': typeof AuthenticatedAirportRoute
   '/arrivals': typeof AuthenticatedArrivalsRoute
   '/assignments': typeof AuthenticatedAssignmentsRoute
   '/attendance': typeof AuthenticatedAttendanceRoute
@@ -199,6 +206,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/airport': typeof AuthenticatedAirportRoute
   '/arrivals': typeof AuthenticatedArrivalsRoute
   '/assignments': typeof AuthenticatedAssignmentsRoute
   '/attendance': typeof AuthenticatedAttendanceRoute
@@ -228,6 +236,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/airport': typeof AuthenticatedAirportRoute
   '/_authenticated/arrivals': typeof AuthenticatedArrivalsRoute
   '/_authenticated/assignments': typeof AuthenticatedAssignmentsRoute
   '/_authenticated/attendance': typeof AuthenticatedAttendanceRoute
@@ -257,6 +266,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/airport'
     | '/arrivals'
     | '/assignments'
     | '/attendance'
@@ -284,6 +294,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/airport'
     | '/arrivals'
     | '/assignments'
     | '/attendance'
@@ -312,6 +323,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/airport'
     | '/_authenticated/arrivals'
     | '/_authenticated/assignments'
     | '/_authenticated/attendance'
@@ -365,6 +377,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/airport': {
+      id: '/_authenticated/airport'
+      path: '/airport'
+      fullPath: '/airport'
+      preLoaderRoute: typeof AuthenticatedAirportRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/arrivals': {
       id: '/_authenticated/arrivals'
@@ -531,6 +550,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAirportRoute: typeof AuthenticatedAirportRoute
   AuthenticatedArrivalsRoute: typeof AuthenticatedArrivalsRoute
   AuthenticatedAssignmentsRoute: typeof AuthenticatedAssignmentsRoute
   AuthenticatedAttendanceRoute: typeof AuthenticatedAttendanceRoute
@@ -557,6 +577,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAirportRoute: AuthenticatedAirportRoute,
   AuthenticatedArrivalsRoute: AuthenticatedArrivalsRoute,
   AuthenticatedAssignmentsRoute: AuthenticatedAssignmentsRoute,
   AuthenticatedAttendanceRoute: AuthenticatedAttendanceRoute,
