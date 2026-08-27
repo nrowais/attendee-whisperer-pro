@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useRoles, roleLabels } from "@/hooks/useAuth";
-import { navItems } from "@/lib/nav";
+import { navGroups } from "@/lib/nav";
 import { Topbar } from "@/components/portal/Topbar";
 
 export const Route = createFileRoute("/_authenticated")({
