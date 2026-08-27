@@ -29,6 +29,7 @@ import { Route as AuthenticatedInvitationsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedInviteesRouteImport } from './routes/_authenticated.invitees'
 import { Route as AuthenticatedMovementsRouteImport } from './routes/_authenticated.movements'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated.notifications'
+import { Route as AuthenticatedOverviewRouteImport } from './routes/_authenticated.overview'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated.reports'
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated.requests'
 import { Route as AuthenticatedRoomsRouteImport } from './routes/_authenticated.rooms'
@@ -142,6 +143,11 @@ const AuthenticatedNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedOverviewRoute = AuthenticatedOverviewRouteImport.update({
+  id: '/overview',
+  path: '/overview',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -213,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/invitees': typeof AuthenticatedInviteesRoute
   '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/overview': typeof AuthenticatedOverviewRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/rooms': typeof AuthenticatedRoomsRoute
@@ -244,6 +251,7 @@ export interface FileRoutesByTo {
   '/invitees': typeof AuthenticatedInviteesRoute
   '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/overview': typeof AuthenticatedOverviewRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/rooms': typeof AuthenticatedRoomsRoute
@@ -277,6 +285,7 @@ export interface FileRoutesById {
   '/_authenticated/invitees': typeof AuthenticatedInviteesRoute
   '/_authenticated/movements': typeof AuthenticatedMovementsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/overview': typeof AuthenticatedOverviewRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/requests': typeof AuthenticatedRequestsRoute
   '/_authenticated/rooms': typeof AuthenticatedRoomsRoute
@@ -310,6 +319,7 @@ export interface FileRouteTypes {
     | '/invitees'
     | '/movements'
     | '/notifications'
+    | '/overview'
     | '/reports'
     | '/requests'
     | '/rooms'
@@ -341,6 +351,7 @@ export interface FileRouteTypes {
     | '/invitees'
     | '/movements'
     | '/notifications'
+    | '/overview'
     | '/reports'
     | '/requests'
     | '/rooms'
@@ -373,6 +384,7 @@ export interface FileRouteTypes {
     | '/_authenticated/invitees'
     | '/_authenticated/movements'
     | '/_authenticated/notifications'
+    | '/_authenticated/overview'
     | '/_authenticated/reports'
     | '/_authenticated/requests'
     | '/_authenticated/rooms'
@@ -533,6 +545,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/overview': {
+      id: '/_authenticated/overview'
+      path: '/overview'
+      fullPath: '/overview'
+      preLoaderRoute: typeof AuthenticatedOverviewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/reports': {
       id: '/_authenticated/reports'
       path: '/reports'
@@ -624,6 +643,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedInviteesRoute: typeof AuthenticatedInviteesRoute
   AuthenticatedMovementsRoute: typeof AuthenticatedMovementsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedOverviewRoute: typeof AuthenticatedOverviewRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
   AuthenticatedRoomsRoute: typeof AuthenticatedRoomsRoute
@@ -654,6 +674,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedInviteesRoute: AuthenticatedInviteesRoute,
   AuthenticatedMovementsRoute: AuthenticatedMovementsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedOverviewRoute: AuthenticatedOverviewRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
   AuthenticatedRoomsRoute: AuthenticatedRoomsRoute,
