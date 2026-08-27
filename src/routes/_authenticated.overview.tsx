@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import {
   PlaneLanding,
   PlaneTakeoff,
@@ -11,9 +12,18 @@ import {
   Mic,
   Users,
   RefreshCw,
+  BellRing,
+  AlarmClock,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -133,7 +143,11 @@ function useOverview() {
             "id, status, trip_type, scheduled_at, pickup_location, dropoff_location, speakers(full_name), drivers(full_name)",
           )
           .order("scheduled_at", { ascending: true }),
-        supabase.from("hotel_bookings").select("id, status, check_in, check_out"),
+        supabase
+          .from("hotel_bookings")
+          .select(
+            "id, status, check_in, check_out, speakers(full_name), hotels(name)",
+          ),
         supabase
           .from("speaker_requests")
           .select("id, title, status, priority, created_at, speakers(full_name)")
@@ -173,8 +187,235 @@ function count(rows: Row[], key: string, values: string[]) {
   return rows.filter((r) => values.includes(String(r[key] ?? "").toLowerCase())).length;
 }
 
+type AlertItem = {
+  id: string;
+  kind: "arrival" | "departure" | "trip" | "checkin";
+  title: string;
+  person: string;
+  place: string;
+  at: Date;
+  minutes: number;
+  to: string;
+};
+
+const kindMeta: Record<
+  AlertItem["kind"],
+  { label: string; icon: typeof PlaneLanding; tone: string }
+> = {
+  arrival: { label: "وصول", icon: PlaneLanding, tone: "bg-sky-500/10 text-sky-600" },
+  departure: { label: "مغادرة", icon: PlaneTakeoff, tone: "bg-violet-500/10 text-violet-600" },
+  trip: { label: "نقل", icon: Car, tone: "bg-amber-500/10 text-amber-600" },
+  checkin: { label: "تسجيل إقامة", icon: BedDouble, tone: "bg-emerald-500/10 text-emerald-600" },
+};
+
+const LEAD_KEY = "ops-alert-lead-minutes";
+
+function minutesUntil(value: string | null | undefined, now: number) {
+  if (!value) return null;
+  const t = new Date(value).getTime();
+  if (Number.isNaN(t)) return null;
+  return Math.round((t - now) / 60000);
+}
+
+/** موعد افتراضي لتسجيل الدخول للفندق: 3:00 عصراً */
+function checkInDate(day: string | null | undefined) {
+  if (!day) return null;
+  const d = new Date(`${day}T15:00:00`);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function buildAlerts(data: ReturnType<typeof useOverview>["data"], lead: number, now: number) {
+  if (!data) return [] as AlertItem[];
+  const out: AlertItem[] = [];
+  const within = (m: number | null) => m !== null && m <= lead && m >= -30;
+
+  for (const a of data.arrivals) {
+    if (["arrived", "completed", "cancelled"].includes(String(a["status"] ?? "").toLowerCase()))
+      continue;
+    const m = minutesUntil(a["arrival_time"], now);
+    if (!within(m)) continue;
+    out.push({
+      id: `arr-${a["id"]}`,
+      kind: "arrival",
+      title: "وصول مرتقب",
+      person: a["speakers"]?.full_name ?? "—",
+      place: a["arrival_point"] ?? "—",
+      at: new Date(a["arrival_time"]),
+      minutes: m as number,
+      to: "/arrivals",
+    });
+  }
+
+  for (const d of data.departures) {
+    if (["departed", "completed", "cancelled"].includes(String(d["status"] ?? "").toLowerCase()))
+      continue;
+    const m = minutesUntil(d["departure_time"], now);
+    if (!within(m)) continue;
+    out.push({
+      id: `dep-${d["id"]}`,
+      kind: "departure",
+      title: "مغادرة مرتقبة",
+      person: d["speakers"]?.full_name ?? "—",
+      place: d["departure_point"] ?? "—",
+      at: new Date(d["departure_time"]),
+      minutes: m as number,
+      to: "/departures",
+    });
+  }
+
+  for (const t of data.trips) {
+    if (["completed", "cancelled"].includes(String(t["status"] ?? "").toLowerCase())) continue;
+    const m = minutesUntil(t["scheduled_at"], now);
+    if (!within(m)) continue;
+    out.push({
+      id: `trip-${t["id"]}`,
+      kind: "trip",
+      title: "تحرك نقل",
+      person: t["speakers"]?.full_name ?? "—",
+      place: `${t["pickup_location"] ?? "—"} ← ${t["dropoff_location"] ?? "—"}`,
+      at: new Date(t["scheduled_at"]),
+      minutes: m as number,
+      to: "/trips",
+    });
+  }
+
+  for (const b of data.bookings) {
+    if (["checked_in", "cancelled", "completed"].includes(String(b["status"] ?? "").toLowerCase()))
+      continue;
+    const at = checkInDate(b["check_in"]);
+    if (!at) continue;
+    const m = Math.round((at.getTime() - now) / 60000);
+    if (!within(m)) continue;
+    out.push({
+      id: `bk-${b["id"]}`,
+      kind: "checkin",
+      title: "تسجيل إقامة",
+      person: b["speakers"]?.full_name ?? "—",
+      place: b["hotels"]?.name ?? "—",
+      at,
+      minutes: m,
+      to: "/bookings",
+    });
+  }
+
+  return out.sort((a, b) => a.minutes - b.minutes);
+}
+
+function relative(minutes: number) {
+  if (minutes < 0) return `متأخر ${Math.abs(minutes)} دقيقة`;
+  if (minutes === 0) return "الآن";
+  if (minutes < 60) return `بعد ${minutes} دقيقة`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m ? `بعد ${h} ساعة و${m} دقيقة` : `بعد ${h} ساعة`;
+}
+
+function AlertsPanel({ data }: { data: ReturnType<typeof useOverview>["data"] }) {
+  const [lead, setLead] = useState(60);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const saved = Number(localStorage.getItem(LEAD_KEY));
+    if (saved > 0) setLead(saved);
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
+  const alerts = buildAlerts(data, lead, now);
+  const urgent = alerts.filter((a) => a.minutes <= 15);
+
+  return (
+    <Card className={alerts.length ? "border-primary/40" : undefined}>
+      <CardHeader className="flex-row flex-wrap items-center justify-between gap-3">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <BellRing className={`size-4 ${urgent.length ? "animate-pulse text-red-500" : "text-primary"}`} />
+          تنبيهات قبل الموعد
+          {alerts.length > 0 && (
+            <Badge className="bg-primary/10 text-primary">{alerts.length}</Badge>
+          )}
+        </CardTitle>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">مهلة التنبيه</span>
+          <Select
+            value={String(lead)}
+            onValueChange={(v) => {
+              setLead(Number(v));
+              localStorage.setItem(LEAD_KEY, v);
+            }}
+          >
+            <SelectTrigger className="w-36">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="30">٣٠ دقيقة</SelectItem>
+              <SelectItem value="60">ساعة واحدة</SelectItem>
+              <SelectItem value="120">ساعتان</SelectItem>
+              <SelectItem value="180">٣ ساعات</SelectItem>
+              <SelectItem value="360">٦ ساعات</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {alerts.length === 0 ? (
+          <p className="py-4 text-center text-sm text-muted-foreground">
+            لا توجد مواعيد خلال المهلة المحددة — كل شيء تحت السيطرة.
+          </p>
+        ) : (
+          alerts.map((a) => {
+            const meta = kindMeta[a.kind];
+            const late = a.minutes < 0;
+            const soon = a.minutes >= 0 && a.minutes <= 15;
+            return (
+              <Link
+                key={a.id}
+                to={a.to as never}
+                className={`flex flex-wrap items-center gap-3 rounded-xl border p-3 transition-colors hover:bg-muted/50 ${
+                  late
+                    ? "border-red-500/40 bg-red-500/5"
+                    : soon
+                      ? "border-amber-500/40 bg-amber-500/5"
+                      : ""
+                }`}
+              >
+                <span className={`flex size-10 items-center justify-center rounded-lg ${meta.tone}`}>
+                  <meta.icon className="size-5" />
+                </span>
+                <div className="min-w-40 flex-1">
+                  <p className="text-sm font-semibold">
+                    {a.title} — {a.person}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {a.place} · {fmt(a.at.toISOString())}
+                  </p>
+                </div>
+                <Badge
+                  className={
+                    late
+                      ? "bg-red-500/10 text-red-600"
+                      : soon
+                        ? "bg-amber-500/10 text-amber-600"
+                        : "bg-muted text-muted-foreground"
+                  }
+                >
+                  <AlarmClock className="ms-1 size-3" />
+                  {relative(a.minutes)}
+                </Badge>
+              </Link>
+            );
+          })
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function OverviewPage() {
   const { data, isLoading, isFetching, refetch } = useOverview();
+
 
   if (isLoading || !data) {
     return (
@@ -266,6 +507,9 @@ function OverviewPage() {
           تحديث
         </Button>
       </header>
+
+      <AlertsPanel data={data} />
+
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((k) => (
