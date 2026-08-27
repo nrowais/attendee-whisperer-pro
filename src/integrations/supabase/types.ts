@@ -171,6 +171,47 @@ export type Database = {
         }
         Relationships: []
       }
+      flight_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          due_at: string
+          flight_id: string
+          id: string
+          message: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          due_at: string
+          flight_id: string
+          id?: string
+          message: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          due_at?: string
+          flight_id?: string
+          id?: string
+          message?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flight_alerts_flight_id_fkey"
+            columns: ["flight_id"]
+            isOneToOne: false
+            referencedRelation: "flights"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       flights: {
         Row: {
           airline: string | null
@@ -1023,6 +1064,10 @@ export type Database = {
     }
     Functions: {
       can_edit: { Args: { _user_id: string }; Returns: boolean }
+      check_flight_alerts: {
+        Args: { window_minutes?: number }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
