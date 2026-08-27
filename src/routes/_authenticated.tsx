@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
-import { LogOut, Menu, X } from "lucide-react";
+import { X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useRoles, roleLabels } from "@/hooks/useAuth";
-import { navGroups } from "@/lib/nav";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { navItems } from "@/lib/nav";
+import { Topbar } from "@/components/portal/Topbar";
 
 export const Route = createFileRoute("/_authenticated")({
   component: PortalLayout,
