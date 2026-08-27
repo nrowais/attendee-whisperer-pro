@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as SpeakerRouteImport } from './routes/speaker'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated.activity'
 import { Route as AuthenticatedAirportRouteImport } from './routes/_authenticated.airport'
 import { Route as AuthenticatedArrivalsRouteImport } from './routes/_authenticated.arrivals'
@@ -53,6 +54,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeakerRoute = SpeakerRouteImport.update({
+  id: '/speaker',
+  path: '/speaker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
@@ -202,6 +208,7 @@ const AuthenticatedVehiclesRoute = AuthenticatedVehiclesRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/speaker': typeof SpeakerRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/airport': typeof AuthenticatedAirportRoute
   '/arrivals': typeof AuthenticatedArrivalsRoute
@@ -234,6 +241,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/speaker': typeof SpeakerRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/airport': typeof AuthenticatedAirportRoute
   '/arrivals': typeof AuthenticatedArrivalsRoute
@@ -268,6 +276,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/speaker': typeof SpeakerRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/airport': typeof AuthenticatedAirportRoute
   '/_authenticated/arrivals': typeof AuthenticatedArrivalsRoute
@@ -302,6 +311,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/speaker'
     | '/activity'
     | '/airport'
     | '/arrivals'
@@ -334,6 +344,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/speaker'
     | '/activity'
     | '/airport'
     | '/arrivals'
@@ -367,6 +378,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/speaker'
     | '/_authenticated/activity'
     | '/_authenticated/airport'
     | '/_authenticated/arrivals'
@@ -401,6 +413,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  SpeakerRoute: typeof SpeakerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -424,6 +437,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/speaker': {
+      id: '/speaker'
+      path: '/speaker'
+      fullPath: '/speaker'
+      preLoaderRoute: typeof SpeakerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/activity': {
@@ -695,6 +715,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  SpeakerRoute: SpeakerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
