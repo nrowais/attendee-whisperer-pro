@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
-import { LogOut, Menu, X } from "lucide-react";
+import { X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useRoles, roleLabels } from "@/hooks/useAuth";
-import { navGroups } from "@/lib/nav";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { navItems } from "@/lib/nav";
+import { Topbar } from "@/components/portal/Topbar";
 
 export const Route = createFileRoute("/_authenticated")({
   component: PortalLayout,
@@ -49,30 +48,25 @@ function PortalLayout() {
           </button>
         </div>
 
-        <nav className="space-y-6 px-3 py-5">
-          {navGroups.map((group) => (
-            <div key={group.title}>
-              <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wide text-sidebar-foreground/50">
-                {group.title}
-              </p>
-              <div className="space-y-1">
-                {group.items.map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => setOpenNav(false)}
-                    className="block rounded-lg px-3 py-2 text-sm text-sidebar-foreground/85 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                    activeProps={{
-                      className:
-                        "block rounded-lg px-3 py-2 text-sm bg-sidebar-primary text-sidebar-primary-foreground font-semibold",
-                    }}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
+        <nav className="space-y-1 px-3 py-5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => setOpenNav(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-sidebar-foreground/85 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                activeProps={{
+                  className:
+                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm bg-sidebar-primary text-sidebar-primary-foreground font-semibold",
+                }}
+              >
+                <Icon className="size-4 shrink-0" />
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
       </aside>
 
@@ -84,30 +78,15 @@ function PortalLayout() {
       ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-border bg-background/85 px-5 py-3 backdrop-blur">
-          <button className="lg:hidden" onClick={() => setOpenNav(true)} aria-label="القائمة">
-            <Menu className="size-5" />
-          </button>
-          <div className="flex flex-1 items-center justify-end gap-3">
-            <div className="text-end">
-              <p className="text-sm font-medium text-foreground">{user.email}</p>
-              <Badge variant="secondary" className="mt-0.5">
-                {roleLabel}
-              </Badge>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={async () => {
-                await supabase.auth.signOut();
-                navigate({ to: "/auth" });
-              }}
-              aria-label="تسجيل الخروج"
-            >
-              <LogOut className="size-4" />
-            </Button>
-          </div>
-        </header>
+        <Topbar
+          email={user.email ?? ""}
+          roleLabel={roleLabel}
+          onMenu={() => setOpenNav(true)}
+          onSignOut={async () => {
+            await supabase.auth.signOut();
+            navigate({ to: "/auth" });
+          }}
+        />
 
         <main className="flex-1 p-5 lg:p-8">
           <Outlet />

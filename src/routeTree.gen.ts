@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAirportRouteImport } from './routes/_authenticated.airport'
 import { Route as AuthenticatedArrivalsRouteImport } from './routes/_authenticated.arrivals'
 import { Route as AuthenticatedAssignmentsRouteImport } from './routes/_authenticated.assignments'
 import { Route as AuthenticatedAttendanceRouteImport } from './routes/_authenticated.attendance'
@@ -25,10 +26,13 @@ import { Route as AuthenticatedFlightsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedHotelsRouteImport } from './routes/_authenticated.hotels'
 import { Route as AuthenticatedInvitationsRouteImport } from './routes/_authenticated.invitations'
 import { Route as AuthenticatedInviteesRouteImport } from './routes/_authenticated.invitees'
+import { Route as AuthenticatedMovementsRouteImport } from './routes/_authenticated.movements'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated.notifications'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated.reports'
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated.requests'
 import { Route as AuthenticatedRoomsRouteImport } from './routes/_authenticated.rooms'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated.sessions'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedSpeakersRouteImport } from './routes/_authenticated.speakers'
 import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated.staff'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated.trips'
@@ -48,6 +52,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAirportRoute = AuthenticatedAirportRouteImport.update({
+  id: '/airport',
+  path: '/airport',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedArrivalsRoute = AuthenticatedArrivalsRouteImport.update({
   id: '/arrivals',
@@ -116,12 +125,22 @@ const AuthenticatedInviteesRoute = AuthenticatedInviteesRouteImport.update({
   path: '/invitees',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedMovementsRoute = AuthenticatedMovementsRouteImport.update({
+  id: '/movements',
+  path: '/movements',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedNotificationsRoute =
   AuthenticatedNotificationsRouteImport.update({
     id: '/notifications',
     path: '/notifications',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedRequestsRoute = AuthenticatedRequestsRouteImport.update({
   id: '/requests',
   path: '/requests',
@@ -135,6 +154,11 @@ const AuthenticatedRoomsRoute = AuthenticatedRoomsRouteImport.update({
 const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
   id: '/sessions',
   path: '/sessions',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSpeakersRoute = AuthenticatedSpeakersRouteImport.update({
@@ -166,6 +190,7 @@ const AuthenticatedVehiclesRoute = AuthenticatedVehiclesRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/airport': typeof AuthenticatedAirportRoute
   '/arrivals': typeof AuthenticatedArrivalsRoute
   '/assignments': typeof AuthenticatedAssignmentsRoute
   '/attendance': typeof AuthenticatedAttendanceRoute
@@ -179,10 +204,13 @@ export interface FileRoutesByFullPath {
   '/hotels': typeof AuthenticatedHotelsRoute
   '/invitations': typeof AuthenticatedInvitationsRoute
   '/invitees': typeof AuthenticatedInviteesRoute
+  '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/reports': typeof AuthenticatedReportsRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/rooms': typeof AuthenticatedRoomsRoute
   '/sessions': typeof AuthenticatedSessionsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/staff': typeof AuthenticatedStaffRoute
   '/trips': typeof AuthenticatedTripsRoute
@@ -192,6 +220,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/airport': typeof AuthenticatedAirportRoute
   '/arrivals': typeof AuthenticatedArrivalsRoute
   '/assignments': typeof AuthenticatedAssignmentsRoute
   '/attendance': typeof AuthenticatedAttendanceRoute
@@ -205,10 +234,13 @@ export interface FileRoutesByTo {
   '/hotels': typeof AuthenticatedHotelsRoute
   '/invitations': typeof AuthenticatedInvitationsRoute
   '/invitees': typeof AuthenticatedInviteesRoute
+  '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/reports': typeof AuthenticatedReportsRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/rooms': typeof AuthenticatedRoomsRoute
   '/sessions': typeof AuthenticatedSessionsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/staff': typeof AuthenticatedStaffRoute
   '/trips': typeof AuthenticatedTripsRoute
@@ -220,6 +252,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/airport': typeof AuthenticatedAirportRoute
   '/_authenticated/arrivals': typeof AuthenticatedArrivalsRoute
   '/_authenticated/assignments': typeof AuthenticatedAssignmentsRoute
   '/_authenticated/attendance': typeof AuthenticatedAttendanceRoute
@@ -233,10 +266,13 @@ export interface FileRoutesById {
   '/_authenticated/hotels': typeof AuthenticatedHotelsRoute
   '/_authenticated/invitations': typeof AuthenticatedInvitationsRoute
   '/_authenticated/invitees': typeof AuthenticatedInviteesRoute
+  '/_authenticated/movements': typeof AuthenticatedMovementsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/requests': typeof AuthenticatedRequestsRoute
   '/_authenticated/rooms': typeof AuthenticatedRoomsRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/speakers': typeof AuthenticatedSpeakersRoute
   '/_authenticated/staff': typeof AuthenticatedStaffRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
@@ -248,6 +284,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/airport'
     | '/arrivals'
     | '/assignments'
     | '/attendance'
@@ -261,10 +298,13 @@ export interface FileRouteTypes {
     | '/hotels'
     | '/invitations'
     | '/invitees'
+    | '/movements'
     | '/notifications'
+    | '/reports'
     | '/requests'
     | '/rooms'
     | '/sessions'
+    | '/settings'
     | '/speakers'
     | '/staff'
     | '/trips'
@@ -274,6 +314,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/airport'
     | '/arrivals'
     | '/assignments'
     | '/attendance'
@@ -287,10 +328,13 @@ export interface FileRouteTypes {
     | '/hotels'
     | '/invitations'
     | '/invitees'
+    | '/movements'
     | '/notifications'
+    | '/reports'
     | '/requests'
     | '/rooms'
     | '/sessions'
+    | '/settings'
     | '/speakers'
     | '/staff'
     | '/trips'
@@ -301,6 +345,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/airport'
     | '/_authenticated/arrivals'
     | '/_authenticated/assignments'
     | '/_authenticated/attendance'
@@ -314,10 +359,13 @@ export interface FileRouteTypes {
     | '/_authenticated/hotels'
     | '/_authenticated/invitations'
     | '/_authenticated/invitees'
+    | '/_authenticated/movements'
     | '/_authenticated/notifications'
+    | '/_authenticated/reports'
     | '/_authenticated/requests'
     | '/_authenticated/rooms'
     | '/_authenticated/sessions'
+    | '/_authenticated/settings'
     | '/_authenticated/speakers'
     | '/_authenticated/staff'
     | '/_authenticated/trips'
@@ -353,6 +401,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/airport': {
+      id: '/_authenticated/airport'
+      path: '/airport'
+      fullPath: '/airport'
+      preLoaderRoute: typeof AuthenticatedAirportRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/arrivals': {
       id: '/_authenticated/arrivals'
@@ -445,11 +500,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInviteesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/movements': {
+      id: '/_authenticated/movements'
+      path: '/movements'
+      fullPath: '/movements'
+      preLoaderRoute: typeof AuthenticatedMovementsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/notifications': {
       id: '/_authenticated/notifications'
       path: '/notifications'
       fullPath: '/notifications'
       preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/requests': {
@@ -471,6 +540,13 @@ declare module '@tanstack/react-router' {
       path: '/sessions'
       fullPath: '/sessions'
       preLoaderRoute: typeof AuthenticatedSessionsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/speakers': {
@@ -512,6 +588,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAirportRoute: typeof AuthenticatedAirportRoute
   AuthenticatedArrivalsRoute: typeof AuthenticatedArrivalsRoute
   AuthenticatedAssignmentsRoute: typeof AuthenticatedAssignmentsRoute
   AuthenticatedAttendanceRoute: typeof AuthenticatedAttendanceRoute
@@ -525,10 +602,13 @@ interface AuthenticatedRouteChildren {
   AuthenticatedHotelsRoute: typeof AuthenticatedHotelsRoute
   AuthenticatedInvitationsRoute: typeof AuthenticatedInvitationsRoute
   AuthenticatedInviteesRoute: typeof AuthenticatedInviteesRoute
+  AuthenticatedMovementsRoute: typeof AuthenticatedMovementsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
   AuthenticatedRoomsRoute: typeof AuthenticatedRoomsRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSpeakersRoute: typeof AuthenticatedSpeakersRoute
   AuthenticatedStaffRoute: typeof AuthenticatedStaffRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
@@ -537,6 +617,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAirportRoute: AuthenticatedAirportRoute,
   AuthenticatedArrivalsRoute: AuthenticatedArrivalsRoute,
   AuthenticatedAssignmentsRoute: AuthenticatedAssignmentsRoute,
   AuthenticatedAttendanceRoute: AuthenticatedAttendanceRoute,
@@ -550,10 +631,13 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedHotelsRoute: AuthenticatedHotelsRoute,
   AuthenticatedInvitationsRoute: AuthenticatedInvitationsRoute,
   AuthenticatedInviteesRoute: AuthenticatedInviteesRoute,
+  AuthenticatedMovementsRoute: AuthenticatedMovementsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
   AuthenticatedRoomsRoute: AuthenticatedRoomsRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSpeakersRoute: AuthenticatedSpeakersRoute,
   AuthenticatedStaffRoute: AuthenticatedStaffRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,

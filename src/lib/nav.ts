@@ -1,57 +1,34 @@
-export type NavItem = { to: string; label: string };
-export type NavGroup = { title: string; items: NavItem[] };
+import {
+  LayoutDashboard,
+  Mic,
+  Users,
+  PlaneTakeoff,
+  Plane,
+  Car,
+  BedDouble,
+  ClipboardList,
+  UserCheck,
+  UsersRound,
+  BarChart3,
+  Settings,
+  type LucideIcon,
+} from "lucide-react";
 
-export const navGroups: NavGroup[] = [
-  {
-    title: "نظرة عامة",
-    items: [
-      { to: "/dashboard", label: "لوحة التحكم" },
-      { to: "/events", label: "الفعاليات" },
-    ],
-  },
-  {
-    title: "المتحدثون",
-    items: [
-      { to: "/speakers", label: "المتحدثون" },
-      { to: "/sessions", label: "الجلسات" },
-      { to: "/requests", label: "طلبات المتحدثين" },
-      { to: "/categories", label: "تصنيفات الطلبات" },
-    ],
-  },
-  {
-    title: "الدعوات والحضور",
-    items: [
-      { to: "/invitees", label: "المدعوون" },
-      { to: "/invitations", label: "الدعوات" },
-      { to: "/attendance", label: "الحضور" },
-    ],
-  },
-  {
-    title: "السفر والإقامة",
-    items: [
-      { to: "/flights", label: "الرحلات الجوية" },
-      { to: "/arrivals", label: "الوصول" },
-      { to: "/departures", label: "المغادرة" },
-      { to: "/hotels", label: "الفنادق" },
-      { to: "/rooms", label: "الغرف" },
-      { to: "/bookings", label: "حجوزات الفنادق" },
-    ],
-  },
-  {
-    title: "النقل",
-    items: [
-      { to: "/drivers", label: "السائقون" },
-      { to: "/vehicles", label: "المركبات" },
-      { to: "/trips", label: "رحلات النقل" },
-    ],
-  },
-  {
-    title: "الفريق والإدارة",
-    items: [
-      { to: "/staff", label: "الموظفون" },
-      { to: "/assignments", label: "التكليفات" },
-      { to: "/notifications", label: "الإشعارات" },
-      { to: "/users", label: "المستخدمون والصلاحيات" },
-    ],
-  },
+export type NavItem = { to: string; label: string; icon: LucideIcon };
+
+export const navItems: NavItem[] = [
+  { to: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard },
+  { to: "/speakers", label: "المتحدثون", icon: Mic },
+  { to: "/invitees", label: "المدعوون", icon: Users },
+  { to: "/movements", label: "الوصول والمغادرة", icon: PlaneTakeoff },
+  { to: "/airport", label: "المطار", icon: Plane },
+  { to: "/trips", label: "النقل والسيارات", icon: Car },
+  { to: "/hotels", label: "الفنادق والسكن", icon: BedDouble },
+  { to: "/requests", label: "الطلبات الخاصة", icon: ClipboardList },
+  { to: "/attendance", label: "الحضور والتسجيل", icon: UserCheck },
+  { to: "/staff", label: "فريق العمل", icon: UsersRound },
+  { to: "/reports", label: "التقارير", icon: BarChart3 },
+  { to: "/settings", label: "الإعدادات", icon: Settings },
 ];
+
+export const eventName = "منتدى الرياض الدولي 2026";
