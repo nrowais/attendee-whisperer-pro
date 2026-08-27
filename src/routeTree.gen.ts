@@ -25,6 +25,7 @@ import { Route as AuthenticatedFlightsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedHotelsRouteImport } from './routes/_authenticated.hotels'
 import { Route as AuthenticatedInvitationsRouteImport } from './routes/_authenticated.invitations'
 import { Route as AuthenticatedInviteesRouteImport } from './routes/_authenticated.invitees'
+import { Route as AuthenticatedMovementsRouteImport } from './routes/_authenticated.movements'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated.notifications'
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated.requests'
 import { Route as AuthenticatedRoomsRouteImport } from './routes/_authenticated.rooms'
@@ -116,6 +117,11 @@ const AuthenticatedInviteesRoute = AuthenticatedInviteesRouteImport.update({
   path: '/invitees',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedMovementsRoute = AuthenticatedMovementsRouteImport.update({
+  id: '/movements',
+  path: '/movements',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedNotificationsRoute =
   AuthenticatedNotificationsRouteImport.update({
     id: '/notifications',
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/hotels': typeof AuthenticatedHotelsRoute
   '/invitations': typeof AuthenticatedInvitationsRoute
   '/invitees': typeof AuthenticatedInviteesRoute
+  '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/rooms': typeof AuthenticatedRoomsRoute
@@ -205,6 +212,7 @@ export interface FileRoutesByTo {
   '/hotels': typeof AuthenticatedHotelsRoute
   '/invitations': typeof AuthenticatedInvitationsRoute
   '/invitees': typeof AuthenticatedInviteesRoute
+  '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/rooms': typeof AuthenticatedRoomsRoute
@@ -233,6 +241,7 @@ export interface FileRoutesById {
   '/_authenticated/hotels': typeof AuthenticatedHotelsRoute
   '/_authenticated/invitations': typeof AuthenticatedInvitationsRoute
   '/_authenticated/invitees': typeof AuthenticatedInviteesRoute
+  '/_authenticated/movements': typeof AuthenticatedMovementsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/requests': typeof AuthenticatedRequestsRoute
   '/_authenticated/rooms': typeof AuthenticatedRoomsRoute
@@ -261,6 +270,7 @@ export interface FileRouteTypes {
     | '/hotels'
     | '/invitations'
     | '/invitees'
+    | '/movements'
     | '/notifications'
     | '/requests'
     | '/rooms'
@@ -287,6 +297,7 @@ export interface FileRouteTypes {
     | '/hotels'
     | '/invitations'
     | '/invitees'
+    | '/movements'
     | '/notifications'
     | '/requests'
     | '/rooms'
@@ -314,6 +325,7 @@ export interface FileRouteTypes {
     | '/_authenticated/hotels'
     | '/_authenticated/invitations'
     | '/_authenticated/invitees'
+    | '/_authenticated/movements'
     | '/_authenticated/notifications'
     | '/_authenticated/requests'
     | '/_authenticated/rooms'
@@ -445,6 +457,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInviteesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/movements': {
+      id: '/_authenticated/movements'
+      path: '/movements'
+      fullPath: '/movements'
+      preLoaderRoute: typeof AuthenticatedMovementsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/notifications': {
       id: '/_authenticated/notifications'
       path: '/notifications'
@@ -525,6 +544,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedHotelsRoute: typeof AuthenticatedHotelsRoute
   AuthenticatedInvitationsRoute: typeof AuthenticatedInvitationsRoute
   AuthenticatedInviteesRoute: typeof AuthenticatedInviteesRoute
+  AuthenticatedMovementsRoute: typeof AuthenticatedMovementsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
   AuthenticatedRoomsRoute: typeof AuthenticatedRoomsRoute
@@ -550,6 +570,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedHotelsRoute: AuthenticatedHotelsRoute,
   AuthenticatedInvitationsRoute: AuthenticatedInvitationsRoute,
   AuthenticatedInviteesRoute: AuthenticatedInviteesRoute,
+  AuthenticatedMovementsRoute: AuthenticatedMovementsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
   AuthenticatedRoomsRoute: AuthenticatedRoomsRoute,
