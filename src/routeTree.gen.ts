@@ -32,6 +32,7 @@ import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated.requests'
 import { Route as AuthenticatedRoomsRouteImport } from './routes/_authenticated.rooms'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated.sessions'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedSpeakersRouteImport } from './routes/_authenticated.speakers'
 import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated.staff'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated.trips'
@@ -155,6 +156,11 @@ const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
   path: '/sessions',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSpeakersRoute = AuthenticatedSpeakersRouteImport.update({
   id: '/speakers',
   path: '/speakers',
@@ -204,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/requests': typeof AuthenticatedRequestsRoute
   '/rooms': typeof AuthenticatedRoomsRoute
   '/sessions': typeof AuthenticatedSessionsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/staff': typeof AuthenticatedStaffRoute
   '/trips': typeof AuthenticatedTripsRoute
@@ -233,6 +240,7 @@ export interface FileRoutesByTo {
   '/requests': typeof AuthenticatedRequestsRoute
   '/rooms': typeof AuthenticatedRoomsRoute
   '/sessions': typeof AuthenticatedSessionsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/staff': typeof AuthenticatedStaffRoute
   '/trips': typeof AuthenticatedTripsRoute
@@ -264,6 +272,7 @@ export interface FileRoutesById {
   '/_authenticated/requests': typeof AuthenticatedRequestsRoute
   '/_authenticated/rooms': typeof AuthenticatedRoomsRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/speakers': typeof AuthenticatedSpeakersRoute
   '/_authenticated/staff': typeof AuthenticatedStaffRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
@@ -295,6 +304,7 @@ export interface FileRouteTypes {
     | '/requests'
     | '/rooms'
     | '/sessions'
+    | '/settings'
     | '/speakers'
     | '/staff'
     | '/trips'
@@ -324,6 +334,7 @@ export interface FileRouteTypes {
     | '/requests'
     | '/rooms'
     | '/sessions'
+    | '/settings'
     | '/speakers'
     | '/staff'
     | '/trips'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/_authenticated/requests'
     | '/_authenticated/rooms'
     | '/_authenticated/sessions'
+    | '/_authenticated/settings'
     | '/_authenticated/speakers'
     | '/_authenticated/staff'
     | '/_authenticated/trips'
@@ -530,6 +542,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSessionsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/speakers': {
       id: '/_authenticated/speakers'
       path: '/speakers'
@@ -589,6 +608,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
   AuthenticatedRoomsRoute: typeof AuthenticatedRoomsRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSpeakersRoute: typeof AuthenticatedSpeakersRoute
   AuthenticatedStaffRoute: typeof AuthenticatedStaffRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
@@ -617,6 +637,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
   AuthenticatedRoomsRoute: AuthenticatedRoomsRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSpeakersRoute: AuthenticatedSpeakersRoute,
   AuthenticatedStaffRoute: AuthenticatedStaffRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,
