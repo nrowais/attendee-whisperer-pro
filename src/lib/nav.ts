@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  Activity,
   Mic,
   Users,
   PlaneTakeoff,
