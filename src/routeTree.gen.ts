@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated.activity'
 import { Route as AuthenticatedAirportRouteImport } from './routes/_authenticated.airport'
 import { Route as AuthenticatedArrivalsRouteImport } from './routes/_authenticated.arrivals'
 import { Route as AuthenticatedAssignmentsRouteImport } from './routes/_authenticated.assignments'
@@ -52,6 +53,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAirportRoute = AuthenticatedAirportRouteImport.update({
   id: '/airport',
@@ -190,6 +196,7 @@ const AuthenticatedVehiclesRoute = AuthenticatedVehiclesRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/activity': typeof AuthenticatedActivityRoute
   '/airport': typeof AuthenticatedAirportRoute
   '/arrivals': typeof AuthenticatedArrivalsRoute
   '/assignments': typeof AuthenticatedAssignmentsRoute
@@ -220,6 +227,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/activity': typeof AuthenticatedActivityRoute
   '/airport': typeof AuthenticatedAirportRoute
   '/arrivals': typeof AuthenticatedArrivalsRoute
   '/assignments': typeof AuthenticatedAssignmentsRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/airport': typeof AuthenticatedAirportRoute
   '/_authenticated/arrivals': typeof AuthenticatedArrivalsRoute
   '/_authenticated/assignments': typeof AuthenticatedAssignmentsRoute
@@ -284,6 +293,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/activity'
     | '/airport'
     | '/arrivals'
     | '/assignments'
@@ -314,6 +324,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/activity'
     | '/airport'
     | '/arrivals'
     | '/assignments'
@@ -345,6 +356,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/activity'
     | '/_authenticated/airport'
     | '/_authenticated/arrivals'
     | '/_authenticated/assignments'
@@ -401,6 +413,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/activity': {
+      id: '/_authenticated/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof AuthenticatedActivityRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/airport': {
       id: '/_authenticated/airport'
@@ -588,6 +607,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
   AuthenticatedAirportRoute: typeof AuthenticatedAirportRoute
   AuthenticatedArrivalsRoute: typeof AuthenticatedArrivalsRoute
   AuthenticatedAssignmentsRoute: typeof AuthenticatedAssignmentsRoute
@@ -617,6 +637,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedActivityRoute: AuthenticatedActivityRoute,
   AuthenticatedAirportRoute: AuthenticatedAirportRoute,
   AuthenticatedArrivalsRoute: AuthenticatedArrivalsRoute,
   AuthenticatedAssignmentsRoute: AuthenticatedAssignmentsRoute,

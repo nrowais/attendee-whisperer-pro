@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
-import { Bell, LogOut, Menu, Search } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Bell, History, LogOut, Menu, Search } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
 import { eventName } from "@/lib/nav";
+import { activityLog } from "@/lib/sampleData";
 
 function formatNow(d: Date) {
   return new Intl.DateTimeFormat("ar-SA", {
@@ -16,6 +20,12 @@ function formatNow(d: Date) {
   }).format(d);
 }
 
+function stateVariant(state: string) {
+  if (state === "تنبيه") return "destructive" as const;
+  if (state === "قيد التنفيذ") return "secondary" as const;
+  return "default" as const;
+}
+
 type Props = {
   email: string;
   roleLabel: string;
@@ -24,8 +34,12 @@ type Props = {
   onSignOut: () => void;
 };
 
-export function Topbar({ email, roleLabel, notifications = 3, onMenu, onSignOut }: Props) {
+export function Topbar({ email, roleLabel, notifications, onMenu, onSignOut }: Props) {
   const [now, setNow] = useState<string>("");
+  const [open, setOpen] = useState(false);
+
+  const latest = activityLog.slice(0, 6);
+  const count = notifications ?? latest.filter((a) => a.state !== "مكتمل").length;
 
   useEffect(() => {
     const tick = () => setNow(formatNow(new Date()));
@@ -52,14 +66,50 @@ export function Topbar({ email, roleLabel, notifications = 3, onMenu, onSignOut 
         </div>
 
         <div className="ms-auto flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="relative" aria-label="الإشعارات">
-            <Bell className="size-4" />
-            {notifications > 0 ? (
-              <span className="absolute -top-0.5 -end-0.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-                {notifications}
-              </span>
-            ) : null}
-          </Button>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative" aria-label="الإشعارات">
+                <Bell className="size-4" />
+                {count > 0 ? (
+                  <span className="absolute -top-0.5 -end-0.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                    {count}
+                  </span>
+                ) : null}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-[22rem] p-0" dir="rtl">
+              <div className="flex items-center justify-between px-4 py-3">
+                <p className="font-display text-sm font-bold text-foreground">آخر التحديثات</p>
+                <Badge variant="secondary">{latest.length}</Badge>
+              </div>
+              <Separator />
+              <ul className="max-h-80 divide-y divide-border overflow-y-auto">
+                {latest.map((a) => (
+                  <li key={a.id} className="px-4 py-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-medium text-foreground">{a.kind}</p>
+                      <Badge variant={stateVariant(a.state)} className="shrink-0">
+                        {a.state}
+                      </Badge>
+                    </div>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">{a.detail}</p>
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      {a.actor} · {a.time}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+              <Separator />
+              <div className="p-2">
+                <Button asChild variant="ghost" className="w-full justify-center gap-2" onClick={() => setOpen(false)}>
+                  <Link to="/activity">
+                    <History className="size-4" />
+                    فتح سجل النشاط
+                  </Link>
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
 
           <div className="hidden text-end sm:block">
             <p className="max-w-[180px] truncate text-sm font-medium text-foreground">{email}</p>
