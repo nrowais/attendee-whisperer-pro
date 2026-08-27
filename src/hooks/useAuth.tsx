@@ -1,0 +1,59 @@
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import type { Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+
+export function useAuth() {
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, next) => {
+      setSession(next);
+      setLoading(false);
+    });
+
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  return { session, user: session?.user ?? null, loading };
+}
+
+export type AppRole = "admin" | "coordinator" | "viewer";
+
+export const roleLabels: Record<AppRole, string> = {
+  admin: "مدير النظام",
+  coordinator: "منسّق",
+  viewer: "مطّلع",
+};
+
+export function useRoles() {
+  const { user } = useAuth();
+  const query = useQuery({
+    queryKey: ["my-roles", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      return (data ?? []).map((r) => r.role as AppRole);
+    },
+  });
+
+  const roles = query.data ?? [];
+  return {
+    roles,
+    isAdmin: roles.includes("admin"),
+    canEdit: roles.includes("admin") || roles.includes("coordinator"),
+    loading: query.isLoading,
+  };
+}
