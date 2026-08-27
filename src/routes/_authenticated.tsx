@@ -30,7 +30,7 @@ function PortalLayout() {
     );
   }
 
-  const roleLabel = roles.length ? roleLabels[roles[0]] : "مطّلع";
+  const roleLabel = roles[0] ? roleLabels[roles[0]] : "مطّلع";
 
   return (
     <div className="flex min-h-screen bg-background">

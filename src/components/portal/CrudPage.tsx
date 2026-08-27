@@ -151,7 +151,7 @@ export function CrudPage({
           .order(field.ref!.labelKey, { ascending: true });
         if (error) throw error;
         result[field.key] = (data ?? []).map((r: Row) => ({
-          id: r.id,
+          id: r['id'],
           label: r[field.ref!.labelKey] ?? "—",
         }));
       }
@@ -190,7 +190,7 @@ export function CrudPage({
         payload[field.key] = value;
       }
       if (editing) {
-        const { error } = await db.from(table).update(payload).eq("id", editing.id);
+        const { error } = await db.from(table).update(payload).eq("id", editing["id"]);
         if (error) throw error;
       } else {
         const { error } = await db.from(table).insert(payload);
@@ -293,7 +293,7 @@ export function CrudPage({
             </TableHeader>
             <TableBody>
               {filtered.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row["id"]}>
                   {listFields.map((f) => (
                     <TableCell key={f.key} className="text-start align-middle">
                       {f.badge ? (
@@ -312,7 +312,7 @@ export function CrudPage({
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => setDeleteId(row.id)}
+                          onClick={() => setDeleteId(row["id"])}
                         >
                           <Trash2 className="size-4 text-destructive" />
                         </Button>
@@ -356,7 +356,7 @@ export function CrudPage({
                   </div>
                 ) : field.type === "select" || field.type === "ref" ? (
                   <Select
-                    value={form[field.key] ? String(form[field.key]) : undefined}
+                    value={form[field.key] ? String(form[field.key]) : ""}
                     onValueChange={(v) => setForm({ ...form, [field.key]: v })}
                   >
                     <SelectTrigger id={field.key}>
