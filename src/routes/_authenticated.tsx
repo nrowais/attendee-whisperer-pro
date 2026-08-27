@@ -48,30 +48,25 @@ function PortalLayout() {
           </button>
         </div>
 
-        <nav className="space-y-6 px-3 py-5">
-          {navGroups.map((group) => (
-            <div key={group.title}>
-              <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wide text-sidebar-foreground/50">
-                {group.title}
-              </p>
-              <div className="space-y-1">
-                {group.items.map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => setOpenNav(false)}
-                    className="block rounded-lg px-3 py-2 text-sm text-sidebar-foreground/85 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                    activeProps={{
-                      className:
-                        "block rounded-lg px-3 py-2 text-sm bg-sidebar-primary text-sidebar-primary-foreground font-semibold",
-                    }}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
+        <nav className="space-y-1 px-3 py-5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => setOpenNav(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-sidebar-foreground/85 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                activeProps={{
+                  className:
+                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm bg-sidebar-primary text-sidebar-primary-foreground font-semibold",
+                }}
+              >
+                <Icon className="size-4 shrink-0" />
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
       </aside>
 
