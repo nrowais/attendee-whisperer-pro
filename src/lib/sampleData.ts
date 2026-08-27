@@ -224,3 +224,41 @@ export const requestRows: RequestRow[] = [
   { id: "r5", guest: "د. هند الزهراني", category: "احتياج طبي", detail: "ثلاجة صغيرة لحفظ دواء في الغرفة", priority: "عالية", owner: "منى الصالح", status: "قيد التنفيذ" },
   { id: "r6", guest: "أ. مشاري العتيبي", category: "نقل خاص", detail: "توصيل إلى المطار الساعة 06:00", priority: "متوسطة", owner: "خالد السبيعي", status: "مرفوض" },
 ];
+
+export type HotelRoomRow = {
+  id: string;
+  guest: string;
+  hotel: "فندق الفيصلية" | "فندق الفورسيزونز" | "فندق نارسس";
+  room: string;
+  roomType: "جناح" | "غرفة تنفيذية" | "غرفة عادية";
+  checkIn: string;
+  checkOut: string;
+  status: "محجوزة" | "تم تسجيل الدخول" | "تم تسجيل الخروج";
+};
+
+export const hotelRows: HotelRoomRow[] = [
+  { id: "h1", guest: "م. يوسف بن عمر", hotel: "فندق الفيصلية", room: "1204", roomType: "جناح", checkIn: "10 نوفمبر", checkOut: "13 نوفمبر", status: "تم تسجيل الدخول" },
+  { id: "h2", guest: "د. هند الزهراني", hotel: "فندق الفيصلية", room: "0918", roomType: "غرفة تنفيذية", checkIn: "10 نوفمبر", checkOut: "12 نوفمبر", status: "تم تسجيل الدخول" },
+  { id: "h3", guest: "Prof. Daniel Reyes", hotel: "فندق الفورسيزونز", room: "1503", roomType: "جناح", checkIn: "10 نوفمبر", checkOut: "14 نوفمبر", status: "محجوزة" },
+  { id: "h4", guest: "أ. ليلى المنصور", hotel: "فندق نارسس", room: "0421", roomType: "غرفة تنفيذية", checkIn: "10 نوفمبر", checkOut: "12 نوفمبر", status: "محجوزة" },
+  { id: "h5", guest: "أ. مشاري العتيبي", hotel: "فندق نارسس", room: "0307", roomType: "غرفة عادية", checkIn: "09 نوفمبر", checkOut: "11 نوفمبر", status: "تم تسجيل الخروج" },
+];
+
+export type TripRow = {
+  id: string;
+  passenger: string;
+  driver: string;
+  vehicle: string;
+  from: string;
+  to: string;
+  time: string;
+  status: "مجدولة" | "جارية" | "مكتملة" | "ملغاة";
+};
+
+export const tripRows: TripRow[] = [
+  { id: "t1", passenger: "د. سلطان الغامدي", driver: "فهد الشمري", vehicle: "GMC يوكن — ر ط ن 4412", from: "مطار الملك خالد", to: "فندق الفيصلية", time: "14:50", status: "مجدولة" },
+  { id: "t2", passenger: "أ. ليلى المنصور", driver: "ماجد الدوسري", vehicle: "مرسيدس S500 — أ ب ج 2210", from: "مطار الملك خالد", to: "فندق نارسس", time: "15:25", status: "جارية" },
+  { id: "t3", passenger: "Prof. Daniel Reyes", driver: "سعد المطيري", vehicle: "لكزس ES — ك ل م 7788", from: "فندق الفورسيزونز", to: "موقع الفعالية", time: "16:40", status: "مجدولة" },
+  { id: "t4", passenger: "م. يوسف بن عمر", driver: "بندر الرشيد", vehicle: "هيونداي H1 — د هـ و 5533", from: "فندق الفيصلية", to: "موقع الفعالية", time: "08:30", status: "مكتملة" },
+  { id: "t5", passenger: "أ. مشاري العتيبي", driver: "تركي العنزي", vehicle: "تويوتا كامري — ن س ع 1199", from: "فندق نارسس", to: "مطار الملك خالد", time: "06:00", status: "ملغاة" },
+];
