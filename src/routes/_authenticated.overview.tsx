@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
+  Plane,
   PlaneLanding,
   PlaneTakeoff,
   Car,
@@ -36,6 +37,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
+import { useRoles } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/overview")({
   head: () => ({
@@ -413,6 +415,192 @@ function AlertsPanel({ data }: { data: ReturnType<typeof useOverview>["data"] })
   );
 }
 
+type FlightAlertRow = {
+  id: string;
+  alert_type: "arrival" | "departure";
+  status: "pending" | "acknowledged" | "dismissed";
+  message: string;
+  due_at: string;
+  flights: { flight_number: string; airline: string; origin: string; destination: string } | null;
+};
+
+const FLIGHT_ALERT_WINDOW_KEY = "flight-alert-window-minutes";
+
+function FlightAlertsPanel() {
+  const { canEdit } = useRoles();
+  const queryClient = useQueryClient();
+  const [windowMinutes, setWindowMinutes] = useState(60);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const saved = Number(localStorage.getItem(FLIGHT_ALERT_WINDOW_KEY));
+    if (saved > 0) setWindowMinutes(saved);
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["flight-alerts"],
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("flight_alerts")
+        .select("*, flights(flight_number, airline, origin, destination)")
+        .in("status", ["pending", "acknowledged"])
+        .order("due_at", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as FlightAlertRow[];
+    },
+  });
+
+  const updateStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase.from("flight_alerts").update({ status }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["flight-alerts"] }),
+  });
+
+  const alerts = (data ?? []).filter((a) => {
+    const m = minutesUntil(a.due_at, now);
+    return m !== null && m <= windowMinutes && m >= -30;
+  });
+
+  const pending = alerts.filter((a) => a.status === "pending");
+  const urgent = pending.filter((a) => {
+    const m = minutesUntil(a.due_at, now);
+    return m !== null && m <= 15;
+  });
+
+  return (
+    <Card className={pending.length ? "border-destructive/30" : undefined}>
+      <CardHeader className="flex-row flex-wrap items-center justify-between gap-3">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Plane
+            className={`size-4 ${urgent.length ? "animate-pulse text-destructive" : "text-primary"}`}
+          />
+          تنبيهات الرحلات الجوية
+          {pending.length > 0 && (
+            <Badge className="bg-destructive/10 text-destructive">{pending.length}</Badge>
+          )}
+        </CardTitle>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">نافذة التنبيه</span>
+          <Select
+            value={String(windowMinutes)}
+            onValueChange={(v) => {
+              setWindowMinutes(Number(v));
+              localStorage.setItem(FLIGHT_ALERT_WINDOW_KEY, v);
+            }}
+          >
+            <SelectTrigger className="w-36">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="30">٣٠ دقيقة</SelectItem>
+              <SelectItem value="60">ساعة واحدة</SelectItem>
+              <SelectItem value="120">ساعتان</SelectItem>
+              <SelectItem value="180">٣ ساعات</SelectItem>
+              <SelectItem value="360">٦ ساعات</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {isLoading ? (
+          <div className="space-y-2 py-4">
+            <div className="h-12 animate-pulse rounded bg-muted" />
+            <div className="h-12 animate-pulse rounded bg-muted" />
+          </div>
+        ) : alerts.length === 0 ? (
+          <p className="py-4 text-center text-sm text-muted-foreground">
+            لا توجد تنبيهات رحلات ضمن النافذة المحددة.
+          </p>
+        ) : (
+          alerts.map((a) => {
+            const m = minutesUntil(a.due_at, now);
+            const late = m !== null && m < 0;
+            const soon = m !== null && m >= 0 && m <= 15;
+            const isArrival = a.alert_type === "arrival";
+            const Icon = isArrival ? PlaneLanding : PlaneTakeoff;
+            return (
+              <div
+                key={a.id}
+                className={`flex flex-wrap items-center gap-3 rounded-xl border p-3 transition-colors ${
+                  late
+                    ? "border-red-500/40 bg-red-500/5"
+                    : soon
+                      ? "border-amber-500/40 bg-amber-500/5"
+                      : ""
+                }`}
+              >
+                <span
+                  className={`flex size-10 items-center justify-center rounded-lg ${
+                    isArrival
+                      ? "bg-sky-500/10 text-sky-600"
+                      : "bg-violet-500/10 text-violet-600"
+                  }`}
+                >
+                  <Icon className="size-5" />
+                </span>
+                <div className="min-w-40 flex-1">
+                  <p className="text-sm font-semibold">{a.message}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {a.flights?.flight_number
+                      ? `${a.flights.airline} ${a.flights.flight_number}`
+                      : null}
+                    {a.flights?.flight_number ? " · " : null}
+                    {fmt(a.due_at)}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge
+                    className={
+                      late
+                        ? "bg-red-500/10 text-red-600"
+                        : soon
+                          ? "bg-amber-500/10 text-amber-600"
+                          : "bg-muted text-muted-foreground"
+                    }
+                  >
+                    <AlarmClock className="ms-1 size-3" />
+                    {m === null ? "—" : relative(m)}
+                  </Badge>
+                  {canEdit && a.status === "pending" ? (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => updateStatus.mutate({ id: a.id, status: "acknowledged" })}
+                      >
+                        تأكيد
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => updateStatus.mutate({ id: a.id, status: "dismissed" })}
+                      >
+                        تجاهل
+                      </Button>
+                    </>
+                  ) : a.status === "acknowledged" ? (
+                    <Badge variant="secondary">تم التأكيد</Badge>
+                  ) : a.status === "dismissed" ? (
+                    <Badge variant="outline">متجاهل</Badge>
+                  ) : null}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function OverviewPage() {
   const { data, isLoading, isFetching, refetch } = useOverview();
 
@@ -509,6 +697,8 @@ function OverviewPage() {
       </header>
 
       <AlertsPanel data={data} />
+
+      <FlightAlertsPanel />
 
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Bell, History, LogOut, Menu, Search } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Bell, BellRing, History, LogOut, Menu, Search } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { eventName } from "@/lib/nav";
-import { activityLog } from "@/lib/sampleData";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 function formatNow(d: Date) {
   return new Intl.DateTimeFormat("ar-SA", {
@@ -20,26 +22,43 @@ function formatNow(d: Date) {
   }).format(d);
 }
 
-function stateVariant(state: string) {
-  if (state === "تنبيه") return "destructive" as const;
-  if (state === "قيد التنفيذ") return "secondary" as const;
+function stateVariant(title?: string) {
+  if (!title) return "default" as const;
+  if (title.includes("تنبيه")) return "destructive" as const;
+  if (title.includes("إشعار")) return "secondary" as const;
   return "default" as const;
 }
 
 type Props = {
   email: string;
   roleLabel: string;
-  notifications?: number;
   onMenu: () => void;
   onSignOut: () => void;
 };
 
-export function Topbar({ email, roleLabel, notifications, onMenu, onSignOut }: Props) {
+export function Topbar({ email, roleLabel, onMenu, onSignOut }: Props) {
   const [now, setNow] = useState<string>("");
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
 
-  const latest = activityLog.slice(0, 6);
-  const count = notifications ?? latest.filter((a) => a.state !== "مكتمل").length;
+  const notifications = useQuery({
+    queryKey: ["topbar-notifications", user?.id],
+    enabled: !!user?.id,
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const list = notifications.data ?? [];
+  const unread = list.filter((n: any) => !n.is_read);
+  const latest = list.slice(0, 6);
 
   useEffect(() => {
     const tick = () => setNow(formatNow(new Date()));
@@ -70,9 +89,9 @@ export function Topbar({ email, roleLabel, notifications, onMenu, onSignOut }: P
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="relative" aria-label="الإشعارات">
                 <Bell className="size-4" />
-                {count > 0 ? (
+                {unread.length > 0 ? (
                   <span className="absolute -top-0.5 -end-0.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-                    {count}
+                    {unread.length}
                   </span>
                 ) : null}
               </Button>
@@ -84,24 +103,48 @@ export function Topbar({ email, roleLabel, notifications, onMenu, onSignOut }: P
               </div>
               <Separator />
               <ul className="max-h-80 divide-y divide-border overflow-y-auto">
-                {latest.map((a) => (
-                  <li key={a.id} className="px-4 py-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm font-medium text-foreground">{a.kind}</p>
-                      <Badge variant={stateVariant(a.state)} className="shrink-0">
-                        {a.state}
-                      </Badge>
-                    </div>
-                    <p className="mt-1 text-xs leading-5 text-muted-foreground">{a.detail}</p>
-                    <p className="mt-1 text-[11px] text-muted-foreground">
-                      {a.actor} · {a.time}
-                    </p>
+                {latest.length === 0 ? (
+                  <li className="px-4 py-6 text-center text-sm text-muted-foreground">
+                    لا توجد إشعارات حاليًا
                   </li>
-                ))}
+                ) : (
+                  latest.map((n: any) => (
+                    <li key={n.id} className="px-4 py-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm font-medium text-foreground">{n.title}</p>
+                        <Badge variant={stateVariant(n.title)} className="shrink-0">
+                          {n.is_read ? "مقروء" : "جديد"}
+                        </Badge>
+                      </div>
+                      <p className="mt-1 text-xs leading-5 text-muted-foreground">{n.body}</p>
+                      <p className="mt-1 text-[11px] text-muted-foreground">
+                        {new Date(n.created_at).toLocaleString("ar-SA-u-ca-gregory")}
+                      </p>
+                    </li>
+                  ))
+                )}
               </ul>
               <Separator />
               <div className="p-2">
-                <Button asChild variant="ghost" className="w-full justify-center gap-2" onClick={() => setOpen(false)}>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="w-full justify-center gap-2"
+                  onClick={() => setOpen(false)}
+                >
+                  <Link to="/notifications">
+                    <BellRing className="size-4" />
+                    عرض كل الإشعارات
+                  </Link>
+                </Button>
+              </div>
+              <div className="px-2 pb-2">
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="w-full justify-center gap-2"
+                  onClick={() => setOpen(false)}
+                >
                   <Link to="/activity">
                     <History className="size-4" />
                     فتح سجل النشاط
