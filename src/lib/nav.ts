@@ -33,6 +33,7 @@ export type NavGroup = { label: string; items: NavItem[] };
 
 export const navItems: NavItem[] = [
   { to: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard },
+  { to: "/overview", label: "شاشة المتابعة", icon: Activity },
   { to: "/speakers", label: "المتحدثون", icon: Mic },
   { to: "/invitees", label: "المدعوون", icon: Users },
   { to: "/movements", label: "الوصول والمغادرة", icon: PlaneTakeoff },
