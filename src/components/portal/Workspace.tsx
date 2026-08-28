@@ -29,7 +29,7 @@ export function Workspace({
         {aside}
       </div>
 
-      <Tabs defaultValue={tabs[0]?.value} dir="rtl" className="space-y-5">
+      <Tabs defaultValue={tabs[0]?.value ?? ""} dir="rtl" className="space-y-5">
         <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 bg-secondary/60 p-1">
           {tabs.map((tab) => (
             <TabsTrigger key={tab.value} value={tab.value} className="text-sm">
