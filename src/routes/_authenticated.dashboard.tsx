@@ -93,6 +93,22 @@ function useLiveStats() {
         .order("scheduled_at", { ascending: true })
         .limit(6);
 
+      const dayStart = new Date(now);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+      const dayStartIso = dayStart.toISOString();
+      const dayEndIso = dayEnd.toISOString();
+      const todayDate = `${dayStart.getFullYear()}-${String(dayStart.getMonth() + 1).padStart(2, "0")}-${String(
+        dayStart.getDate(),
+      ).padStart(2, "0")}`;
+
+      const [todayAttendance, todayTrips, todayCheckIns, todayArrivals] = await Promise.all([
+        count("attendance", (q: any) => q.gte("checked_in_at", dayStartIso).lt("checked_in_at", dayEndIso)),
+        count("transport_trips", (q: any) => q.gte("scheduled_at", dayStartIso).lt("scheduled_at", dayEndIso)),
+        count("hotel_bookings", (q: any) => q.eq("check_in", todayDate)),
+        count("speaker_arrivals", (q: any) => q.gte("arrival_time", dayStartIso).lt("arrival_time", dayEndIso)),
+      ]);
+
       const { data: alerts } = await db
         .from("flight_alerts")
         .select("id, message, alert_type, due_at, status")
@@ -112,6 +128,10 @@ function useLiveStats() {
         attendance,
         requestsOpen,
         alertsPending,
+        todayAttendance,
+        todayTrips,
+        todayCheckIns,
+        todayArrivals,
         upcoming: upcoming ?? [],
         nextTrips: nextTrips ?? [],
         alerts: alerts ?? [],
@@ -200,6 +220,36 @@ function DashboardPage() {
         </Badge>
       </div>
 
+      <section className="surface-card p-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <p className="font-display text-lg font-bold text-foreground">الملخص اليومي</p>
+          <span className="text-xs text-muted-foreground">
+            {new Date().toLocaleDateString("ar-SA-u-ca-gregory", {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </span>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            { label: "الحضور اليوم", value: data.todayAttendance, sub: "تسجيل دخول في الموقع", icon: UserCheck },
+            { label: "رحلات نقل اليوم", value: data.todayTrips, sub: "مجدولة خلال اليوم", icon: Car },
+            { label: "تسجيل إقامة اليوم", value: data.todayCheckIns, sub: "دخول الفنادق", icon: BedDouble },
+            { label: "وصول اليوم", value: data.todayArrivals, sub: "حركات وصول مجدولة", icon: PlaneLanding },
+          ].map((item) => (
+            <div key={item.label} className="rounded-xl border border-border bg-secondary/40 p-4">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm text-muted-foreground">{item.label}</p>
+                <item.icon className="size-4 text-primary" />
+              </div>
+              <p className="mt-2 font-display text-2xl font-bold text-foreground">{item.value}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{item.sub}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Kpi icon={Mic} label="المتحدثون" value={data.speakers} sub="مسجلون في النظام" to="/speakers" />
