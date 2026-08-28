@@ -1,197 +1,306 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
-  Plane,
+  Mic,
+  Users,
   PlaneLanding,
-  BedDouble,
   Car,
-  ClipboardCheck,
+  BedDouble,
+  ClipboardList,
   UserCheck,
+  AlertTriangle,
+  ArrowLeft,
 } from "lucide-react";
 
+import { supabase } from "@/integrations/supabase/client";
+import { eventName } from "@/lib/nav";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  speakerKpis,
-  guestKpis,
-  upcomingArrivals,
-  recentActivities,
-  type ActivityKind,
-  type ArrivalStatus,
-} from "@/lib/sampleData";
+import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "لوحة التحكم — عمليات ضيوف الفعالية" },
-      {
-        name: "description",
-        content: "مؤشرات تشغيلية لحظية للمتحدثين والمدعوين والوصول والنقل والإقامة.",
-      },
-      { property: "og:title", content: "لوحة التحكم — عمليات ضيوف الفعالية" },
-      { property: "og:description", content: "مؤشرات تشغيلية لحظية لعمليات ضيوف الفعالية." },
+      { title: "المتابعة اللحظية — بوابة إدارة الفعالية" },
+      { name: "description", content: "أرقام وإحصائيات لحظية عن المتحدثين والحضور والتحركات والإقامة." },
+      { property: "og:title", content: "المتابعة اللحظية — بوابة إدارة الفعالية" },
+      { property: "og:description", content: "حالة الفعالية لحظة بلحظة في شاشة واحدة." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: Dashboard,
+  component: DashboardPage,
 });
 
-const toneClass: Record<string, string> = {
-  primary: "bg-primary/10 text-primary",
-  success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  info: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
-  danger: "bg-destructive/10 text-destructive",
-  muted: "bg-muted text-muted-foreground",
-};
+const db = supabase as any;
 
-const statusTone: Record<ArrivalStatus, string> = {
-  "في الجو": "bg-sky-500/10 text-sky-600 dark:text-sky-400",
-  "هبطت الرحلة": "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
-  "في المطار": "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  "بالطريق": "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-  "في الفندق": "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  "في موقع الفعالية": "bg-primary/10 text-primary",
-  "غادر": "bg-muted text-muted-foreground",
-};
+async function count(table: string, filter?: (q: any) => any) {
+  let q = db.from(table).select("id", { count: "exact", head: true });
+  if (filter) q = filter(q);
+  const { count: c } = await q;
+  return c ?? 0;
+}
 
-const activityIcon: Record<ActivityKind, typeof Plane> = {
-  "وصول متحدث": UserCheck,
-  "هبوط رحلة": PlaneLanding,
-  "وصول الفندق": BedDouble,
-  "بدء رحلة سيارة": Car,
-  "تنفيذ طلب خاص": ClipboardCheck,
-};
+function useLiveStats() {
+  return useQuery({
+    queryKey: ["live-stats"],
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const now = new Date();
+      const soon = new Date(now.getTime() + 12 * 60 * 60 * 1000).toISOString();
+      const nowIso = now.toISOString();
 
-function KpiCard({ label, value, tone }: { label: string; value: number; tone: string }) {
+      const [
+        speakers,
+        invitees,
+        arrivalsTotal,
+        arrived,
+        tripsTotal,
+        tripsActive,
+        bookingsTotal,
+        checkedIn,
+        attendance,
+        requestsOpen,
+        alertsPending,
+      ] = await Promise.all([
+        count("speakers"),
+        count("invitees"),
+        count("speaker_arrivals"),
+        count("speaker_arrivals", (q: any) => q.eq("status", "arrived")),
+        count("transport_trips"),
+        count("transport_trips", (q: any) => q.eq("status", "in_progress")),
+        count("hotel_bookings"),
+        count("hotel_bookings", (q: any) => q.eq("status", "checked_in")),
+        count("attendance"),
+        count("speaker_requests", (q: any) => q.in("status", ["open", "in_progress"])),
+        count("flight_alerts", (q: any) => q.eq("status", "pending")),
+      ]);
+
+      const { data: upcoming } = await db
+        .from("speaker_arrivals")
+        .select("id, arrival_time, arrival_point, status, speakers(full_name)")
+        .gte("arrival_time", nowIso)
+        .lte("arrival_time", soon)
+        .order("arrival_time", { ascending: true })
+        .limit(6);
+
+      const { data: nextTrips } = await db
+        .from("transport_trips")
+        .select("id, scheduled_at, pickup_location, dropoff_location, status, speakers(full_name)")
+        .gte("scheduled_at", nowIso)
+        .lte("scheduled_at", soon)
+        .order("scheduled_at", { ascending: true })
+        .limit(6);
+
+      const { data: alerts } = await db
+        .from("flight_alerts")
+        .select("id, message, alert_type, due_at, status")
+        .eq("status", "pending")
+        .order("due_at", { ascending: true })
+        .limit(5);
+
+      return {
+        speakers,
+        invitees,
+        arrivalsTotal,
+        arrived,
+        tripsTotal,
+        tripsActive,
+        bookingsTotal,
+        checkedIn,
+        attendance,
+        requestsOpen,
+        alertsPending,
+        upcoming: upcoming ?? [],
+        nextTrips: nextTrips ?? [],
+        alerts: alerts ?? [],
+      };
+    },
+  });
+}
+
+function fmtTime(value?: string | null) {
+  if (!value) return "—";
+  return new Date(value).toLocaleString("ar-SA-u-ca-gregory", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function Kpi({
+  icon: Icon,
+  label,
+  value,
+  sub,
+  to,
+}: {
+  icon: typeof Mic;
+  label: string;
+  value: number | string;
+  sub?: string;
+  to: string;
+}) {
   return (
-    <Card className="transition-shadow hover:shadow-md">
-      <CardContent className="p-4">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <div className="mt-2 flex items-center justify-between gap-2">
-          <span className="font-display text-2xl font-bold text-foreground">
-            {value.toLocaleString("ar-SA")}
-          </span>
-          <span className={`rounded-md px-2 py-1 text-[11px] font-medium ${toneClass[tone]}`}>
-            محدث
-          </span>
+    <Link to={to} className="surface-card group block p-5 transition-shadow hover:shadow-lg">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm text-muted-foreground">{label}</p>
+          <p className="mt-2 font-display text-3xl font-bold text-foreground">{value}</p>
+          {sub ? <p className="mt-1 text-xs text-muted-foreground">{sub}</p> : null}
         </div>
-      </CardContent>
-    </Card>
+        <span className="rounded-xl bg-secondary p-2.5 text-primary">
+          <Icon className="size-5" />
+        </span>
+      </div>
+    </Link>
   );
 }
 
-function Dashboard() {
+function ProgressRow({ label, done, total }: { label: string; done: number; total: number }) {
+  const pct = total ? Math.round((done / total) * 100) : 0;
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-foreground">لوحة التحكم</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          نظرة تشغيلية شاملة على حركة المتحدثين والمدعوين خلال الفعالية.
-        </p>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-foreground">{label}</span>
+        <span className="text-muted-foreground">
+          {done} / {total} ({pct}%)
+        </span>
+      </div>
+      <Progress value={pct} />
+    </div>
+  );
+}
+
+function DashboardPage() {
+  const { data, isLoading } = useLiveStats();
+
+  if (isLoading || !data) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+          <Skeleton key={i} className="h-28 w-full" />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-7">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-display text-2xl font-bold text-foreground">المتابعة اللحظية</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{eventName} — حالة الفعالية الآن</p>
+        </div>
+        <Badge variant="secondary" className="gap-2">
+          <span className="size-2 animate-pulse rounded-full bg-primary" />
+          تحديث تلقائي كل 30 ثانية
+        </Badge>
       </div>
 
-      <section>
-        <h2 className="mb-3 text-sm font-semibold text-muted-foreground">مؤشرات المتحدثين</h2>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
-          {speakerKpis.map((kpi) => (
-            <KpiCard key={kpi.key} label={kpi.label} value={kpi.value} tone={kpi.tone} />
-          ))}
+      {data.alertsPending > 0 ? (
+        <div className="surface-card border-s-4 border-s-destructive p-5">
+          <div className="mb-3 flex items-center gap-2 text-destructive">
+            <AlertTriangle className="size-5" />
+            <p className="font-semibold">تنبيهات نشطة ({data.alertsPending})</p>
+          </div>
+          <ul className="space-y-2 text-sm">
+            {data.alerts.map((a: any) => (
+              <li key={a.id} className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-foreground">{a.message}</span>
+                <span className="text-xs text-muted-foreground">{fmtTime(a.due_at)}</span>
+              </li>
+            ))}
+          </ul>
         </div>
-      </section>
+      ) : null}
 
-      <section>
-        <h2 className="mb-3 text-sm font-semibold text-muted-foreground">مؤشرات دعوات الضيوف</h2>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
-          {guestKpis.map((kpi) => (
-            <KpiCard key={kpi.key} label={kpi.label} value={kpi.value} tone={kpi.tone} />
-          ))}
-        </div>
-      </section>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <Kpi icon={Mic} label="المتحدثون" value={data.speakers} sub="مسجلون في النظام" to="/speakers" />
+        <Kpi icon={Users} label="المدعوون" value={data.invitees} sub="إجمالي قائمة الدعوات" to="/invitees" />
+        <Kpi
+          icon={PlaneLanding}
+          label="تم وصولهم"
+          value={`${data.arrived} / ${data.arrivalsTotal}`}
+          sub="من حركات الوصول المسجلة"
+          to="/movements"
+        />
+        <Kpi icon={UserCheck} label="الحضور المسجل" value={data.attendance} sub="تسجيل في الموقع" to="/invitees" />
+        <Kpi icon={Car} label="رحلات النقل" value={data.tripsTotal} sub={`${data.tripsActive} جارية الآن`} to="/trips" />
+        <Kpi
+          icon={BedDouble}
+          label="حجوزات الإقامة"
+          value={data.bookingsTotal}
+          sub={`${data.checkedIn} تم تسجيل دخولهم`}
+          to="/hotels"
+        />
+        <Kpi icon={ClipboardList} label="طلبات مفتوحة" value={data.requestsOpen} sub="بحاجة إلى متابعة" to="/speakers" />
+        <Kpi icon={AlertTriangle} label="تنبيهات نشطة" value={data.alertsPending} sub="رحلات قريبة" to="/flight-alerts" />
+      </div>
 
-      <div className="grid gap-6 xl:grid-cols-3">
-        <Card className="xl:col-span-2">
-          <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
-            <CardTitle className="text-base">القادمون خلال الساعات القادمة</CardTitle>
-            <Badge variant="secondary">{upcomingArrivals.length} قادم</Badge>
-          </CardHeader>
-          <CardContent className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-start">الصورة</TableHead>
-                  <TableHead className="text-start">الاسم</TableHead>
-                  <TableHead className="text-start">الرحلة</TableHead>
-                  <TableHead className="text-start">وقت الوصول</TableHead>
-                  <TableHead className="text-start">المطار</TableHead>
-                  <TableHead className="text-start">مسؤول الاستقبال</TableHead>
-                  <TableHead className="text-start">السائق</TableHead>
-                  <TableHead className="text-start">الحالة</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {upcomingArrivals.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell>
-                      <img
-                        src={row.photo}
-                        alt={`صورة ${row.name}`}
-                        loading="lazy"
-                        className="size-9 rounded-full border border-border object-cover"
-                      />
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap font-medium">{row.name}</TableCell>
-                    <TableCell className="whitespace-nowrap">{row.flight}</TableCell>
-                    <TableCell className="whitespace-nowrap">{row.arrivalTime}</TableCell>
-                    <TableCell className="whitespace-nowrap text-muted-foreground">
-                      {row.airport}
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap">{row.greeter}</TableCell>
-                    <TableCell className="whitespace-nowrap">{row.driver}</TableCell>
-                    <TableCell>
-                      <span
-                        className={`whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium ${statusTone[row.status]}`}
-                      >
-                        {row.status}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+      <div className="surface-card space-y-5 p-6">
+        <p className="font-display text-lg font-bold text-foreground">نسب الإنجاز</p>
+        <ProgressRow label="وصول المتحدثين" done={data.arrived} total={data.arrivalsTotal} />
+        <ProgressRow label="تسجيل الدخول للفنادق" done={data.checkedIn} total={data.bookingsTotal} />
+        <ProgressRow label="رحلات النقل المنفذة" done={data.tripsTotal - data.tripsActive} total={data.tripsTotal} />
+      </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">آخر التحديثات</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {recentActivities.map((item) => {
-              const Icon = activityIcon[item.kind];
-              return (
-                <div key={item.id} className="flex items-start gap-3">
-                  <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <Icon className="size-4" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground">{item.kind}</p>
-                    <p className="truncate text-xs text-muted-foreground">{item.detail}</p>
-                    <p className="mt-0.5 text-[11px] text-muted-foreground/70">{item.time}</p>
+      <div className="grid gap-5 lg:grid-cols-2">
+        <div className="surface-card p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <p className="font-display text-lg font-bold text-foreground">وصول خلال 12 ساعة</p>
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/movements">
+                الكل <ArrowLeft className="size-4" />
+              </Link>
+            </Button>
+          </div>
+          {data.upcoming.length === 0 ? (
+            <p className="py-8 text-center text-sm text-muted-foreground">لا يوجد وصول مجدول قريباً</p>
+          ) : (
+            <ul className="divide-y divide-border">
+              {data.upcoming.map((row: any) => (
+                <li key={row.id} className="flex items-center justify-between gap-3 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{row.speakers?.full_name ?? "—"}</p>
+                    <p className="text-xs text-muted-foreground">{row.arrival_point ?? "—"}</p>
                   </div>
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
+                  <span className="text-xs text-muted-foreground">{fmtTime(row.arrival_time)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="surface-card p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <p className="font-display text-lg font-bold text-foreground">تنقلات قادمة</p>
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/trips">
+                الكل <ArrowLeft className="size-4" />
+              </Link>
+            </Button>
+          </div>
+          {data.nextTrips.length === 0 ? (
+            <p className="py-8 text-center text-sm text-muted-foreground">لا توجد تنقلات مجدولة قريباً</p>
+          ) : (
+            <ul className="divide-y divide-border">
+              {data.nextTrips.map((row: any) => (
+                <li key={row.id} className="flex items-center justify-between gap-3 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{row.speakers?.full_name ?? "رحلة نقل"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {row.pickup_location ?? "—"} ← {row.dropoff_location ?? "—"}
+                    </p>
+                  </div>
+                  <span className="text-xs text-muted-foreground">{fmtTime(row.scheduled_at)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );

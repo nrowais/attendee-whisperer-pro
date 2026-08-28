@@ -14,34 +14,17 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as SpeakerRouteImport } from './routes/speaker'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated.activity'
-import { Route as AuthenticatedAirportRouteImport } from './routes/_authenticated.airport'
-import { Route as AuthenticatedArrivalsRouteImport } from './routes/_authenticated.arrivals'
-import { Route as AuthenticatedAssignmentsRouteImport } from './routes/_authenticated.assignments'
-import { Route as AuthenticatedAttendanceRouteImport } from './routes/_authenticated.attendance'
-import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated.bookings'
-import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated.categories'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
-import { Route as AuthenticatedDeparturesRouteImport } from './routes/_authenticated.departures'
-import { Route as AuthenticatedDriversRouteImport } from './routes/_authenticated.drivers'
-import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated.events'
 import { Route as AuthenticatedFlightAlertsRouteImport } from './routes/_authenticated.flight-alerts'
-import { Route as AuthenticatedFlightsRouteImport } from './routes/_authenticated.flights'
 import { Route as AuthenticatedHotelsRouteImport } from './routes/_authenticated.hotels'
-import { Route as AuthenticatedInvitationsRouteImport } from './routes/_authenticated.invitations'
 import { Route as AuthenticatedInviteesRouteImport } from './routes/_authenticated.invitees'
 import { Route as AuthenticatedMovementsRouteImport } from './routes/_authenticated.movements'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated.notifications'
-import { Route as AuthenticatedOverviewRouteImport } from './routes/_authenticated.overview'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated.reports'
-import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated.requests'
-import { Route as AuthenticatedRoomsRouteImport } from './routes/_authenticated.rooms'
-import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated.sessions'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedSpeakersRouteImport } from './routes/_authenticated.speakers'
-import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated.staff'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated.trips'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
-import { Route as AuthenticatedVehiclesRouteImport } from './routes/_authenticated.vehicles'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -67,55 +50,9 @@ const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedAirportRoute = AuthenticatedAirportRouteImport.update({
-  id: '/airport',
-  path: '/airport',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedArrivalsRoute = AuthenticatedArrivalsRouteImport.update({
-  id: '/arrivals',
-  path: '/arrivals',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedAssignmentsRoute =
-  AuthenticatedAssignmentsRouteImport.update({
-    id: '/assignments',
-    path: '/assignments',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedAttendanceRoute = AuthenticatedAttendanceRouteImport.update({
-  id: '/attendance',
-  path: '/attendance',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedBookingsRoute = AuthenticatedBookingsRouteImport.update({
-  id: '/bookings',
-  path: '/bookings',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedCategoriesRoute = AuthenticatedCategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDeparturesRoute = AuthenticatedDeparturesRouteImport.update({
-  id: '/departures',
-  path: '/departures',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDriversRoute = AuthenticatedDriversRouteImport.update({
-  id: '/drivers',
-  path: '/drivers',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
-  id: '/events',
-  path: '/events',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedFlightAlertsRoute =
@@ -124,22 +61,11 @@ const AuthenticatedFlightAlertsRoute =
     path: '/flight-alerts',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedFlightsRoute = AuthenticatedFlightsRouteImport.update({
-  id: '/flights',
-  path: '/flights',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedHotelsRoute = AuthenticatedHotelsRouteImport.update({
   id: '/hotels',
   path: '/hotels',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedInvitationsRoute =
-  AuthenticatedInvitationsRouteImport.update({
-    id: '/invitations',
-    path: '/invitations',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedInviteesRoute = AuthenticatedInviteesRouteImport.update({
   id: '/invitees',
   path: '/invitees',
@@ -156,29 +82,9 @@ const AuthenticatedNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedOverviewRoute = AuthenticatedOverviewRouteImport.update({
-  id: '/overview',
-  path: '/overview',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedRequestsRoute = AuthenticatedRequestsRouteImport.update({
-  id: '/requests',
-  path: '/requests',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedRoomsRoute = AuthenticatedRoomsRouteImport.update({
-  id: '/rooms',
-  path: '/rooms',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
-  id: '/sessions',
-  path: '/sessions',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
@@ -191,11 +97,6 @@ const AuthenticatedSpeakersRoute = AuthenticatedSpeakersRouteImport.update({
   path: '/speakers',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedStaffRoute = AuthenticatedStaffRouteImport.update({
-  id: '/staff',
-  path: '/staff',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
   id: '/trips',
   path: '/trips',
@@ -206,79 +107,40 @@ const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedVehiclesRoute = AuthenticatedVehiclesRouteImport.update({
-  id: '/vehicles',
-  path: '/vehicles',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/speaker': typeof SpeakerRoute
   '/activity': typeof AuthenticatedActivityRoute
-  '/airport': typeof AuthenticatedAirportRoute
-  '/arrivals': typeof AuthenticatedArrivalsRoute
-  '/assignments': typeof AuthenticatedAssignmentsRoute
-  '/attendance': typeof AuthenticatedAttendanceRoute
-  '/bookings': typeof AuthenticatedBookingsRoute
-  '/categories': typeof AuthenticatedCategoriesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/departures': typeof AuthenticatedDeparturesRoute
-  '/drivers': typeof AuthenticatedDriversRoute
-  '/events': typeof AuthenticatedEventsRoute
   '/flight-alerts': typeof AuthenticatedFlightAlertsRoute
-  '/flights': typeof AuthenticatedFlightsRoute
   '/hotels': typeof AuthenticatedHotelsRoute
-  '/invitations': typeof AuthenticatedInvitationsRoute
   '/invitees': typeof AuthenticatedInviteesRoute
   '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
-  '/overview': typeof AuthenticatedOverviewRoute
   '/reports': typeof AuthenticatedReportsRoute
-  '/requests': typeof AuthenticatedRequestsRoute
-  '/rooms': typeof AuthenticatedRoomsRoute
-  '/sessions': typeof AuthenticatedSessionsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
-  '/staff': typeof AuthenticatedStaffRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/users': typeof AuthenticatedUsersRoute
-  '/vehicles': typeof AuthenticatedVehiclesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/speaker': typeof SpeakerRoute
   '/activity': typeof AuthenticatedActivityRoute
-  '/airport': typeof AuthenticatedAirportRoute
-  '/arrivals': typeof AuthenticatedArrivalsRoute
-  '/assignments': typeof AuthenticatedAssignmentsRoute
-  '/attendance': typeof AuthenticatedAttendanceRoute
-  '/bookings': typeof AuthenticatedBookingsRoute
-  '/categories': typeof AuthenticatedCategoriesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/departures': typeof AuthenticatedDeparturesRoute
-  '/drivers': typeof AuthenticatedDriversRoute
-  '/events': typeof AuthenticatedEventsRoute
   '/flight-alerts': typeof AuthenticatedFlightAlertsRoute
-  '/flights': typeof AuthenticatedFlightsRoute
   '/hotels': typeof AuthenticatedHotelsRoute
-  '/invitations': typeof AuthenticatedInvitationsRoute
   '/invitees': typeof AuthenticatedInviteesRoute
   '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
-  '/overview': typeof AuthenticatedOverviewRoute
   '/reports': typeof AuthenticatedReportsRoute
-  '/requests': typeof AuthenticatedRequestsRoute
-  '/rooms': typeof AuthenticatedRoomsRoute
-  '/sessions': typeof AuthenticatedSessionsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
-  '/staff': typeof AuthenticatedStaffRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/users': typeof AuthenticatedUsersRoute
-  '/vehicles': typeof AuthenticatedVehiclesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -287,34 +149,17 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/speaker': typeof SpeakerRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
-  '/_authenticated/airport': typeof AuthenticatedAirportRoute
-  '/_authenticated/arrivals': typeof AuthenticatedArrivalsRoute
-  '/_authenticated/assignments': typeof AuthenticatedAssignmentsRoute
-  '/_authenticated/attendance': typeof AuthenticatedAttendanceRoute
-  '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
-  '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/departures': typeof AuthenticatedDeparturesRoute
-  '/_authenticated/drivers': typeof AuthenticatedDriversRoute
-  '/_authenticated/events': typeof AuthenticatedEventsRoute
   '/_authenticated/flight-alerts': typeof AuthenticatedFlightAlertsRoute
-  '/_authenticated/flights': typeof AuthenticatedFlightsRoute
   '/_authenticated/hotels': typeof AuthenticatedHotelsRoute
-  '/_authenticated/invitations': typeof AuthenticatedInvitationsRoute
   '/_authenticated/invitees': typeof AuthenticatedInviteesRoute
   '/_authenticated/movements': typeof AuthenticatedMovementsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
-  '/_authenticated/overview': typeof AuthenticatedOverviewRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
-  '/_authenticated/requests': typeof AuthenticatedRequestsRoute
-  '/_authenticated/rooms': typeof AuthenticatedRoomsRoute
-  '/_authenticated/sessions': typeof AuthenticatedSessionsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/speakers': typeof AuthenticatedSpeakersRoute
-  '/_authenticated/staff': typeof AuthenticatedStaffRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
-  '/_authenticated/vehicles': typeof AuthenticatedVehiclesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -323,68 +168,34 @@ export interface FileRouteTypes {
     | '/auth'
     | '/speaker'
     | '/activity'
-    | '/airport'
-    | '/arrivals'
-    | '/assignments'
-    | '/attendance'
-    | '/bookings'
-    | '/categories'
     | '/dashboard'
-    | '/departures'
-    | '/drivers'
-    | '/events'
     | '/flight-alerts'
-    | '/flights'
     | '/hotels'
-    | '/invitations'
     | '/invitees'
     | '/movements'
     | '/notifications'
-    | '/overview'
     | '/reports'
-    | '/requests'
-    | '/rooms'
-    | '/sessions'
     | '/settings'
     | '/speakers'
-    | '/staff'
     | '/trips'
     | '/users'
-    | '/vehicles'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/speaker'
     | '/activity'
-    | '/airport'
-    | '/arrivals'
-    | '/assignments'
-    | '/attendance'
-    | '/bookings'
-    | '/categories'
     | '/dashboard'
-    | '/departures'
-    | '/drivers'
-    | '/events'
     | '/flight-alerts'
-    | '/flights'
     | '/hotels'
-    | '/invitations'
     | '/invitees'
     | '/movements'
     | '/notifications'
-    | '/overview'
     | '/reports'
-    | '/requests'
-    | '/rooms'
-    | '/sessions'
     | '/settings'
     | '/speakers'
-    | '/staff'
     | '/trips'
     | '/users'
-    | '/vehicles'
   id:
     | '__root__'
     | '/'
@@ -392,34 +203,17 @@ export interface FileRouteTypes {
     | '/auth'
     | '/speaker'
     | '/_authenticated/activity'
-    | '/_authenticated/airport'
-    | '/_authenticated/arrivals'
-    | '/_authenticated/assignments'
-    | '/_authenticated/attendance'
-    | '/_authenticated/bookings'
-    | '/_authenticated/categories'
     | '/_authenticated/dashboard'
-    | '/_authenticated/departures'
-    | '/_authenticated/drivers'
-    | '/_authenticated/events'
     | '/_authenticated/flight-alerts'
-    | '/_authenticated/flights'
     | '/_authenticated/hotels'
-    | '/_authenticated/invitations'
     | '/_authenticated/invitees'
     | '/_authenticated/movements'
     | '/_authenticated/notifications'
-    | '/_authenticated/overview'
     | '/_authenticated/reports'
-    | '/_authenticated/requests'
-    | '/_authenticated/rooms'
-    | '/_authenticated/sessions'
     | '/_authenticated/settings'
     | '/_authenticated/speakers'
-    | '/_authenticated/staff'
     | '/_authenticated/trips'
     | '/_authenticated/users'
-    | '/_authenticated/vehicles'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -466,74 +260,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedActivityRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/airport': {
-      id: '/_authenticated/airport'
-      path: '/airport'
-      fullPath: '/airport'
-      preLoaderRoute: typeof AuthenticatedAirportRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/arrivals': {
-      id: '/_authenticated/arrivals'
-      path: '/arrivals'
-      fullPath: '/arrivals'
-      preLoaderRoute: typeof AuthenticatedArrivalsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/assignments': {
-      id: '/_authenticated/assignments'
-      path: '/assignments'
-      fullPath: '/assignments'
-      preLoaderRoute: typeof AuthenticatedAssignmentsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/attendance': {
-      id: '/_authenticated/attendance'
-      path: '/attendance'
-      fullPath: '/attendance'
-      preLoaderRoute: typeof AuthenticatedAttendanceRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/bookings': {
-      id: '/_authenticated/bookings'
-      path: '/bookings'
-      fullPath: '/bookings'
-      preLoaderRoute: typeof AuthenticatedBookingsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/categories': {
-      id: '/_authenticated/categories'
-      path: '/categories'
-      fullPath: '/categories'
-      preLoaderRoute: typeof AuthenticatedCategoriesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/departures': {
-      id: '/_authenticated/departures'
-      path: '/departures'
-      fullPath: '/departures'
-      preLoaderRoute: typeof AuthenticatedDeparturesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/drivers': {
-      id: '/_authenticated/drivers'
-      path: '/drivers'
-      fullPath: '/drivers'
-      preLoaderRoute: typeof AuthenticatedDriversRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/events': {
-      id: '/_authenticated/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof AuthenticatedEventsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/flight-alerts': {
@@ -543,25 +274,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFlightAlertsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/flights': {
-      id: '/_authenticated/flights'
-      path: '/flights'
-      fullPath: '/flights'
-      preLoaderRoute: typeof AuthenticatedFlightsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/hotels': {
       id: '/_authenticated/hotels'
       path: '/hotels'
       fullPath: '/hotels'
       preLoaderRoute: typeof AuthenticatedHotelsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/invitations': {
-      id: '/_authenticated/invitations'
-      path: '/invitations'
-      fullPath: '/invitations'
-      preLoaderRoute: typeof AuthenticatedInvitationsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/invitees': {
@@ -585,39 +302,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/overview': {
-      id: '/_authenticated/overview'
-      path: '/overview'
-      fullPath: '/overview'
-      preLoaderRoute: typeof AuthenticatedOverviewRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/reports': {
       id: '/_authenticated/reports'
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof AuthenticatedReportsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/requests': {
-      id: '/_authenticated/requests'
-      path: '/requests'
-      fullPath: '/requests'
-      preLoaderRoute: typeof AuthenticatedRequestsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/rooms': {
-      id: '/_authenticated/rooms'
-      path: '/rooms'
-      fullPath: '/rooms'
-      preLoaderRoute: typeof AuthenticatedRoomsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/sessions': {
-      id: '/_authenticated/sessions'
-      path: '/sessions'
-      fullPath: '/sessions'
-      preLoaderRoute: typeof AuthenticatedSessionsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/settings': {
@@ -634,13 +323,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSpeakersRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/staff': {
-      id: '/_authenticated/staff'
-      path: '/staff'
-      fullPath: '/staff'
-      preLoaderRoute: typeof AuthenticatedStaffRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/trips': {
       id: '/_authenticated/trips'
       path: '/trips'
@@ -655,78 +337,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsersRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/vehicles': {
-      id: '/_authenticated/vehicles'
-      path: '/vehicles'
-      fullPath: '/vehicles'
-      preLoaderRoute: typeof AuthenticatedVehiclesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
-  AuthenticatedAirportRoute: typeof AuthenticatedAirportRoute
-  AuthenticatedArrivalsRoute: typeof AuthenticatedArrivalsRoute
-  AuthenticatedAssignmentsRoute: typeof AuthenticatedAssignmentsRoute
-  AuthenticatedAttendanceRoute: typeof AuthenticatedAttendanceRoute
-  AuthenticatedBookingsRoute: typeof AuthenticatedBookingsRoute
-  AuthenticatedCategoriesRoute: typeof AuthenticatedCategoriesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedDeparturesRoute: typeof AuthenticatedDeparturesRoute
-  AuthenticatedDriversRoute: typeof AuthenticatedDriversRoute
-  AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
   AuthenticatedFlightAlertsRoute: typeof AuthenticatedFlightAlertsRoute
-  AuthenticatedFlightsRoute: typeof AuthenticatedFlightsRoute
   AuthenticatedHotelsRoute: typeof AuthenticatedHotelsRoute
-  AuthenticatedInvitationsRoute: typeof AuthenticatedInvitationsRoute
   AuthenticatedInviteesRoute: typeof AuthenticatedInviteesRoute
   AuthenticatedMovementsRoute: typeof AuthenticatedMovementsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
-  AuthenticatedOverviewRoute: typeof AuthenticatedOverviewRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
-  AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
-  AuthenticatedRoomsRoute: typeof AuthenticatedRoomsRoute
-  AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSpeakersRoute: typeof AuthenticatedSpeakersRoute
-  AuthenticatedStaffRoute: typeof AuthenticatedStaffRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
-  AuthenticatedVehiclesRoute: typeof AuthenticatedVehiclesRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedActivityRoute: AuthenticatedActivityRoute,
-  AuthenticatedAirportRoute: AuthenticatedAirportRoute,
-  AuthenticatedArrivalsRoute: AuthenticatedArrivalsRoute,
-  AuthenticatedAssignmentsRoute: AuthenticatedAssignmentsRoute,
-  AuthenticatedAttendanceRoute: AuthenticatedAttendanceRoute,
-  AuthenticatedBookingsRoute: AuthenticatedBookingsRoute,
-  AuthenticatedCategoriesRoute: AuthenticatedCategoriesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedDeparturesRoute: AuthenticatedDeparturesRoute,
-  AuthenticatedDriversRoute: AuthenticatedDriversRoute,
-  AuthenticatedEventsRoute: AuthenticatedEventsRoute,
   AuthenticatedFlightAlertsRoute: AuthenticatedFlightAlertsRoute,
-  AuthenticatedFlightsRoute: AuthenticatedFlightsRoute,
   AuthenticatedHotelsRoute: AuthenticatedHotelsRoute,
-  AuthenticatedInvitationsRoute: AuthenticatedInvitationsRoute,
   AuthenticatedInviteesRoute: AuthenticatedInviteesRoute,
   AuthenticatedMovementsRoute: AuthenticatedMovementsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
-  AuthenticatedOverviewRoute: AuthenticatedOverviewRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
-  AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
-  AuthenticatedRoomsRoute: AuthenticatedRoomsRoute,
-  AuthenticatedSessionsRoute: AuthenticatedSessionsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSpeakersRoute: AuthenticatedSpeakersRoute,
-  AuthenticatedStaffRoute: AuthenticatedStaffRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
-  AuthenticatedVehiclesRoute: AuthenticatedVehiclesRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
