@@ -256,6 +256,14 @@ function DashboardPage() {
   const { data, isLoading } = useLiveStats();
 
 
+  const summaryCards = [
+    { label: "الحضور اليوم", value: data?.todayAttendance ?? 0, sub: "تسجيل دخول في الموقع", icon: UserCheck },
+    { label: "رحلات نقل اليوم", value: data?.todayTrips ?? 0, sub: "مجدولة خلال اليوم", icon: Car },
+    { label: "تسجيل إقامة اليوم", value: data?.todayCheckIns ?? 0, sub: "دخول الفنادق", icon: BedDouble },
+    { label: "وصول اليوم", value: data?.todayArrivals ?? 0, sub: "حركات وصول مجدولة", icon: PlaneLanding },
+  ];
+  const summaryRows = summaryCards.map(({ label, value }) => ({ label, value }));
+
   if (isLoading || !data) {
     return (
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
