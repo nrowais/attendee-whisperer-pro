@@ -38,11 +38,12 @@ function PortalLayout() {
           openNav ? "translate-x-0" : "translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="flex items-center justify-between border-b border-sidebar-border px-5 py-5">
-          <div>
-            <p className="font-display text-base font-bold">بوابة الفعاليات</p>
-            <p className="text-xs text-sidebar-foreground/60">إدارة متكاملة</p>
-          </div>
+        <div className="flex items-center justify-between gap-3 border-b border-sidebar-border px-5 py-5">
+          <img
+            src={eventLogo.url}
+            alt="شعار مؤتمر حوار الأمن والتاريخ"
+            className="h-14 w-auto max-w-[170px] object-contain"
+          />
           <button className="lg:hidden" onClick={() => setOpenNav(false)} aria-label="إغلاق">
             <X className="size-5" />
           </button>
