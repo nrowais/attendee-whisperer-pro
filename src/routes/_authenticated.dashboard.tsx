@@ -93,6 +93,22 @@ function useLiveStats() {
         .order("scheduled_at", { ascending: true })
         .limit(6);
 
+      const dayStart = new Date(now);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+      const dayStartIso = dayStart.toISOString();
+      const dayEndIso = dayEnd.toISOString();
+      const todayDate = `${dayStart.getFullYear()}-${String(dayStart.getMonth() + 1).padStart(2, "0")}-${String(
+        dayStart.getDate(),
+      ).padStart(2, "0")}`;
+
+      const [todayAttendance, todayTrips, todayCheckIns, todayArrivals] = await Promise.all([
+        count("attendance", (q: any) => q.gte("checked_in_at", dayStartIso).lt("checked_in_at", dayEndIso)),
+        count("transport_trips", (q: any) => q.gte("scheduled_at", dayStartIso).lt("scheduled_at", dayEndIso)),
+        count("hotel_bookings", (q: any) => q.eq("check_in", todayDate)),
+        count("speaker_arrivals", (q: any) => q.gte("arrival_time", dayStartIso).lt("arrival_time", dayEndIso)),
+      ]);
+
       const { data: alerts } = await db
         .from("flight_alerts")
         .select("id, message, alert_type, due_at, status")
