@@ -251,7 +251,8 @@ function ReportsPage() {
       <div>
         <h1 className="font-display text-2xl font-bold text-foreground">التقارير</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          أرقام حقيقية من قاعدة البيانات مع إمكانية التصدير إلى ملف Excel/CSV.
+          أرقام حقيقية من قاعدة البيانات مع إمكانية التصدير إلى ملف PDF مرتب وجاهز للطباعة.
+
         </p>
       </div>
 
