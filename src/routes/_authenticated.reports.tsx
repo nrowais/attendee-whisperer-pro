@@ -108,14 +108,82 @@ const reports: ReportDef[] = [
   },
 ];
 
-function toCsv(rows: Record<string, any>[]) {
-  if (rows.length === 0) return "";
-  const headers = Object.keys(rows[0]!);
-  const escape = (v: any) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  return [
-    headers.join(","),
-    ...rows.map((r) => headers.map((h) => escape(r[h])).join(",")),
-  ].join("\n");
+function esc(v: any) {
+  return String(v ?? "—")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function fmt(v: any) {
+  if (v === null || v === undefined || v === "") return "—";
+  if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}([T ]|$)/.test(v)) {
+    const d = new Date(v);
+    if (!Number.isNaN(d.getTime())) {
+      return v.length <= 10
+        ? d.toLocaleDateString("ar-SA-u-ca-gregory")
+        : d.toLocaleString("ar-SA-u-ca-gregory", {
+            dateStyle: "medium",
+            timeStyle: "short",
+          });
+    }
+  }
+  if (typeof v === "boolean") return v ? "نعم" : "لا";
+  return String(v);
+}
+
+function buildReportHtml(report: ReportDef, rows: Record<string, any>[]) {
+  const now = new Date().toLocaleString("ar-SA-u-ca-gregory", {
+    dateStyle: "full",
+    timeStyle: "short",
+  });
+  const head = report.columns.map((c) => `<th>${esc(c.label)}</th>`).join("");
+  const body = rows
+    .map(
+      (r, i) =>
+        `<tr><td class="num">${i + 1}</td>${report.columns
+          .map((c) => `<td>${esc(fmt(r[c.key]))}</td>`)
+          .join("")}</tr>`,
+    )
+    .join("");
+
+  return `<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8" />
+<title>${esc(report.title)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  @page { size: A4; margin: 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: Cairo, "Segoe UI", sans-serif; color: #10241d; margin: 0; }
+  header { display: flex; justify-content: space-between; align-items: flex-end;
+    border-bottom: 3px solid #064e3b; padding-bottom: 12px; margin-bottom: 18px; }
+  h1 { font-size: 20px; margin: 0 0 4px; color: #064e3b; }
+  .sub { font-size: 12px; color: #5b6b66; margin: 0; }
+  .brand { font-size: 13px; font-weight: 700; color: #c9a84c; text-align: left; }
+  .meta { display: flex; gap: 18px; font-size: 12px; color: #5b6b66; margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th { background: #064e3b; color: #fff; text-align: right; padding: 8px 10px; font-weight: 600; }
+  tbody td { border-bottom: 1px solid #e3ebe7; padding: 7px 10px; text-align: right; }
+  tbody tr:nth-child(even) td { background: #f6faf8; }
+  td.num { color: #8a9a95; width: 34px; }
+  thead { display: table-header-group; }
+  tr { page-break-inside: avoid; }
+  footer { margin-top: 16px; font-size: 11px; color: #8a9a95; text-align: center; }
+</style></head>
+<body>
+  <header>
+    <div>
+      <h1>${esc(report.title)}</h1>
+      <p class="sub">${esc(report.desc)}</p>
+    </div>
+    <div class="brand">بوابة إدارة الفعالية<br />منتدى الرياض الدولي 2026</div>
+  </header>
+  <div class="meta"><span>عدد السجلات: <strong>${rows.length}</strong></span><span>تاريخ التقرير: ${esc(now)}</span></div>
+  <table><thead><tr><th>#</th>${head}</tr></thead><tbody>${body}</tbody></table>
+  <footer>تم إنشاء هذا التقرير آلياً من بوابة إدارة الفعالية</footer>
+  <script>window.onload = function () { setTimeout(function () { window.print(); }, 400); };<\/script>
+</body></html>`;
 }
 
 function ReportCard({ report }: { report: ReportDef }) {
@@ -131,20 +199,20 @@ function ReportCard({ report }: { report: ReportDef }) {
 
   const rows = query.data ?? [];
 
-  function download() {
-    const csv = toCsv(rows);
-    if (!csv) {
+  function exportPdf() {
+    if (rows.length === 0) {
       toast.error("لا توجد بيانات للتصدير");
       return;
     }
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${report.key}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("تم تصدير التقرير");
+    const win = window.open("", "_blank", "width=1000,height=760");
+    if (!win) {
+      toast.error("يرجى السماح بالنوافذ المنبثقة لتصدير PDF");
+      return;
+    }
+    win.document.open();
+    win.document.write(buildReportHtml(report, rows));
+    win.document.close();
+    toast.success("جاري تجهيز ملف PDF");
   }
 
   return (
@@ -168,13 +236,14 @@ function ReportCard({ report }: { report: ReportDef }) {
         </p>
       )}
 
-      <Button variant="outline" onClick={download} className="mt-auto w-full">
+      <Button variant="outline" onClick={exportPdf} className="mt-auto w-full">
         <Download className="size-4" />
-        تصدير CSV
+        تصدير PDF
       </Button>
     </div>
   );
 }
+
 
 function ReportsPage() {
   return (
