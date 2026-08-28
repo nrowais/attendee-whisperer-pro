@@ -242,11 +242,18 @@ export function CrudPage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold text-foreground">{title}</h1>
-          {subtitle ? <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p> : null}
+          {compact ? (
+            <p className="text-sm font-semibold text-foreground">{subtitle ?? title}</p>
+          ) : (
+            <>
+              <h1 className="font-display text-2xl font-bold text-foreground">{title}</h1>
+              {subtitle ? <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p> : null}
+            </>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
+
             <Search className="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={search}
