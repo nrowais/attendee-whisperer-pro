@@ -45,7 +45,7 @@ const speaker = {
   phone: "+966 50 123 4567",
   badge: "SPK-0012",
   status: "في الجو",
-  eventName: "منتدى الرياض الدولي 2026",
+  eventName: "حوار الأمن والتاريخ — الرياض 2026",
 };
 
 const flight = {
@@ -191,7 +191,7 @@ function SpeakerPortal() {
         {/* Welcome + quick actions */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-lg font-semibold text-foreground">مرحباً بك في منتدى الرياض الدولي 2026</p>
+            <p className="text-lg font-semibold text-foreground">مرحباً بك في حوار الأمن والتاريخ — الرياض 2026</p>
             <p className="text-sm text-muted-foreground">هنا تجد جدولك، تفاصيل سفرك، إقامتك، وكل طلباتك.</p>
           </div>
           <div className="flex gap-2">
