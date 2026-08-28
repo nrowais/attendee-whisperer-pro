@@ -220,6 +220,36 @@ function DashboardPage() {
         </Badge>
       </div>
 
+      <section className="surface-card p-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <p className="font-display text-lg font-bold text-foreground">الملخص اليومي</p>
+          <span className="text-xs text-muted-foreground">
+            {new Date().toLocaleDateString("ar-SA-u-ca-gregory", {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </span>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            { label: "الحضور اليوم", value: data.todayAttendance, sub: "تسجيل دخول في الموقع", icon: UserCheck },
+            { label: "رحلات نقل اليوم", value: data.todayTrips, sub: "مجدولة خلال اليوم", icon: Car },
+            { label: "تسجيل إقامة اليوم", value: data.todayCheckIns, sub: "دخول الفنادق", icon: BedDouble },
+            { label: "وصول اليوم", value: data.todayArrivals, sub: "حركات وصول مجدولة", icon: PlaneLanding },
+          ].map((item) => (
+            <div key={item.label} className="rounded-xl border border-border bg-secondary/40 p-4">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm text-muted-foreground">{item.label}</p>
+                <item.icon className="size-4 text-primary" />
+              </div>
+              <p className="mt-2 font-display text-2xl font-bold text-foreground">{item.value}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{item.sub}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Kpi icon={Mic} label="المتحدثون" value={data.speakers} sub="مسجلون في النظام" to="/speakers" />
