@@ -10,6 +10,8 @@ import {
   UserCheck,
   AlertTriangle,
   ArrowLeft,
+  FileDown,
+  FileSpreadsheet,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -194,8 +196,75 @@ function ProgressRow({ label, done, total }: { label: string; done: number; tota
   );
 }
 
+function todayLabel() {
+  return new Date().toLocaleDateString("ar-SA-u-ca-gregory", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function exportSummaryCsv(rows: { label: string; value: number | string }[]) {
+  const lines = [["البند", "القيمة"], ...rows.map((r) => [r.label, String(r.value)])]
+    .map((cols) => cols.map((c) => `"${c.replace(/"/g, '""')}"`).join(","))
+    .join("\n");
+  const blob = new Blob(["\uFEFF" + `الملخص اليومي - ${todayLabel()}\n\n` + lines], {
+    type: "text/csv;charset=utf-8;",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `daily-summary-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportSummaryPdf(rows: { label: string; value: number | string }[]) {
+  const win = window.open("", "_blank", "width=900,height=700");
+  if (!win) return;
+  const body = rows
+    .map(
+      (r, i) =>
+        `<tr><td>${i + 1}</td><td>${r.label}</td><td class="num">${r.value}</td></tr>`,
+    )
+    .join("");
+  win.document.write(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8">
+<title>الملخص اليومي</title>
+<style>
+@page { size: A4; margin: 18mm; }
+body { font-family: "Tajawal","Cairo",system-ui,sans-serif; color:#1c2333; }
+h1 { font-size: 20px; margin:0 0 4px; }
+p.meta { color:#5b657d; font-size:12px; margin:0 0 20px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { border:1px solid #d7dce8; padding:9px 10px; text-align:right; }
+thead th { background:#3c4c9c; color:#fff; }
+tbody tr:nth-child(even) { background:#f4f6fb; }
+td.num { font-weight:700; }
+footer { margin-top:24px; font-size:11px; color:#7b8497; text-align:center; }
+</style></head><body>
+<h1>${eventName} — الملخص اليومي</h1>
+<p class="meta">${todayLabel()}</p>
+<table><thead><tr><th style="width:48px">#</th><th>البند</th><th style="width:120px">القيمة</th></tr></thead>
+<tbody>${body}</tbody></table>
+<footer>تم إنشاء التقرير آليًا من بوابة إدارة الفعالية</footer>
+</body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 350);
+}
+
 function DashboardPage() {
   const { data, isLoading } = useLiveStats();
+
+
+  const summaryCards = [
+    { label: "الحضور اليوم", value: data?.todayAttendance ?? 0, sub: "تسجيل دخول في الموقع", icon: UserCheck },
+    { label: "رحلات نقل اليوم", value: data?.todayTrips ?? 0, sub: "مجدولة خلال اليوم", icon: Car },
+    { label: "تسجيل إقامة اليوم", value: data?.todayCheckIns ?? 0, sub: "دخول الفنادق", icon: BedDouble },
+    { label: "وصول اليوم", value: data?.todayArrivals ?? 0, sub: "حركات وصول مجدولة", icon: PlaneLanding },
+  ];
+  const summaryRows = summaryCards.map(({ label, value }) => ({ label, value }));
 
   if (isLoading || !data) {
     return (
@@ -221,24 +290,24 @@ function DashboardPage() {
       </div>
 
       <section className="surface-card p-6">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <p className="font-display text-lg font-bold text-foreground">الملخص اليومي</p>
-          <span className="text-xs text-muted-foreground">
-            {new Date().toLocaleDateString("ar-SA-u-ca-gregory", {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          </span>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="font-display text-lg font-bold text-foreground">الملخص اليومي</p>
+            <span className="text-xs text-muted-foreground">{todayLabel()}</span>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => exportSummaryCsv(summaryRows)}>
+              <FileSpreadsheet className="size-4" />
+              CSV
+            </Button>
+            <Button size="sm" className="gap-2" onClick={() => exportSummaryPdf(summaryRows)}>
+              <FileDown className="size-4" />
+              PDF
+            </Button>
+          </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            { label: "الحضور اليوم", value: data.todayAttendance, sub: "تسجيل دخول في الموقع", icon: UserCheck },
-            { label: "رحلات نقل اليوم", value: data.todayTrips, sub: "مجدولة خلال اليوم", icon: Car },
-            { label: "تسجيل إقامة اليوم", value: data.todayCheckIns, sub: "دخول الفنادق", icon: BedDouble },
-            { label: "وصول اليوم", value: data.todayArrivals, sub: "حركات وصول مجدولة", icon: PlaneLanding },
-          ].map((item) => (
+          {summaryCards.map((item) => (
             <div key={item.label} className="rounded-xl border border-border bg-secondary/40 p-4">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-sm text-muted-foreground">{item.label}</p>
