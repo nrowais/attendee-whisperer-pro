@@ -1,94 +1,26 @@
 import {
-  LayoutDashboard,
   Activity,
   Mic,
   Users,
-  PlaneTakeoff,
   Plane,
   Car,
   BedDouble,
-  ClipboardList,
-  UserCheck,
-  UsersRound,
   BarChart3,
   Settings,
-  CalendarDays,
-  Presentation,
-  MailOpen,
-  Ticket,
-  PlaneLanding,
-  DoorOpen,
-  Hotel,
-  KeyRound,
-  IdCard,
-  Tags,
-  CalendarClock,
-  Bell,
-  BellRing,
-
-  History,
-  ShieldCheck,
   type LucideIcon,
 } from "lucide-react";
 
-export type NavItem = { to: string; label: string; icon: LucideIcon };
-export type NavGroup = { label: string; items: NavItem[] };
+export type NavItem = { to: string; label: string; icon: LucideIcon; hint?: string };
 
 export const navItems: NavItem[] = [
-  { to: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard },
-  { to: "/overview", label: "شاشة المتابعة", icon: Activity },
-  { to: "/speakers", label: "المتحدثون", icon: Mic },
-  { to: "/invitees", label: "المدعوون", icon: Users },
-  { to: "/movements", label: "الوصول والمغادرة", icon: PlaneTakeoff },
-  { to: "/airport", label: "المطار", icon: Plane },
-  { to: "/trips", label: "النقل والسيارات", icon: Car },
-  { to: "/hotels", label: "الفنادق والسكن", icon: BedDouble },
-  { to: "/requests", label: "الطلبات الخاصة", icon: ClipboardList },
-  { to: "/attendance", label: "الحضور والتسجيل", icon: UserCheck },
-  { to: "/staff", label: "فريق العمل", icon: UsersRound },
-  { to: "/reports", label: "التقارير", icon: BarChart3 },
-  { to: "/settings", label: "الإعدادات", icon: Settings },
-];
-
-export const navGroups: NavGroup[] = [
-  { label: "العمليات", items: navItems },
-  {
-    label: "الفعاليات والدعوات",
-    items: [
-      { to: "/events", label: "الفعاليات", icon: CalendarDays },
-      { to: "/sessions", label: "جلسات المتحدثين", icon: Presentation },
-      { to: "/invitations", label: "الدعوات", icon: MailOpen },
-      { to: "/categories", label: "تصنيفات الطلبات", icon: Tags },
-    ],
-  },
-  {
-    label: "السفر والإقامة",
-    items: [
-      { to: "/flights", label: "الرحلات الجوية", icon: Ticket },
-      { to: "/flight-alerts", label: "سجل تنبيهات الرحلات", icon: BellRing },
-
-      { to: "/arrivals", label: "سجل الوصول", icon: PlaneLanding },
-      { to: "/departures", label: "سجل المغادرة", icon: DoorOpen },
-      { to: "/rooms", label: "غرف الفنادق", icon: Hotel },
-      { to: "/bookings", label: "حجوزات الإقامة", icon: KeyRound },
-    ],
-  },
-  {
-    label: "الموارد والفريق",
-    items: [
-      { to: "/drivers", label: "السائقون", icon: IdCard },
-      { to: "/vehicles", label: "المركبات", icon: Car },
-      { to: "/assignments", label: "مهام الفريق", icon: CalendarClock },
-    ],
-  },
-  {
-    label: "النظام",
-    items: [
-      { to: "/activity", label: "سجل النشاط", icon: History },
-      { to: "/notifications", label: "الإشعارات", icon: Bell },
-      { to: "/users", label: "المستخدمون والصلاحيات", icon: ShieldCheck },
-    ],
-  },
+  { to: "/dashboard", label: "المتابعة اللحظية", icon: Activity, hint: "الأرقام والحالة الآن" },
+  { to: "/speakers", label: "المتحدثون", icon: Mic, hint: "البيانات والجلسات والطلبات" },
+  { to: "/invitees", label: "المدعوون والحضور", icon: Users, hint: "الدعوات والتسجيل" },
+  { to: "/movements", label: "السفر والتحركات", icon: Plane, hint: "الرحلات والوصول والمغادرة" },
+  { to: "/trips", label: "النقل الأرضي", icon: Car, hint: "الرحلات والسائقون والمركبات" },
+  { to: "/hotels", label: "الإقامة", icon: BedDouble, hint: "الفنادق والغرف والحجوزات" },
+  { to: "/reports", label: "التقارير", icon: BarChart3, hint: "ملخصات قابلة للتصدير" },
+  { to: "/settings", label: "الإعدادات", icon: Settings, hint: "الفعالية والفريق والصلاحيات" },
 ];
 
 export const eventName = "منتدى الرياض الدولي 2026";
