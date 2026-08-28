@@ -1,55 +1,69 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { OpsPage, StatusPill, type OpsColumn } from "@/components/portal/OpsPage";
-import { hotelRows, type HotelRoomRow } from "@/lib/sampleData";
+import { CrudPage } from "@/components/portal/CrudPage";
+import { Workspace } from "@/components/portal/Workspace";
+import { bookingFields, hotelFields, roomFields } from "@/lib/tableFields";
 
 export const Route = createFileRoute("/_authenticated/hotels")({
   head: () => ({
     meta: [
-      { title: "الفنادق والسكن — عمليات ضيوف الفعالية" },
-      { name: "description", content: "توزيع الضيوف على الفنادق والغرف وحالة الإقامة." },
-      { property: "og:title", content: "الفنادق والسكن — عمليات ضيوف الفعالية" },
-      { property: "og:description", content: "توزيع الغرف وحالة الإقامة." },
+      { title: "الإقامة — بوابة إدارة الفعالية" },
+      { name: "description", content: "حجوزات الإقامة وتوزيع الغرف على الضيوف والمتحدثين." },
+      { property: "og:title", content: "الإقامة — بوابة إدارة الفعالية" },
+      { property: "og:description", content: "الفنادق والغرف وحجوزات الإقامة." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: HotelsPage,
+  component: HotelsWorkspace,
 });
 
-const tone: Record<HotelRoomRow["status"], string> = {
-  "محجوزة": "info",
-  "تم تسجيل الدخول": "success",
-  "تم تسجيل الخروج": "muted",
-};
-
-const columns: OpsColumn<HotelRoomRow>[] = [
-  { key: "guest", label: "الضيف" },
-  { key: "hotel", label: "الفندق" },
-  { key: "room", label: "الغرفة" },
-  { key: "roomType", label: "النوع" },
-  { key: "checkIn", label: "تاريخ الدخول" },
-  { key: "checkOut", label: "تاريخ الخروج" },
-  { key: "status", label: "الحالة", render: (r) => <StatusPill label={r.status} tone={tone[r.status]} /> },
-];
-
-function HotelsPage() {
+function HotelsWorkspace() {
   return (
-    <OpsPage
-      title="الفنادق والسكن"
-      subtitle="إدارة الحجوزات وتوزيع الغرف على الضيوف والمتحدثين."
-      kpis={[
-        { label: "إجمالي الحجوزات", value: 164 },
-        { label: "تم تسجيل الدخول", value: 63 },
-        { label: "بانتظار الوصول", value: 88 },
-        { label: "غرف شاغرة", value: 22 },
+    <Workspace
+      title="الإقامة"
+      subtitle="الحجوزات الفندقية وتوزيع الغرف وحالة تسجيل الدخول."
+      tabs={[
+        {
+          value: "bookings",
+          label: "الحجوزات",
+          content: (
+            <CrudPage
+              compact
+              table="hotel_bookings"
+              title="الحجوزات"
+              subtitle="حجوزات الإقامة وحالتها"
+              fields={bookingFields}
+            />
+          ),
+        },
+        {
+          value: "hotels",
+          label: "الفنادق",
+          content: (
+            <CrudPage
+              compact
+              table="hotels"
+              title="الفنادق"
+              subtitle="الفنادق المتعاقد معها"
+              fields={hotelFields}
+            />
+          ),
+        },
+        {
+          value: "rooms",
+          label: "الغرف",
+          content: (
+            <CrudPage
+              compact
+              table="hotel_rooms"
+              title="الغرف"
+              subtitle="غرف الفنادق وأنواعها"
+              fields={roomFields}
+            />
+          ),
+        },
       ]}
-      columns={columns}
-      rows={hotelRows}
-      searchKeys={["guest", "hotel", "room"]}
-      statusKey="status"
-      statuses={["محجوزة", "تم تسجيل الدخول", "تم تسجيل الخروج"]}
-      actionLabel="حجز جديد"
     />
   );
 }
