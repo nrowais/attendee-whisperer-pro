@@ -51,8 +51,11 @@ const reports: ReportDef[] = [
     title: "تقرير الوصول",
     desc: "حركات وصول المتحدثين وحالتها.",
     table: "speaker_arrivals",
-    select: "arrival_time, arrival_point, status",
+    select:
+      "arrival_time, arrival_point, status, speakers(full_name), flights(airline, flight_number)",
     columns: [
+      { key: "speakers_name", label: "المتحدث" },
+      { key: "flights_name", label: "الرحلة" },
       { key: "arrival_time", label: "الوقت" },
       { key: "arrival_point", label: "النقطة" },
       { key: "status", label: "الحالة" },
@@ -63,11 +66,16 @@ const reports: ReportDef[] = [
     title: "تقرير النقل",
     desc: "رحلات النقل الأرضي ومواعيدها وحالتها.",
     table: "transport_trips",
-    select: "trip_type, pickup_location, dropoff_location, scheduled_at, status",
+    select:
+      "trip_type, pickup_location, dropoff_location, scheduled_at, status, speakers(full_name), drivers(full_name), vehicles(plate_number)",
     columns: [
+      { key: "speakers_name", label: "المتحدث" },
+      { key: "drivers_name", label: "السائق" },
+      { key: "vehicles_name", label: "المركبة" },
       { key: "trip_type", label: "النوع" },
       { key: "pickup_location", label: "من" },
       { key: "dropoff_location", label: "إلى" },
+      { key: "scheduled_at", label: "الموعد" },
       { key: "status", label: "الحالة" },
     ],
   },
@@ -76,8 +84,12 @@ const reports: ReportDef[] = [
     title: "تقرير الإقامة",
     desc: "حجوزات الفنادق وتواريخ الدخول والخروج.",
     table: "hotel_bookings",
-    select: "check_in, check_out, status, notes",
+    select:
+      "check_in, check_out, status, notes, speakers(full_name), hotels(name), hotel_rooms(room_number)",
     columns: [
+      { key: "speakers_name", label: "المتحدث" },
+      { key: "hotels_name", label: "الفندق" },
+      { key: "hotel_rooms_name", label: "الغرفة" },
       { key: "check_in", label: "الدخول" },
       { key: "check_out", label: "الخروج" },
       { key: "status", label: "الحالة" },
@@ -88,8 +100,9 @@ const reports: ReportDef[] = [
     title: "تقرير الحضور",
     desc: "سجل تسجيل الحضور في موقع الفعالية.",
     table: "attendance",
-    select: "checked_in_at, method",
+    select: "checked_in_at, method, invitees(full_name, organization)",
     columns: [
+      { key: "invitees_name", label: "المدعو" },
       { key: "checked_in_at", label: "وقت التسجيل" },
       { key: "method", label: "الطريقة" },
     ],
@@ -99,14 +112,37 @@ const reports: ReportDef[] = [
     title: "تقرير الطلبات الخاصة",
     desc: "الطلبات وحالتها وأولويتها.",
     table: "speaker_requests",
-    select: "title, priority, status, details",
+    select: "title, priority, status, details, speakers(full_name), request_categories(name)",
     columns: [
+      { key: "speakers_name", label: "المتحدث" },
+      { key: "request_categories_name", label: "التصنيف" },
       { key: "title", label: "الطلب" },
       { key: "priority", label: "الأولوية" },
       { key: "status", label: "الحالة" },
     ],
   },
 ];
+
+function flattenNames(row: Record<string, any>) {
+  const out: Record<string, any> = { ...row };
+  for (const [k, v] of Object.entries(row)) {
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      const rel = v as Record<string, any>;
+      const label =
+        rel["full_name"] ??
+        rel["name"] ??
+        rel["room_number"] ??
+        rel["plate_number"] ??
+        (rel["airline"] || rel["flight_number"]
+          ? `${rel["airline"] ?? ""} ${rel["flight_number"] ?? ""}`.trim()
+          : null);
+      out[`${k}_name`] = label ?? "—";
+      delete out[k];
+    }
+  }
+  return out;
+}
+
 
 function esc(v: any) {
   return String(v ?? "—")
