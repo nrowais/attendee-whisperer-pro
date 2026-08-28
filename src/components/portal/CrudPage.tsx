@@ -110,11 +110,13 @@ export function CrudPage({
   title,
   subtitle,
   fields,
+  compact,
 }: {
   table: string;
   title: string;
   subtitle?: string;
   fields: Field[];
+  compact?: boolean;
 }) {
   const queryClient = useQueryClient();
   const { canEdit } = useRoles();
