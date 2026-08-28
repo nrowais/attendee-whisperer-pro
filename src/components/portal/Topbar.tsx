@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Separator } from "@/components/ui/separator";
 import { eventName } from "@/lib/nav";
 import { supabase } from "@/integrations/supabase/client";
+import eventLogo from "@/assets/event-logo.png.asset.json";
 import { useAuth } from "@/hooks/useAuth";
 
 function formatNow(d: Date) {
@@ -74,9 +75,16 @@ export function Topbar({ email, roleLabel, onMenu, onSignOut }: Props) {
           <Menu className="size-5" />
         </button>
 
-        <div className="min-w-0">
-          <p className="truncate font-display text-sm font-bold text-foreground lg:text-base">{eventName}</p>
-          <p className="truncate text-xs text-muted-foreground">{now}</p>
+        <div className="flex min-w-0 items-center gap-2">
+          <img
+            src={eventLogo.url}
+            alt="شعار الفعالية"
+            className="hidden h-9 w-auto rounded-md object-contain sm:block"
+          />
+          <div className="min-w-0">
+            <p className="truncate font-display text-sm font-bold text-foreground lg:text-base">{eventName}</p>
+            <p className="truncate text-xs text-muted-foreground">{now}</p>
+          </div>
         </div>
 
         <div className="relative mx-auto hidden max-w-sm flex-1 md:block">
