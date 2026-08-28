@@ -200,22 +200,6 @@ function DashboardPage() {
         </Badge>
       </div>
 
-      {data.alertsPending > 0 ? (
-        <div className="surface-card border-s-4 border-s-destructive p-5">
-          <div className="mb-3 flex items-center gap-2 text-destructive">
-            <AlertTriangle className="size-5" />
-            <p className="font-semibold">تنبيهات نشطة ({data.alertsPending})</p>
-          </div>
-          <ul className="space-y-2 text-sm">
-            {data.alerts.map((a: any) => (
-              <li key={a.id} className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-foreground">{a.message}</span>
-                <span className="text-xs text-muted-foreground">{fmtTime(a.due_at)}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Kpi icon={Mic} label="المتحدثون" value={data.speakers} sub="مسجلون في النظام" to="/speakers" />
