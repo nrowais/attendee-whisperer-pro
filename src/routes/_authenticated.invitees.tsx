@@ -1,44 +1,69 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { CrudPage, type Field } from "@/components/portal/CrudPage";
-
-const fields: Field[] = [
-  { key: "full_name", label: "الاسم الكامل", required: true },
-  { key: "organization", label: "الجهة" },
-  {
-    key: "invitee_type",
-    label: "الفئة",
-    type: "select",
-    badge: true,
-    options: [
-      { value: "vip", label: "كبار الشخصيات" },
-      { value: "official", label: "جهة رسمية" },
-      { value: "media", label: "إعلامي" },
-      { value: "guest", label: "ضيف" },
-      { value: "sponsor", label: "راعٍ" },
-    ],
-  },
-  { key: "email", label: "البريد الإلكتروني" },
-  { key: "phone", label: "الجوال" },
-];
+import { CrudPage } from "@/components/portal/CrudPage";
+import { Workspace } from "@/components/portal/Workspace";
+import { inviteeFields, invitationFields, attendanceFields } from "@/lib/tableFields";
 
 export const Route = createFileRoute("/_authenticated/invitees")({
   head: () => ({
     meta: [
-      { title: "المدعوون — عمليات ضيوف الفعالية" },
-      { name: "description", content: "إدارة قائمة المدعوين وفئاتهم وبيانات التواصل معهم." },
-      { property: "og:title", content: "المدعوون — عمليات ضيوف الفعالية" },
-      { property: "og:description", content: "إدارة قائمة المدعوين وبياناتهم." },
+      { title: "المدعوون والحضور — بوابة إدارة الفعالية" },
+      { name: "description", content: "إدارة المدعوين والدعوات وتسجيل الحضور في شاشة واحدة." },
+      { property: "og:title", content: "المدعوون والحضور — بوابة إدارة الفعالية" },
+      { property: "og:description", content: "المدعوون والدعوات وتسجيل الحضور." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: () => (
-    <CrudPage
-      table="invitees"
-      title="المدعوون"
-      subtitle="إدخال وتحديث بيانات المدعوين وفئاتهم"
-      fields={fields}
-    />
-  ),
+  component: InviteesWorkspace,
 });
+
+function InviteesWorkspace() {
+  return (
+    <Workspace
+      title="المدعوون والحضور"
+      subtitle="سجّل المدعوين، أرسل الدعوات، وتابع تسجيل الحضور."
+      tabs={[
+        {
+          value: "invitees",
+          label: "المدعوون",
+          content: (
+            <CrudPage
+              compact
+              table="invitees"
+              title="المدعوون"
+              subtitle="قائمة المدعوين"
+              fields={inviteeFields}
+            />
+          ),
+        },
+        {
+          value: "invitations",
+          label: "الدعوات",
+          content: (
+            <CrudPage
+              compact
+              table="invitations"
+              title="الدعوات"
+              subtitle="حالة الدعوات والردود"
+              fields={invitationFields}
+            />
+          ),
+        },
+        {
+          value: "attendance",
+          label: "الحضور والتسجيل",
+          content: (
+            <CrudPage
+              compact
+              table="attendance"
+              title="الحضور"
+              subtitle="تسجيل الحضور في الموقع"
+              fields={attendanceFields}
+            />
+          ),
+        },
+      ]}
+    />
+  );
+}
