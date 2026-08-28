@@ -229,7 +229,7 @@ function ReportCard({ report }: { report: ReportDef }) {
     queryFn: async () => {
       const { data, error } = await db.from(report.table).select(report.select).limit(1000);
       if (error) throw error;
-      return (data ?? []) as Record<string, any>[];
+      return ((data ?? []) as Record<string, any>[]).map(flattenNames);
     },
   });
 
