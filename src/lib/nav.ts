@@ -23,4 +23,4 @@ export const navItems: NavItem[] = [
   { to: "/settings", label: "الإعدادات", icon: Settings, hint: "الفعالية والفريق والصلاحيات" },
 ];
 
-export const eventName = "منتدى الرياض الدولي 2026";
+export const eventName = "مؤتمر حوار الأمن والتاريخ — الرياض 2026";
