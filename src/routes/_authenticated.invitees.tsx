@@ -1,54 +1,44 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { OpsPage, StatusPill, type OpsColumn } from "@/components/portal/OpsPage";
-import { inviteeRows, type InviteeRow } from "@/lib/sampleData";
+import { CrudPage, type Field } from "@/components/portal/CrudPage";
+
+const fields: Field[] = [
+  { key: "full_name", label: "الاسم الكامل", required: true },
+  { key: "organization", label: "الجهة" },
+  {
+    key: "invitee_type",
+    label: "الفئة",
+    type: "select",
+    badge: true,
+    options: [
+      { value: "vip", label: "كبار الشخصيات" },
+      { value: "official", label: "جهة رسمية" },
+      { value: "media", label: "إعلامي" },
+      { value: "guest", label: "ضيف" },
+      { value: "sponsor", label: "راعٍ" },
+    ],
+  },
+  { key: "email", label: "البريد الإلكتروني" },
+  { key: "phone", label: "الجوال" },
+];
 
 export const Route = createFileRoute("/_authenticated/invitees")({
   head: () => ({
     meta: [
       { title: "المدعوون — عمليات ضيوف الفعالية" },
-      { name: "description", content: "قائمة المدعوين وحالة ردودهم على الدعوة." },
+      { name: "description", content: "إدارة قائمة المدعوين وفئاتهم وبيانات التواصل معهم." },
       { property: "og:title", content: "المدعوون — عمليات ضيوف الفعالية" },
-      { property: "og:description", content: "قائمة المدعوين وحالة الردود." },
+      { property: "og:description", content: "إدارة قائمة المدعوين وبياناتهم." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: InviteesPage,
-});
-
-const tone: Record<InviteeRow["status"], string> = {
-  "أكد الحضور": "success",
-  "اعتذر": "danger",
-  "لم يرد": "muted",
-};
-
-const columns: OpsColumn<InviteeRow>[] = [
-  { key: "name", label: "الاسم" },
-  { key: "org", label: "الجهة" },
-  { key: "category", label: "التصنيف" },
-  { key: "email", label: "البريد" },
-  { key: "phone", label: "الجوال" },
-  { key: "status", label: "حالة الدعوة", render: (r) => <StatusPill label={r.status} tone={tone[r.status]} /> },
-];
-
-function InviteesPage() {
-  return (
-    <OpsPage
+  component: () => (
+    <CrudPage
+      table="invitees"
       title="المدعوون"
-      subtitle="متابعة الدعوات وردود الضيوف حتى 1000 مدعو."
-      kpis={[
-        { label: "إجمالي المدعوين", value: 1000 },
-        { label: "أكد الحضور", value: 642 },
-        { label: "اعتذر", value: 133 },
-        { label: "لم يرد", value: 225 },
-      ]}
-      columns={columns}
-      rows={inviteeRows}
-      searchKeys={["name", "org", "email"]}
-      statusKey="status"
-      statuses={["أكد الحضور", "اعتذر", "لم يرد"]}
-      actionLabel="إضافة مدعو"
+      subtitle="إدخال وتحديث بيانات المدعوين وفئاتهم"
+      fields={fields}
     />
-  );
-}
+  ),
+});

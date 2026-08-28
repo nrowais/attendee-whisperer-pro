@@ -1,61 +1,55 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { OpsPage, StatusPill, type OpsColumn } from "@/components/portal/OpsPage";
-import { requestRows, type RequestRow } from "@/lib/sampleData";
+import { CrudPage, type Field } from "@/components/portal/CrudPage";
+
+const fields: Field[] = [
+  { key: "title", label: "عنوان الطلب", required: true },
+  { key: "speaker_id", label: "المتحدث", type: "ref", ref: { table: "speakers", labelKey: "full_name" } },
+  { key: "event_id", label: "الفعالية", type: "ref", ref: { table: "events", labelKey: "name" } },
+  { key: "category_id", label: "التصنيف", type: "ref", ref: { table: "request_categories", labelKey: "name" } },
+  {
+    key: "priority",
+    label: "الأولوية",
+    type: "select",
+    badge: true,
+    options: [
+      { value: "high", label: "عالية" },
+      { value: "medium", label: "متوسطة" },
+      { value: "low", label: "منخفضة" },
+    ],
+  },
+  {
+    key: "status",
+    label: "الحالة",
+    type: "select",
+    badge: true,
+    options: [
+      { value: "new", label: "جديد" },
+      { value: "in_progress", label: "قيد التنفيذ" },
+      { value: "done", label: "منفذ" },
+      { value: "rejected", label: "مرفوض" },
+    ],
+  },
+  { key: "details", label: "التفاصيل", type: "textarea", list: false },
+];
 
 export const Route = createFileRoute("/_authenticated/requests")({
   head: () => ({
     meta: [
       { title: "الطلبات الخاصة — عمليات ضيوف الفعالية" },
-      { name: "description", content: "متابعة طلبات الضيوف الخاصة وحالة تنفيذها." },
+      { name: "description", content: "استقبال طلبات الضيوف الخاصة وتحديث أولويتها وحالة تنفيذها." },
       { property: "og:title", content: "الطلبات الخاصة — عمليات ضيوف الفعالية" },
-      { property: "og:description", content: "طلبات الضيوف الخاصة وحالة التنفيذ." },
+      { property: "og:description", content: "إدارة طلبات الضيوف وحالة التنفيذ." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: RequestsPage,
-});
-
-const tone: Record<RequestRow["status"], string> = {
-  "جديد": "info",
-  "قيد التنفيذ": "warning",
-  "منفذ": "success",
-  "مرفوض": "danger",
-};
-
-const priorityTone: Record<RequestRow["priority"], string> = {
-  "عالية": "danger",
-  "متوسطة": "warning",
-  "منخفضة": "muted",
-};
-
-const columns: OpsColumn<RequestRow>[] = [
-  { key: "guest", label: "الضيف" },
-  { key: "category", label: "التصنيف" },
-  { key: "detail", label: "التفاصيل", render: (r) => <span className="whitespace-normal">{r.detail}</span> },
-  { key: "priority", label: "الأولوية", render: (r) => <StatusPill label={r.priority} tone={priorityTone[r.priority]} /> },
-  { key: "owner", label: "المسؤول" },
-  { key: "status", label: "الحالة", render: (r) => <StatusPill label={r.status} tone={tone[r.status]} /> },
-];
-
-function RequestsPage() {
-  return (
-    <OpsPage
+  component: () => (
+    <CrudPage
+      table="speaker_requests"
       title="الطلبات الخاصة"
-      subtitle="طلبات الضيوف والمتحدثين ومتابعة تنفيذها حتى الإغلاق."
-      kpis={[
-        { label: "إجمالي الطلبات", value: 87 },
-        { label: "جديدة", value: 12 },
-        { label: "قيد التنفيذ", value: 19 },
-        { label: "منفذة", value: 51 },
-      ]}
-      columns={columns}
-      rows={requestRows}
-      searchKeys={["guest", "category", "detail", "owner"]}
-      statusKey="status"
-      statuses={["جديد", "قيد التنفيذ", "منفذ", "مرفوض"]}
-      actionLabel="طلب جديد"
+      subtitle="تسجيل الطلبات ومتابعة حالتها حتى الإغلاق"
+      fields={fields}
     />
-  );
-}
+  ),
+});
