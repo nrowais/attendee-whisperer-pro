@@ -24,6 +24,8 @@ import {
   Tags,
   CalendarClock,
   Bell,
+  BellRing,
+
   History,
   ShieldCheck,
   type LucideIcon,
@@ -63,6 +65,8 @@ export const navGroups: NavGroup[] = [
     label: "السفر والإقامة",
     items: [
       { to: "/flights", label: "الرحلات الجوية", icon: Ticket },
+      { to: "/flight-alerts", label: "سجل تنبيهات الرحلات", icon: BellRing },
+
       { to: "/arrivals", label: "سجل الوصول", icon: PlaneLanding },
       { to: "/departures", label: "سجل المغادرة", icon: DoorOpen },
       { to: "/rooms", label: "غرف الفنادق", icon: Hotel },
