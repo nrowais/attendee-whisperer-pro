@@ -213,7 +213,7 @@ function buildReportHtml(report: ReportDef, rows: Record<string, any>[]) {
       <h1>${esc(report.title)}</h1>
       <p class="sub">${esc(report.desc)}</p>
     </div>
-    <div class="brand">بوابة إدارة الفعالية<br />منتدى الرياض الدولي 2026</div>
+    <div class="brand">بوابة إدارة الفعالية<br />حوار الأمن والتاريخ — الرياض 2026</div>
   </header>
   <div class="meta"><span>عدد السجلات: <strong>${rows.length}</strong></span><span>تاريخ التقرير: ${esc(now)}</span></div>
   <table><thead><tr><th>#</th>${head}</tr></thead><tbody>${body}</tbody></table>
