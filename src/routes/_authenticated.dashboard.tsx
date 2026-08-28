@@ -280,24 +280,24 @@ function DashboardPage() {
       </div>
 
       <section className="surface-card p-6">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <p className="font-display text-lg font-bold text-foreground">الملخص اليومي</p>
-          <span className="text-xs text-muted-foreground">
-            {new Date().toLocaleDateString("ar-SA-u-ca-gregory", {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          </span>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="font-display text-lg font-bold text-foreground">الملخص اليومي</p>
+            <span className="text-xs text-muted-foreground">{todayLabel()}</span>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => exportSummaryCsv(summaryRows)}>
+              <FileSpreadsheet className="size-4" />
+              CSV
+            </Button>
+            <Button size="sm" className="gap-2" onClick={() => exportSummaryPdf(summaryRows)}>
+              <FileDown className="size-4" />
+              PDF
+            </Button>
+          </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            { label: "الحضور اليوم", value: data.todayAttendance, sub: "تسجيل دخول في الموقع", icon: UserCheck },
-            { label: "رحلات نقل اليوم", value: data.todayTrips, sub: "مجدولة خلال اليوم", icon: Car },
-            { label: "تسجيل إقامة اليوم", value: data.todayCheckIns, sub: "دخول الفنادق", icon: BedDouble },
-            { label: "وصول اليوم", value: data.todayArrivals, sub: "حركات وصول مجدولة", icon: PlaneLanding },
-          ].map((item) => (
+          {summaryCards.map((item) => (
             <div key={item.label} className="rounded-xl border border-border bg-secondary/40 p-4">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-sm text-muted-foreground">{item.label}</p>
