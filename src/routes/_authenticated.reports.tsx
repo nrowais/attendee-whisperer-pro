@@ -4,6 +4,7 @@ import { Download, FileBarChart } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { eventName } from "@/lib/nav";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -213,11 +214,11 @@ function buildReportHtml(report: ReportDef, rows: Record<string, any>[]) {
       <h1>${esc(report.title)}</h1>
       <p class="sub">${esc(report.desc)}</p>
     </div>
-    <div class="brand">حوار الأمن والتاريخ<br />حوار الأمن والتاريخ — الرياض 2026</div>
+    <div class="brand">${eventName}</div>
   </header>
   <div class="meta"><span>عدد السجلات: <strong>${rows.length}</strong></span><span>تاريخ التقرير: ${esc(now)}</span></div>
   <table><thead><tr><th>#</th>${head}</tr></thead><tbody>${body}</tbody></table>
-  <footer>تم إنشاء هذا التقرير آلياً من حوار الأمن والتاريخ</footer>
+  <footer>تم إنشاء هذا التقرير آلياً من بوابة ${eventName}</footer>
   <script>window.onload = function () { setTimeout(function () { window.print(); }, 400); };<\/script>
 </body></html>`;
 }

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 import heroImage from "@/assets/hero-event.jpg";
+import { eventName } from "@/lib/nav";
 
 export const Route = createFileRoute("/speaker")({
   head: () => ({
@@ -45,7 +46,7 @@ const speaker = {
   phone: "+966 50 123 4567",
   badge: "SPK-0012",
   status: "في الجو",
-  eventName: "حوار الأمن والتاريخ — الرياض 2026",
+  eventName,
 };
 
 const flight = {
@@ -191,7 +192,7 @@ function SpeakerPortal() {
         {/* Welcome + quick actions */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-lg font-semibold text-foreground">مرحباً بك في حوار الأمن والتاريخ — الرياض 2026</p>
+            <p className="text-lg font-semibold text-foreground">مرحباً بك في {eventName}</p>
             <p className="text-sm text-muted-foreground">هنا تجد جدولك، تفاصيل سفرك، إقامتك، وكل طلباتك.</p>
           </div>
           <div className="flex gap-2">
