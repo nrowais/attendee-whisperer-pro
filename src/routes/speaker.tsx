@@ -23,9 +23,9 @@ import heroImage from "@/assets/hero-event.jpg";
 export const Route = createFileRoute("/speaker")({
   head: () => ({
     meta: [
-      { title: "حساب المتحدث — عمليات ضيوف الفعالية" },
+      { title: "حساب المتحدث — حوار الأمن والتاريخ" },
       { name: "description", content: "بوابة المتحدث الشخصية لمتابعة الرحلات والإقامة والجلسات والطلبات." },
-      { property: "og:title", content: "حساب المتحدث — عمليات ضيوف الفعالية" },
+      { property: "og:title", content: "حساب المتحدث — حوار الأمن والتاريخ" },
       { property: "og:description", content: "بوابة المتحدث الشخصية لمتابعة الفعالية." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

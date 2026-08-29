@@ -24,9 +24,9 @@ import { useAuth, useRoles } from "@/hooks/useAuth";
 export const Route = createFileRoute("/_authenticated/activity")({
   head: () => ({
     meta: [
-      { title: "التحديثات وسجل النشاط — عمليات ضيوف الفعالية" },
+      { title: "التحديثات وسجل النشاط — حوار الأمن والتاريخ" },
       { name: "description", content: "رفع التحديثات التشغيلية ومتابعتها لحظة بلحظة: الرحلات، الوصول، النقل، الإقامة، والطلبات." },
-      { property: "og:title", content: "التحديثات وسجل النشاط — عمليات ضيوف الفعالية" },
+      { property: "og:title", content: "التحديثات وسجل النشاط — حوار الأمن والتاريخ" },
       { property: "og:description", content: "رفع التحديثات التشغيلية ومتابعتها." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

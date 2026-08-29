@@ -7,9 +7,9 @@ import { flightFields, arrivalFields, departureFields } from "@/lib/tableFields"
 export const Route = createFileRoute("/_authenticated/movements")({
   head: () => ({
     meta: [
-      { title: "السفر والتحركات — بوابة إدارة الفعالية" },
+      { title: "السفر والتحركات — حوار الأمن والتاريخ" },
       { name: "description", content: "رحلات الطيران وحركة الوصول والمغادرة للمتحدثين." },
-      { property: "og:title", content: "السفر والتحركات — بوابة إدارة الفعالية" },
+      { property: "og:title", content: "السفر والتحركات — حوار الأمن والتاريخ" },
       { property: "og:description", content: "رحلات الطيران والوصول والمغادرة." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

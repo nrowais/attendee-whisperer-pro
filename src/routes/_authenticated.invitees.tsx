@@ -7,9 +7,9 @@ import { inviteeFields, invitationFields, attendanceFields } from "@/lib/tableFi
 export const Route = createFileRoute("/_authenticated/invitees")({
   head: () => ({
     meta: [
-      { title: "المدعوون والحضور — بوابة إدارة الفعالية" },
+      { title: "المدعوون والحضور — حوار الأمن والتاريخ" },
       { name: "description", content: "إدارة المدعوين والدعوات وتسجيل الحضور في شاشة واحدة." },
-      { property: "og:title", content: "المدعوون والحضور — بوابة إدارة الفعالية" },
+      { property: "og:title", content: "المدعوون والحضور — حوار الأمن والتاريخ" },
       { property: "og:description", content: "المدعوون والدعوات وتسجيل الحضور." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

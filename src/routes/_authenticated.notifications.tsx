@@ -10,9 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
     meta: [
-      { title: "الإشعارات — بوابة إدارة الفعاليات" },
+      { title: "الإشعارات — حوار الأمن والتاريخ" },
       { name: "description", content: "إشعارات المستخدم الخاصة بمهام وتحديثات الفعاليات." },
-      { property: "og:title", content: "الإشعارات — بوابة إدارة الفعاليات" },
+      { property: "og:title", content: "الإشعارات — حوار الأمن والتاريخ" },
       { property: "og:description", content: "إشعارات المستخدم داخل البوابة." },
     ],
   }),

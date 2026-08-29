@@ -24,9 +24,9 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "المتابعة اللحظية — بوابة إدارة الفعالية" },
+      { title: "المتابعة اللحظية — حوار الأمن والتاريخ" },
       { name: "description", content: "أرقام وإحصائيات لحظية عن المتحدثين والحضور والتحركات والإقامة." },
-      { property: "og:title", content: "المتابعة اللحظية — بوابة إدارة الفعالية" },
+      { property: "og:title", content: "المتابعة اللحظية — حوار الأمن والتاريخ" },
       { property: "og:description", content: "حالة الفعالية لحظة بلحظة في شاشة واحدة." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -247,7 +247,7 @@ footer { margin-top:24px; font-size:11px; color:#7b8497; text-align:center; }
 <p class="meta">${todayLabel()}</p>
 <table><thead><tr><th style="width:48px">#</th><th>البند</th><th style="width:120px">القيمة</th></tr></thead>
 <tbody>${body}</tbody></table>
-<footer>تم إنشاء التقرير آليًا من بوابة إدارة الفعالية</footer>
+<footer>تم إنشاء التقرير آليًا من حوار الأمن والتاريخ</footer>
 </body></html>`);
   win.document.close();
   win.focus();

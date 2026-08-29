@@ -7,9 +7,9 @@ import { tripFields, driverFields, vehicleFields } from "@/lib/tableFields";
 export const Route = createFileRoute("/_authenticated/trips")({
   head: () => ({
     meta: [
-      { title: "النقل الأرضي — بوابة إدارة الفعالية" },
+      { title: "النقل الأرضي — حوار الأمن والتاريخ" },
       { name: "description", content: "جدولة رحلات النقل وإدارة السائقين والمركبات." },
-      { property: "og:title", content: "النقل الأرضي — بوابة إدارة الفعالية" },
+      { property: "og:title", content: "النقل الأرضي — حوار الأمن والتاريخ" },
       { property: "og:description", content: "رحلات النقل والسائقون والمركبات." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

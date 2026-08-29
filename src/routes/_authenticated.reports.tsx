@@ -10,9 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
     meta: [
-      { title: "التقارير — بوابة إدارة الفعالية" },
+      { title: "التقارير — حوار الأمن والتاريخ" },
       { name: "description", content: "تقارير تشغيلية بأرقام حقيقية قابلة للتصدير بصيغة CSV." },
-      { property: "og:title", content: "التقارير — بوابة إدارة الفعالية" },
+      { property: "og:title", content: "التقارير — حوار الأمن والتاريخ" },
       { property: "og:description", content: "تقارير الحضور والوصول والنقل والإقامة." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -213,11 +213,11 @@ function buildReportHtml(report: ReportDef, rows: Record<string, any>[]) {
       <h1>${esc(report.title)}</h1>
       <p class="sub">${esc(report.desc)}</p>
     </div>
-    <div class="brand">بوابة إدارة الفعالية<br />حوار الأمن والتاريخ — الرياض 2026</div>
+    <div class="brand">حوار الأمن والتاريخ<br />حوار الأمن والتاريخ — الرياض 2026</div>
   </header>
   <div class="meta"><span>عدد السجلات: <strong>${rows.length}</strong></span><span>تاريخ التقرير: ${esc(now)}</span></div>
   <table><thead><tr><th>#</th>${head}</tr></thead><tbody>${body}</tbody></table>
-  <footer>تم إنشاء هذا التقرير آلياً من بوابة إدارة الفعالية</footer>
+  <footer>تم إنشاء هذا التقرير آلياً من حوار الأمن والتاريخ</footer>
   <script>window.onload = function () { setTimeout(function () { window.print(); }, 400); };<\/script>
 </body></html>`;
 }

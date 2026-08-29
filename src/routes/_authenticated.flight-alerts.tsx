@@ -12,9 +12,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/_authenticated/flight-alerts")({
   head: () => ({
     meta: [
-      { title: "سجل تنبيهات الرحلات — عمليات ضيوف الفعالية" },
+      { title: "سجل تنبيهات الرحلات — حوار الأمن والتاريخ" },
       { name: "description", content: "سجل كامل لتنبيهات رحلات الطيران المُرسلة مع وقت الإرسال وحالة كل تنبيه لكل رحلة." },
-      { property: "og:title", content: "سجل تنبيهات الرحلات — عمليات ضيوف الفعالية" },
+      { property: "og:title", content: "سجل تنبيهات الرحلات — حوار الأمن والتاريخ" },
       { property: "og:description", content: "تتبّع تنبيهات الوصول والإقلاع لكل رحلة وحالتها." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

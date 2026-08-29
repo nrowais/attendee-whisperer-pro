@@ -7,9 +7,9 @@ import { bookingFields, hotelFields, roomFields } from "@/lib/tableFields";
 export const Route = createFileRoute("/_authenticated/hotels")({
   head: () => ({
     meta: [
-      { title: "الإقامة — بوابة إدارة الفعالية" },
+      { title: "الإقامة — حوار الأمن والتاريخ" },
       { name: "description", content: "حجوزات الإقامة وتوزيع الغرف على الضيوف والمتحدثين." },
-      { property: "og:title", content: "الإقامة — بوابة إدارة الفعالية" },
+      { property: "og:title", content: "الإقامة — حوار الأمن والتاريخ" },
       { property: "og:description", content: "الفنادق والغرف وحجوزات الإقامة." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
