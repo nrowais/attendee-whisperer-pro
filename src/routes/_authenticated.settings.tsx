@@ -13,9 +13,9 @@ import {
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
-      { title: "الإعدادات — بوابة إدارة الفعالية" },
+      { title: "الإعدادات — حوار الأمن والتاريخ" },
       { name: "description", content: "إعدادات الفعالية وفريق العمل والتصنيفات والصلاحيات." },
-      { property: "og:title", content: "الإعدادات — بوابة إدارة الفعالية" },
+      { property: "og:title", content: "الإعدادات — حوار الأمن والتاريخ" },
       { property: "og:description", content: "الفعالية وفريق العمل والصلاحيات." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

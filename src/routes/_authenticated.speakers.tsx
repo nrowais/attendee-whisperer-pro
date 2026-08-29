@@ -7,9 +7,9 @@ import { speakerFields, sessionFields, requestFields } from "@/lib/tableFields";
 export const Route = createFileRoute("/_authenticated/speakers")({
   head: () => ({
     meta: [
-      { title: "المتحدثون — بوابة إدارة الفعالية" },
+      { title: "المتحدثون — حوار الأمن والتاريخ" },
       { name: "description", content: "بيانات المتحدثين وجلساتهم وطلباتهم الخاصة في مكان واحد." },
-      { property: "og:title", content: "المتحدثون — بوابة إدارة الفعالية" },
+      { property: "og:title", content: "المتحدثون — حوار الأمن والتاريخ" },
       { property: "og:description", content: "بيانات المتحدثين وجلساتهم وطلباتهم." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

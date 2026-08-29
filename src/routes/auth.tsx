@@ -13,10 +13,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "تسجيل الدخول — بوابة إدارة الفعاليات" },
-      { name: "description", content: "الدخول إلى بوابة إدارة الفعاليات والمتحدثين والدعوات." },
-      { property: "og:title", content: "تسجيل الدخول — بوابة إدارة الفعاليات" },
-      { property: "og:description", content: "الدخول إلى بوابة إدارة الفعاليات." },
+      { title: "تسجيل الدخول — حوار الأمن والتاريخ" },
+      { name: "description", content: "الدخول إلى حوار الأمن والتاريخ والمتحدثين والدعوات." },
+      { property: "og:title", content: "تسجيل الدخول — حوار الأمن والتاريخ" },
+      { property: "og:description", content: "الدخول إلى حوار الأمن والتاريخ." },
     ],
   }),
   component: AuthPage,

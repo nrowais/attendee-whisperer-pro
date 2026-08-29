@@ -25,7 +25,7 @@ import {
 export const Route = createFileRoute("/_authenticated/users")({
   head: () => ({
     meta: [
-      { title: "المستخدمون والصلاحيات — بوابة إدارة الفعاليات" },
+      { title: "المستخدمون والصلاحيات — حوار الأمن والتاريخ" },
       { name: "description", content: "إدارة مستخدمي البوابة وصلاحياتهم: مدير، منسّق، مطّلع." },
       { property: "og:title", content: "المستخدمون والصلاحيات" },
       { property: "og:description", content: "إدارة صلاحيات فريق البوابة." },

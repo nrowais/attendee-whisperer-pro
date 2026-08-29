@@ -7,13 +7,13 @@ import eventLogo from "@/assets/event-logo.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "بوابة إدارة الفعاليات — تنظيم متكامل وأنيق" },
+      { title: "حوار الأمن والتاريخ — تنظيم متكامل وأنيق" },
       {
         name: "description",
         content:
           "بوابة إلكترونية لإدارة الفعاليات: المتحدثون، الجلسات، الدعوات، الحضور، السفر، الإقامة، النقل والطلبات.",
       },
-      { property: "og:title", content: "بوابة إدارة الفعاليات" },
+      { property: "og:title", content: "حوار الأمن والتاريخ" },
       {
         property: "og:description",
         content: "إدارة مركزية لكل تفاصيل الفعالية من الدعوة حتى المغادرة.",
@@ -109,7 +109,7 @@ function Landing() {
 
       <footer className="border-t border-border">
         <div className="mx-auto max-w-6xl px-6 py-8 text-sm text-muted-foreground">
-          بوابة إدارة الفعاليات © {new Date().getFullYear()}
+          حوار الأمن والتاريخ © {new Date().getFullYear()}
         </div>
       </footer>
     </div>
