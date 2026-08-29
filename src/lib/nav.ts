@@ -6,6 +6,7 @@ import {
   Car,
   BedDouble,
   BarChart3,
+  CalendarDays,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -14,6 +15,8 @@ export type NavItem = { to: string; label: string; icon: LucideIcon; hint?: stri
 
 export const navItems: NavItem[] = [
   { to: "/dashboard", label: "المتابعة اللحظية", icon: Activity, hint: "الأرقام والحالة الآن" },
+  { to: "/calendar", label: "التقويم", icon: CalendarDays, hint: "كل المواعيد في شهر واحد" },
+
   { to: "/speakers", label: "المتحدثون", icon: Mic, hint: "البيانات والجلسات والطلبات" },
   { to: "/invitees", label: "المدعوون والحضور", icon: Users, hint: "الدعوات والتسجيل" },
   { to: "/movements", label: "السفر والتحركات", icon: Plane, hint: "الرحلات والوصول والمغادرة" },
