@@ -429,7 +429,37 @@ function DashboardPage() {
         <ProgressRow label="رحلات النقل المنفذة" done={data.tripsTotal - data.tripsActive} total={data.tripsTotal} />
       </div>
 
+      <div className="surface-card p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <p className="font-display text-lg font-bold text-foreground">مغادرات مجدولة خلال 48 ساعة</p>
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/movements">
+              الكل <ArrowLeft className="size-4" />
+            </Link>
+          </Button>
+        </div>
+        {data.upcomingDepartures.length === 0 ? (
+          <p className="py-8 text-center text-sm text-muted-foreground">لا توجد مغادرات مجدولة قريباً</p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {data.upcomingDepartures.map((row: any) => (
+              <li key={row.id} className="flex items-center justify-between gap-3 py-3">
+                <div>
+                  <p className="text-sm font-medium text-foreground">{row.speakers?.full_name ?? "—"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {row.departure_point ?? "—"}
+                    {row.terminal ? ` — صالة ${row.terminal}` : ""}
+                  </p>
+                </div>
+                <span className="text-xs text-muted-foreground">{fmtTime(row.departure_time)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       <div className="grid gap-5 lg:grid-cols-2">
+
         <div className="surface-card p-6">
           <div className="mb-4 flex items-center justify-between">
             <p className="font-display text-lg font-bold text-foreground">وصول خلال 12 ساعة</p>
