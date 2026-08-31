@@ -113,7 +113,7 @@ export function SpeakersStatusBoard() {
   const [query, setQuery] = useState("");
 
   const rows = useMemo(() => {
-    const tab = STATUS_TABS.find((t) => t.value === status) ?? STATUS_TABS[0];
+    const tab = STATUS_TABS.find((t) => t.value === status) ?? STATUS_TABS[0]!;
     return (data ?? []).filter((r: any) => {
       if (!tab.match(r.opStatus)) return false;
       if (tripFilter === "has" && !r.trip) return false;
@@ -140,7 +140,7 @@ export function SpeakersStatusBoard() {
     return map;
   }, [data]);
 
-  const statusIcons: Record<string, typeof CalendarClock> = {
+  const statusIcons: Record<StatusKey, typeof CalendarClock> = {
     all: Mic,
     scheduled: CalendarClock,
     arrived: PlaneLanding,
