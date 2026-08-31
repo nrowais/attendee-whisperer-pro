@@ -88,7 +88,7 @@ function useSpeakersBoard() {
       });
 
       return (speakers ?? []).map((s: any) => {
-        const op = opsBySpeaker.get(s.id);
+        const op: any = opsBySpeaker.get(s.id);
         const trip = tripBySpeaker.get(s.id);
         const booking = bookingBySpeaker.get(s.id);
         return {
