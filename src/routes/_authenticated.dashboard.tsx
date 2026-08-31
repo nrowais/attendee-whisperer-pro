@@ -363,7 +363,7 @@ function DashboardPage() {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Kpi icon={Mic} label="المتحدثون" value={data.speakers} sub="مسجلون في النظام" to="/speakers" />
-        <Kpi icon={Users} label="المدعوون" value={data.invitees} sub="إجمالي قائمة الدعوات" to="/speakers" />
+        <Kpi icon={Users} label="المدعوون" value={data.invitees} sub="إجمالي قائمة الدعوات" to="/invitees" />
         <Kpi
           icon={PlaneLanding}
           label="تم وصولهم"
@@ -371,7 +371,7 @@ function DashboardPage() {
           sub="من حركات الوصول المسجلة"
           to="/movements"
         />
-        <Kpi icon={UserCheck} label="الحضور المسجل" value={data.attendance} sub="تسجيل في الموقع" to="/speakers" />
+        <Kpi icon={UserCheck} label="الحضور المسجل" value={data.attendance} sub="تسجيل في الموقع" to="/invitees" />
         <Kpi icon={Car} label="رحلات النقل" value={data.tripsTotal} sub={`${data.tripsActive} جارية الآن`} to="/movements" />
         <Kpi
           icon={BedDouble}

@@ -19,6 +19,7 @@ import { Route as AuthenticatedDailyRouteImport } from './routes/_authenticated.
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedFlightAlertsRouteImport } from './routes/_authenticated.flight-alerts'
 import { Route as AuthenticatedHotelsRouteImport } from './routes/_authenticated.hotels'
+import { Route as AuthenticatedInviteesRouteImport } from './routes/_authenticated.invitees'
 import { Route as AuthenticatedMovementsRouteImport } from './routes/_authenticated.movements'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated.notifications'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated.reports'
@@ -76,6 +77,11 @@ const AuthenticatedHotelsRoute = AuthenticatedHotelsRouteImport.update({
   path: '/hotels',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedInviteesRoute = AuthenticatedInviteesRouteImport.update({
+  id: '/invitees',
+  path: '/invitees',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedMovementsRoute = AuthenticatedMovementsRouteImport.update({
   id: '/movements',
   path: '/movements',
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/flight-alerts': typeof AuthenticatedFlightAlertsRoute
   '/hotels': typeof AuthenticatedHotelsRoute
+  '/invitees': typeof AuthenticatedInviteesRoute
   '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/reports': typeof AuthenticatedReportsRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/flight-alerts': typeof AuthenticatedFlightAlertsRoute
   '/hotels': typeof AuthenticatedHotelsRoute
+  '/invitees': typeof AuthenticatedInviteesRoute
   '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/reports': typeof AuthenticatedReportsRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/flight-alerts': typeof AuthenticatedFlightAlertsRoute
   '/_authenticated/hotels': typeof AuthenticatedHotelsRoute
+  '/_authenticated/invitees': typeof AuthenticatedInviteesRoute
   '/_authenticated/movements': typeof AuthenticatedMovementsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
@@ -173,6 +182,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/flight-alerts'
     | '/hotels'
+    | '/invitees'
     | '/movements'
     | '/notifications'
     | '/reports'
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/flight-alerts'
     | '/hotels'
+    | '/invitees'
     | '/movements'
     | '/notifications'
     | '/reports'
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/flight-alerts'
     | '/_authenticated/hotels'
+    | '/_authenticated/invitees'
     | '/_authenticated/movements'
     | '/_authenticated/notifications'
     | '/_authenticated/reports'
@@ -295,6 +307,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHotelsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/invitees': {
+      id: '/_authenticated/invitees'
+      path: '/invitees'
+      fullPath: '/invitees'
+      preLoaderRoute: typeof AuthenticatedInviteesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/movements': {
       id: '/_authenticated/movements'
       path: '/movements'
@@ -347,6 +366,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFlightAlertsRoute: typeof AuthenticatedFlightAlertsRoute
   AuthenticatedHotelsRoute: typeof AuthenticatedHotelsRoute
+  AuthenticatedInviteesRoute: typeof AuthenticatedInviteesRoute
   AuthenticatedMovementsRoute: typeof AuthenticatedMovementsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
@@ -362,6 +382,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFlightAlertsRoute: AuthenticatedFlightAlertsRoute,
   AuthenticatedHotelsRoute: AuthenticatedHotelsRoute,
+  AuthenticatedInviteesRoute: AuthenticatedInviteesRoute,
   AuthenticatedMovementsRoute: AuthenticatedMovementsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,

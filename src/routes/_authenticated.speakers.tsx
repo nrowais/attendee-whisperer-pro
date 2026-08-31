@@ -7,9 +7,6 @@ import {
   sessionFields,
   requestFields,
   guestOperationFields,
-  inviteeFields,
-  invitationFields,
-  attendanceFields,
 } from "@/lib/tableFields";
 
 export const Route = createFileRoute("/_authenticated/speakers")({
@@ -32,8 +29,8 @@ export const Route = createFileRoute("/_authenticated/speakers")({
 function GuestsWorkspace() {
   return (
     <Workspace
-      title="الضيوف والمتحدثون"
-      subtitle="كل الأشخاص في مكان واحد: المتحدثون وحالتهم التشغيلية، والمدعوون ودعواتهم وحضورهم."
+      title="المتحدثون"
+      subtitle="المتحدثون وحالتهم التشغيلية وجلساتهم وطلباتهم الخاصة."
       groups={[
         {
           label: "المتحدثون",
@@ -87,50 +84,6 @@ function GuestsWorkspace() {
                   title="الطلبات الخاصة"
                   subtitle="طلبات المتحدثين ومتابعة تنفيذها"
                   fields={requestFields}
-                />
-              ),
-            },
-          ],
-        },
-        {
-          label: "المدعوون والحضور",
-          tabs: [
-            {
-              value: "invitees",
-              label: "المدعوون",
-              content: (
-                <CrudPage
-                  compact
-                  table="invitees"
-                  title="المدعوون"
-                  subtitle="قائمة المدعوين"
-                  fields={inviteeFields}
-                />
-              ),
-            },
-            {
-              value: "invitations",
-              label: "الدعوات",
-              content: (
-                <CrudPage
-                  compact
-                  table="invitations"
-                  title="الدعوات"
-                  subtitle="حالة الدعوات والردود"
-                  fields={invitationFields}
-                />
-              ),
-            },
-            {
-              value: "attendance",
-              label: "الحضور والتسجيل",
-              content: (
-                <CrudPage
-                  compact
-                  table="attendance"
-                  title="الحضور"
-                  subtitle="تسجيل الحضور في الموقع"
-                  fields={attendanceFields}
                 />
               ),
             },
