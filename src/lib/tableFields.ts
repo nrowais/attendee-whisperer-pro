@@ -160,6 +160,7 @@ export const arrivalFields: Field[] = [
   flightRef,
   { key: "arrival_time", label: "وقت الوصول", type: "datetime" },
   { key: "arrival_point", label: "نقطة الوصول" },
+  { key: "terminal", label: "الصالة" },
   {
     key: "status",
     label: "الحالة",
@@ -181,6 +182,7 @@ export const departureFields: Field[] = [
   flightRef,
   { key: "departure_time", label: "وقت المغادرة", type: "datetime" },
   { key: "departure_point", label: "نقطة المغادرة" },
+  { key: "terminal", label: "الصالة" },
   {
     key: "status",
     label: "الحالة",
@@ -195,6 +197,36 @@ export const departureFields: Field[] = [
   },
   { key: "notes", label: "ملاحظات", type: "textarea", list: false },
 ];
+
+export const operationalStatusOptions = [
+  { value: "scheduled", label: "مجدول" },
+  { value: "arrived", label: "وصل المطار" },
+  { value: "in_transport", label: "في النقل" },
+  { value: "at_hotel", label: "في الفندق" },
+  { value: "at_event", label: "في الفعالية" },
+  { value: "departed", label: "غادر" },
+  { value: "cancelled", label: "ملغي" },
+];
+
+export const guestOperationFields: Field[] = [
+  { ...speakerRef, required: true },
+  {
+    key: "operational_status",
+    label: "الحالة التشغيلية",
+    type: "select",
+    badge: true,
+    options: operationalStatusOptions,
+  },
+  { key: "arrival_actual_time", label: "الوصول الفعلي", type: "datetime" },
+  { key: "airport_received_at", label: "الاستقبال بالمطار", type: "datetime" },
+  { key: "transport_departed_at", label: "انطلاق النقل", type: "datetime", list: false },
+  { key: "hotel_arrived_at", label: "الوصول للفندق", type: "datetime", list: false },
+  { key: "hotel_checkin_at", label: "تسجيل دخول الفندق", type: "datetime", list: false },
+  { key: "event_arrived_at", label: "الوصول للفعالية", type: "datetime", list: false },
+  { key: "departure_actual_time", label: "المغادرة الفعلية", type: "datetime" },
+  { key: "notes", label: "ملاحظات", type: "textarea", list: false },
+];
+
 
 export const tripFields: Field[] = [
   eventRef,
