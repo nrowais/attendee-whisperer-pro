@@ -7,6 +7,7 @@ import {
   BedDouble,
   BarChart3,
   CalendarDays,
+  ClipboardPlus,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -16,6 +17,7 @@ export type NavItem = { to: string; label: string; icon: LucideIcon; hint?: stri
 export const navItems: NavItem[] = [
   { to: "/dashboard", label: "المتابعة اللحظية", icon: Activity, hint: "الأرقام والحالة الآن" },
   { to: "/calendar", label: "التقويم", icon: CalendarDays, hint: "كل المواعيد في شهر واحد" },
+  { to: "/daily", label: "الإدخال اليومي", icon: ClipboardPlus, hint: "نقل وإقامة يوماً بيوم" },
 
   { to: "/speakers", label: "المتحدثون", icon: Mic, hint: "البيانات والجلسات والطلبات" },
   { to: "/invitees", label: "المدعوون والحضور", icon: Users, hint: "الدعوات والتسجيل" },
