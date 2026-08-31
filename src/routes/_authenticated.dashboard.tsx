@@ -169,7 +169,12 @@ function useLiveStats() {
         todayTrips,
         todayCheckIns,
         todayArrivals,
+        opCounts,
+        presentNow,
+        plannedArrivals: plannedArrivals ?? 0,
+        plannedDepartures: plannedDepartures ?? 0,
         upcoming: upcoming ?? [],
+        upcomingDepartures: upcomingDepartures ?? [],
         nextTrips: nextTrips ?? [],
         alerts: alerts ?? [],
       };
