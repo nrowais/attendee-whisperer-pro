@@ -165,7 +165,7 @@ function DailyEntryPage() {
   const roomsForHotel = useMemo(
     () =>
       (lookups.data?.rooms ?? []).filter(
-        (r) => !booking["hotel_id"] || r.hotel_id === booking.hotel_id,
+        (r) => !booking.hotel_id || r.hotel_id === booking.hotel_id,
       ),
     [lookups.data?.rooms, booking.hotel_id],
   );
