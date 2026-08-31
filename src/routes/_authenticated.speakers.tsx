@@ -29,8 +29,8 @@ export const Route = createFileRoute("/_authenticated/speakers")({
 function GuestsWorkspace() {
   return (
     <Workspace
-      title="الضيوف والمتحدثون"
-      subtitle="كل الأشخاص في مكان واحد: المتحدثون وحالتهم التشغيلية، والمدعوون ودعواتهم وحضورهم."
+      title="المتحدثون"
+      subtitle="المتحدثون وحالتهم التشغيلية وجلساتهم وطلباتهم الخاصة."
       groups={[
         {
           label: "المتحدثون",
