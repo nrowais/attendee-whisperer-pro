@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { CrudPage } from "@/components/portal/CrudPage";
+import { SpeakersStatusBoard } from "@/components/portal/SpeakersStatusBoard";
 import { Workspace } from "@/components/portal/Workspace";
 import {
   speakerFields,
