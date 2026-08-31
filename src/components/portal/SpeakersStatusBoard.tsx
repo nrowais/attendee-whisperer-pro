@@ -1,0 +1,289 @@
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  CalendarClock,
+  PlaneLanding,
+  Car,
+  BedDouble,
+  Flag,
+  Search,
+  Mic,
+  XCircle,
+  Phone,
+} from "lucide-react";
+
+import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const db = supabase as any;
+
+type StatusKey = "all" | "scheduled" | "arrived" | "present" | "departed" | "cancelled";
+
+const STATUS_TABS: { value: StatusKey; label: string; match: (s: string) => boolean }[] = [
+  { value: "all", label: "الكل", match: () => true },
+  { value: "scheduled", label: "مجدول", match: (s) => s === "scheduled" },
+  { value: "arrived", label: "وصل", match: (s) => s === "arrived" },
+  {
+    value: "present",
+    label: "موجود",
+    match: (s) => ["in_transport", "at_hotel", "at_event"].includes(s),
+  },
+  { value: "departed", label: "غادر", match: (s) => s === "departed" },
+  { value: "cancelled", label: "ملغي", match: (s) => s === "cancelled" },
+];
+
+const DETAIL_STATUS_LABELS: Record<string, string> = {
+  scheduled: "مجدول",
+  arrived: "وصل المطار",
+  in_transport: "في النقل",
+  at_hotel: "في الفندق",
+  at_event: "في الفعالية",
+  departed: "غادر",
+  cancelled: "ملغي",
+};
+
+const TRIP_STATUS_LABELS: Record<string, string> = {
+  scheduled: "مجدولة",
+  in_progress: "جارية",
+  completed: "مكتملة",
+  cancelled: "ملغاة",
+};
+
+const BOOKING_STATUS_LABELS: Record<string, string> = {
+  reserved: "محجوزة",
+  checked_in: "تم تسجيل الدخول",
+  checked_out: "تم تسجيل الخروج",
+  cancelled: "ملغاة",
+};
+
+function useSpeakersBoard() {
+  return useQuery({
+    queryKey: ["speakers-status-board"],
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const [{ data: speakers }, { data: ops }, { data: trips }, { data: bookings }, { data: hotels }] =
+        await Promise.all([
+          db.from("speakers").select("id, full_name, title, organization, country, phone").order("full_name"),
+          db.from("guest_operations").select("*"),
+          db
+            .from("transport_trips")
+            .select("id, speaker_id, trip_type, status, scheduled_at, pickup_location, dropoff_location")
+            .order("scheduled_at", { ascending: false }),
+          db.from("hotel_bookings").select("id, speaker_id, hotel_id, check_in, check_out, status"),
+          db.from("hotels").select("id, name"),
+        ]);
+
+      const hotelNames = new Map((hotels ?? []).map((h: any) => [h.id, h.name]));
+      const opsBySpeaker = new Map((ops ?? []).map((o: any) => [o.speaker_id, o]));
+      const tripBySpeaker = new Map<string, any>();
+      (trips ?? []).forEach((t: any) => {
+        if (t.speaker_id && !tripBySpeaker.has(t.speaker_id)) tripBySpeaker.set(t.speaker_id, t);
+      });
+      const bookingBySpeaker = new Map<string, any>();
+      (bookings ?? []).forEach((b: any) => {
+        if (b.speaker_id && !bookingBySpeaker.has(b.speaker_id)) bookingBySpeaker.set(b.speaker_id, b);
+      });
+
+      return (speakers ?? []).map((s: any) => {
+        const op: any = opsBySpeaker.get(s.id);
+        const trip = tripBySpeaker.get(s.id);
+        const booking = bookingBySpeaker.get(s.id);
+        return {
+          ...s,
+          opStatus: (op?.operational_status as string) ?? "scheduled",
+          op,
+          trip,
+          booking: booking
+            ? { ...booking, hotelName: hotelNames.get(booking.hotel_id) ?? "—" }
+            : null,
+        };
+      });
+    },
+  });
+}
+
+export function SpeakersStatusBoard() {
+  const { data, isLoading } = useSpeakersBoard();
+  const [status, setStatus] = useState<StatusKey>("all");
+  const [tripFilter, setTripFilter] = useState<string>("all");
+  const [hotelFilter, setHotelFilter] = useState<string>("all");
+  const [query, setQuery] = useState("");
+
+  const rows = useMemo(() => {
+    const tab = STATUS_TABS.find((t) => t.value === status) ?? STATUS_TABS[0]!;
+    return (data ?? []).filter((r: any) => {
+      if (!tab.match(r.opStatus)) return false;
+      if (tripFilter === "has" && !r.trip) return false;
+      if (tripFilter === "none" && r.trip) return false;
+      if (!["all", "has", "none"].includes(tripFilter) && r.trip?.status !== tripFilter) return false;
+      if (hotelFilter === "has" && !r.booking) return false;
+      if (hotelFilter === "none" && r.booking) return false;
+      if (!["all", "has", "none"].includes(hotelFilter) && r.booking?.status !== hotelFilter)
+        return false;
+      if (query.trim()) {
+        const q = query.trim();
+        const hay = `${r.full_name} ${r.organization ?? ""} ${r.country ?? ""} ${r.phone ?? ""}`;
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [data, status, tripFilter, hotelFilter, query]);
+
+  const counts = useMemo(() => {
+    const map: Record<string, number> = { all: (data ?? []).length };
+    STATUS_TABS.slice(1).forEach((t) => {
+      map[t.value] = (data ?? []).filter((r: any) => t.match(r.opStatus)).length;
+    });
+    return map;
+  }, [data]);
+
+  const statusIcons: Record<StatusKey, typeof CalendarClock> = {
+    all: Mic,
+    scheduled: CalendarClock,
+    arrived: PlaneLanding,
+    present: Flag,
+    departed: XCircle,
+    cancelled: XCircle,
+  };
+
+  return (
+    <div className="space-y-4" dir="rtl">
+      {/* Status tabs */}
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+        {STATUS_TABS.map((t) => {
+          const Icon = statusIcons[t.value] ?? Mic;
+          const active = status === t.value;
+          return (
+            <button
+              key={t.value}
+              type="button"
+              onClick={() => setStatus(t.value)}
+              className={cn(
+                "flex flex-col items-center gap-1 rounded-xl border p-3 transition-colors",
+                active
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <Icon className="h-4 w-4" />
+              <span className="text-xs font-semibold">{t.label}</span>
+              <span className="text-lg font-bold">{counts[t.value] ?? 0}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative min-w-52 flex-1">
+          <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="بحث بالاسم أو الجهة أو الدولة..."
+            className="pr-9"
+          />
+        </div>
+        <select
+          value={tripFilter}
+          onChange={(e) => setTripFilter(e.target.value)}
+          className="h-10 rounded-md border border-border bg-card px-3 text-sm"
+        >
+          <option value="all">كل النقل</option>
+          <option value="has">له رحلة نقل</option>
+          <option value="none">بدون نقل</option>
+          <option value="scheduled">نقل مجدول</option>
+          <option value="in_progress">نقل جارٍ</option>
+          <option value="completed">نقل مكتمل</option>
+          <option value="cancelled">نقل ملغي</option>
+        </select>
+        <select
+          value={hotelFilter}
+          onChange={(e) => setHotelFilter(e.target.value)}
+          className="h-10 rounded-md border border-border bg-card px-3 text-sm"
+        >
+          <option value="all">كل الإقامة</option>
+          <option value="has">له حجز</option>
+          <option value="none">بدون حجز</option>
+          <option value="reserved">حجز محجوز</option>
+          <option value="checked_in">سجّل دخول الفندق</option>
+          <option value="checked_out">غادر الفندق</option>
+          <option value="cancelled">حجز ملغي</option>
+        </select>
+      </div>
+
+      {/* Results */}
+      {isLoading ? (
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-40 rounded-xl" />
+          ))}
+        </div>
+      ) : rows.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+          لا توجد نتائج مطابقة للفلاتر الحالية
+        </div>
+      ) : (
+        <>
+          <p className="text-xs text-muted-foreground">{rows.length} متحدث</p>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {rows.map((r: any) => (
+              <div key={r.id} className="space-y-3 rounded-xl border border-border bg-card p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-foreground">{r.full_name}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {[r.title, r.organization, r.country].filter(Boolean).join(" · ") || "—"}
+                    </p>
+                  </div>
+                  <Badge variant={r.opStatus === "cancelled" ? "destructive" : "secondary"}>
+                    {DETAIL_STATUS_LABELS[r.opStatus] ?? r.opStatus}
+                  </Badge>
+                </div>
+
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center gap-2 rounded-lg bg-secondary/50 px-3 py-2">
+                    <Car className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                    {r.trip ? (
+                      <span className="min-w-0 truncate">
+                        {r.trip.pickup_location ?? "—"} ← {r.trip.dropoff_location ?? "—"} ·{" "}
+                        <Badge variant="outline" className="text-[10px]">
+                          {TRIP_STATUS_LABELS[r.trip.status] ?? r.trip.status}
+                        </Badge>
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">لا توجد رحلة نقل</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 rounded-lg bg-secondary/50 px-3 py-2">
+                    <BedDouble className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                    {r.booking ? (
+                      <span className="min-w-0 truncate">
+                        {r.booking.hotelName} · {r.booking.check_in ?? "—"} →{" "}
+                        {r.booking.check_out ?? "—"} ·{" "}
+                        <Badge variant="outline" className="text-[10px]">
+                          {BOOKING_STATUS_LABELS[r.booking.status] ?? r.booking.status}
+                        </Badge>
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">لا يوجد حجز إقامة</span>
+                    )}
+                  </div>
+                  {r.phone ? (
+                    <div className="flex items-center gap-2 px-1 text-muted-foreground">
+                      <Phone className="h-3 w-3" />
+                      <span dir="ltr">{r.phone}</span>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
