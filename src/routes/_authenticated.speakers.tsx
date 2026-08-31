@@ -89,50 +89,6 @@ function GuestsWorkspace() {
             },
           ],
         },
-        {
-          label: "المدعوون والحضور",
-          tabs: [
-            {
-              value: "invitees",
-              label: "المدعوون",
-              content: (
-                <CrudPage
-                  compact
-                  table="invitees"
-                  title="المدعوون"
-                  subtitle="قائمة المدعوين"
-                  fields={inviteeFields}
-                />
-              ),
-            },
-            {
-              value: "invitations",
-              label: "الدعوات",
-              content: (
-                <CrudPage
-                  compact
-                  table="invitations"
-                  title="الدعوات"
-                  subtitle="حالة الدعوات والردود"
-                  fields={invitationFields}
-                />
-              ),
-            },
-            {
-              value: "attendance",
-              label: "الحضور والتسجيل",
-              content: (
-                <CrudPage
-                  compact
-                  table="attendance"
-                  title="الحضور"
-                  subtitle="تسجيل الحضور في الموقع"
-                  fields={attendanceFields}
-                />
-              ),
-            },
-          ],
-        },
       ]}
     />
   );

@@ -1,6 +1,8 @@
 import {
   Activity,
   Users,
+  UserCheck,
+  Mic2,
   Plane,
   BedDouble,
   BarChart3,
@@ -17,7 +19,8 @@ export const navItems: NavItem[] = [
   { to: "/calendar", label: "التقويم", icon: CalendarDays, hint: "كل المواعيد في شهر واحد" },
   { to: "/daily", label: "الإدخال اليومي", icon: ClipboardPlus, hint: "نقل وإقامة يوماً بيوم" },
 
-  { to: "/speakers", label: "الضيوف والمتحدثون", icon: Users, hint: "المتحدثون والمدعوون والحضور" },
+  { to: "/speakers", label: "المتحدثون", icon: Mic2, hint: "المتحدثون والجلسات والطلبات" },
+  { to: "/invitees", label: "الضيوف والمدعوون", icon: UserCheck, hint: "المدعوون والدعوات والحضور" },
   { to: "/movements", label: "التنقلات", icon: Plane, hint: "الطيران والوصول والنقل الأرضي" },
   { to: "/hotels", label: "الإقامة", icon: BedDouble, hint: "الفنادق والغرف والحجوزات" },
   { to: "/reports", label: "التقارير", icon: BarChart3, hint: "ملخصات قابلة للتصدير" },
