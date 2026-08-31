@@ -20,6 +20,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_authenticated/operations")({
   head: () => ({
@@ -125,6 +135,25 @@ const ACTIONS: {
   },
 ];
 
+const REVERT_STATUS: Partial<Record<ActionKey, string>> = {
+  arrived: "scheduled",
+  in_transport: "arrived",
+  at_hotel: "in_transport",
+  at_event: "at_hotel",
+  departed: "at_event",
+};
+
+const REVERT_TRIP: Partial<Record<ActionKey, string>> = {
+  in_transport: "scheduled",
+  at_hotel: "in_progress",
+};
+
+const REVERT_BOOKING: Partial<Record<ActionKey, string>> = {
+  hotel_checkout: "checked_in",
+  hotel_checkin: "reserved",
+  departed: "checked_in",
+};
+
 function useOperationsData() {
   return useQuery({
     queryKey: ["operations-manage"],
@@ -178,6 +207,12 @@ function timeLabel(value?: string | null) {
   });
 }
 
+function isActionDone(row: any, action: (typeof ACTIONS)[number]) {
+  if (action.field && row.op?.[action.field]) return true;
+  if (action.key === "hotel_checkout" && row.booking?.status === "checked_out") return true;
+  return false;
+}
+
 function OperationsPage() {
   const { canEdit } = useRoles();
   const { data, isLoading } = useOperationsData();
@@ -185,46 +220,71 @@ function OperationsPage() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [pending, setPending] = useState<string | null>(null);
+  const [confirmUndo, setConfirmUndo] = useState<{ row: any; action: (typeof ACTIONS)[number] } | null>(null);
 
   const mutation = useMutation({
-    mutationFn: async ({ row, action }: { row: any; action: (typeof ACTIONS)[number] }) => {
+    mutationFn: async ({
+      row,
+      action,
+      undo,
+    }: {
+      row: any;
+      action: (typeof ACTIONS)[number];
+      undo?: boolean;
+    }) => {
       const now = new Date().toISOString();
 
       if (action.status || action.field) {
         const payload: Record<string, any> = { speaker_id: row.id };
-        if (action.status) payload['operational_status'] = action.status;
-        if (action.field) payload[action.field] = now;
-        if (row.op?.id) {
-          const { error } = await db.from("guest_operations").update(payload).eq("id", row.op.id);
-          if (error) throw error;
+        if (undo) {
+          if (action.field) payload[action.field] = null;
+          if (action.status && REVERT_STATUS[action.key]) {
+            payload["operational_status"] = REVERT_STATUS[action.key];
+          }
         } else {
-          const { error } = await db
-            .from("guest_operations")
-            .insert({ operational_status: action.status ?? "scheduled", ...payload });
-          if (error) throw error;
+          if (action.status) payload["operational_status"] = action.status;
+          if (action.field) payload[action.field] = now;
+        }
+
+        if (Object.keys(payload).length > 1) {
+          if (row.op?.id) {
+            const { error } = await db.from("guest_operations").update(payload).eq("id", row.op.id);
+            if (error) throw error;
+          } else if (!undo) {
+            const { error } = await db
+              .from("guest_operations")
+              .insert({ operational_status: action.status ?? "scheduled", ...payload });
+            if (error) throw error;
+          }
         }
       }
 
       if (action.trip && row.trip?.id) {
-        const { error } = await db
-          .from("transport_trips")
-          .update({ status: action.trip })
-          .eq("id", row.trip.id);
-        if (error) throw error;
+        const nextStatus = undo ? REVERT_TRIP[action.key] : action.trip;
+        if (nextStatus) {
+          const { error } = await db
+            .from("transport_trips")
+            .update({ status: nextStatus })
+            .eq("id", row.trip.id);
+          if (error) throw error;
+        }
       }
 
       if (action.booking && row.booking?.id) {
-        const { error } = await db
-          .from("hotel_bookings")
-          .update({ status: action.booking })
-          .eq("id", row.booking.id);
-        if (error) throw error;
+        const nextStatus = undo ? REVERT_BOOKING[action.key] : action.booking;
+        if (nextStatus) {
+          const { error } = await db
+            .from("hotel_bookings")
+            .update({ status: nextStatus })
+            .eq("id", row.booking.id);
+          if (error) throw error;
+        }
       }
     },
     onMutate: ({ row, action }) => setPending(`${row.id}:${action.key}`),
     onSettled: () => setPending(null),
-    onSuccess: (_d, { row, action }) => {
-      toast.success(`${row.full_name}: ${action.label}`);
+    onSuccess: (_d, { row, action, undo }) => {
+      toast.success(`${row.full_name}: ${undo ? "تم التراجع عن" : "تم تسجيل"} ${action.label}`);
       queryClient.invalidateQueries({ queryKey: ["operations-manage"] });
       queryClient.invalidateQueries({ queryKey: ["speakers-status-board"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
@@ -248,7 +308,8 @@ function OperationsPage() {
       <header className="space-y-1">
         <h1 className="text-2xl font-bold text-foreground">إدارة الحالة التشغيلية</h1>
         <p className="text-sm text-muted-foreground">
-          سجّل وصول المتحدث ومغادرته ودخوله الفندق وخروجه وحالة النقل — وتظهر فوراً في لوحة الحالات.
+          سجّل وصول المتحدث ومغادرته ودخوله الفندق وخروجه وحالة النقل — وتظهر فوراً في لوحة الحالات. اضغط الزر
+          مرة ثانية للتراجع.
         </p>
       </header>
 
@@ -328,16 +389,20 @@ function OperationsPage() {
                   const Icon = a.icon;
                   const key = `${r.id}:${a.key}`;
                   const busy = pending === key;
-                  const done =
-                    (a.field && r.op?.[a.field]) ||
-                    (a.key === "hotel_checkout" && r.booking?.status === "checked_out");
+                  const done = isActionDone(r, a);
                   return (
                     <Button
                       key={a.key}
                       size="sm"
                       variant={done ? "secondary" : "outline"}
                       disabled={!canEdit || busy}
-                      onClick={() => mutation.mutate({ row: r, action: a })}
+                      onClick={() => {
+                        if (done) {
+                          setConfirmUndo({ row: r, action: a });
+                        } else {
+                          mutation.mutate({ row: r, action: a });
+                        }
+                      }}
                       className={cn("gap-1.5 text-xs", done && "text-primary")}
                     >
                       {busy ? (
@@ -345,7 +410,7 @@ function OperationsPage() {
                       ) : (
                         <Icon className="h-3.5 w-3.5" />
                       )}
-                      {a.label}
+                      {done ? `إلغاء ${a.label}` : a.label}
                     </Button>
                   );
                 })}
@@ -362,6 +427,33 @@ function OperationsPage() {
           ))}
         </div>
       )}
+
+      <AlertDialog open={!!confirmUndo} onOpenChange={(open) => !open && setConfirmUndo(null)}>
+        <AlertDialogContent dir="rtl" className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد التراجع</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل تريد إلغاء تسجيل «{confirmUndo?.action.label}» للمتحدث{" "}
+              <span className="font-semibold text-foreground">{confirmUndo?.row.full_name}</span>؟
+              <br />
+              سيتم مسح الوقت المسجّل وإرجاع الحالة للخطوة السابقة.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 sm:gap-2">
+            <AlertDialogCancel onClick={() => setConfirmUndo(null)}>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (confirmUndo) {
+                  mutation.mutate({ ...confirmUndo, undo: true });
+                  setConfirmUndo(null);
+                }
+              }}
+            >
+              نعم، تراجع
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
