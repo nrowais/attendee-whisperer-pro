@@ -383,6 +383,44 @@ function DashboardPage() {
         <Kpi icon={AlertTriangle} label="تنبيهات نشطة" value={data.alertsPending} sub="رحلات قريبة" to="/flight-alerts" />
       </div>
 
+      <section className="surface-card p-6">
+        <div className="mb-4">
+          <p className="font-display text-lg font-bold text-foreground">الحالة التشغيلية للضيوف</p>
+          <span className="text-xs text-muted-foreground">
+            الأرقام المجدولة من جدول الرحلات، والحالة الفعلية يسجّلها فريق العمل
+          </span>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-xl border border-border bg-secondary/40 p-4">
+            <p className="text-sm text-muted-foreground">قادمون خلال 48 ساعة (مجدول)</p>
+            <p className="mt-2 font-display text-2xl font-bold text-foreground">{data.plannedArrivals}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-secondary/40 p-4">
+            <p className="text-sm text-muted-foreground">مغادرون خلال 48 ساعة (مجدول)</p>
+            <p className="mt-2 font-display text-2xl font-bold text-foreground">{data.plannedDepartures}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-secondary/40 p-4">
+            <p className="text-sm text-muted-foreground">موجودون حالياً (فعلي)</p>
+            <p className="mt-2 font-display text-2xl font-bold text-foreground">{data.presentNow}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-secondary/40 p-4">
+            <p className="text-sm text-muted-foreground">غادروا فعلياً</p>
+            <p className="mt-2 font-display text-2xl font-bold text-foreground">
+              {data.opCounts["departed"] ?? 0}
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {operationalStatusOptions.map((opt) => (
+            <Badge key={opt.value} variant="secondary">
+              {opt.label}: {data.opCounts[opt.value] ?? 0}
+            </Badge>
+          ))}
+        </div>
+      </section>
+
+
+
       <div className="surface-card space-y-5 p-6">
         <p className="font-display text-lg font-bold text-foreground">نسب الإنجاز</p>
         <ProgressRow label="وصول المتحدثين" done={data.arrived} total={data.arrivalsTotal} />
