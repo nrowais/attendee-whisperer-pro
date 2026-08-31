@@ -2,7 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { CrudPage } from "@/components/portal/CrudPage";
 import { Workspace } from "@/components/portal/Workspace";
-import { speakerFields, sessionFields, requestFields } from "@/lib/tableFields";
+import {
+  speakerFields,
+  sessionFields,
+  requestFields,
+  guestOperationFields,
+} from "@/lib/tableFields";
 
 export const Route = createFileRoute("/_authenticated/speakers")({
   head: () => ({
