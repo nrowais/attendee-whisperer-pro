@@ -56,6 +56,19 @@ function SpeakersWorkspace() {
           ),
         },
         {
+          value: "operations",
+          label: "الحالة التشغيلية",
+          content: (
+            <CrudPage
+              compact
+              table="guest_operations"
+              title="الحالة التشغيلية"
+              subtitle="تُسجَّل الأوقات الفعلية يدوياً من فريق العمل"
+              fields={guestOperationFields}
+            />
+          ),
+        },
+        {
           value: "requests",
           label: "الطلبات الخاصة",
           content: (
