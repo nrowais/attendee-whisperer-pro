@@ -154,7 +154,7 @@ export function SpeakersStatusBoard() {
       {/* Status tabs */}
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
         {STATUS_TABS.map((t) => {
-          const Icon = statusIcons[t.value];
+          const Icon = statusIcons[t.value] ?? Mic;
           const active = status === t.value;
           return (
             <button
