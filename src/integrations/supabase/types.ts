@@ -251,6 +251,72 @@ export type Database = {
         }
         Relationships: []
       }
+      guest_operations: {
+        Row: {
+          airport_received_at: string | null
+          arrival_actual_time: string | null
+          created_at: string
+          departure_actual_time: string | null
+          event_arrived_at: string | null
+          event_id: string | null
+          hotel_arrived_at: string | null
+          hotel_checkin_at: string | null
+          id: string
+          notes: string | null
+          operational_status: string
+          speaker_id: string
+          transport_departed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          airport_received_at?: string | null
+          arrival_actual_time?: string | null
+          created_at?: string
+          departure_actual_time?: string | null
+          event_arrived_at?: string | null
+          event_id?: string | null
+          hotel_arrived_at?: string | null
+          hotel_checkin_at?: string | null
+          id?: string
+          notes?: string | null
+          operational_status?: string
+          speaker_id: string
+          transport_departed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          airport_received_at?: string | null
+          arrival_actual_time?: string | null
+          created_at?: string
+          departure_actual_time?: string | null
+          event_arrived_at?: string | null
+          event_id?: string | null
+          hotel_arrived_at?: string | null
+          hotel_checkin_at?: string | null
+          id?: string
+          notes?: string | null
+          operational_status?: string
+          speaker_id?: string
+          transport_departed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_operations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guest_operations_speaker_id_fkey"
+            columns: ["speaker_id"]
+            isOneToOne: true
+            referencedRelation: "speakers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hotel_bookings: {
         Row: {
           check_in: string | null
@@ -569,6 +635,7 @@ export type Database = {
           notes: string | null
           speaker_id: string
           status: string
+          terminal: string | null
           updated_at: string
         }
         Insert: {
@@ -581,6 +648,7 @@ export type Database = {
           notes?: string | null
           speaker_id: string
           status?: string
+          terminal?: string | null
           updated_at?: string
         }
         Update: {
@@ -593,6 +661,7 @@ export type Database = {
           notes?: string | null
           speaker_id?: string
           status?: string
+          terminal?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -630,6 +699,7 @@ export type Database = {
           notes: string | null
           speaker_id: string
           status: string
+          terminal: string | null
           updated_at: string
         }
         Insert: {
@@ -642,6 +712,7 @@ export type Database = {
           notes?: string | null
           speaker_id: string
           status?: string
+          terminal?: string | null
           updated_at?: string
         }
         Update: {
@@ -654,6 +725,7 @@ export type Database = {
           notes?: string | null
           speaker_id?: string
           status?: string
+          terminal?: string | null
           updated_at?: string
         }
         Relationships: [
