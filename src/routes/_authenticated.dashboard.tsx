@@ -79,12 +79,46 @@ function useLiveStats() {
         count("flight_alerts", (q: any) => q.eq("status", "pending")),
       ]);
 
+      const soon48 = new Date(now.getTime() + 48 * 60 * 60 * 1000).toISOString();
+
+      const { data: ops } = await db.from("guest_operations").select("operational_status");
+      const opCounts: Record<string, number> = {};
+      (ops ?? []).forEach((o: any) => {
+        opCounts[o.operational_status] = (opCounts[o.operational_status] ?? 0) + 1;
+      });
+      const presentNow =
+        (opCounts["arrived"] ?? 0) +
+        (opCounts["in_transport"] ?? 0) +
+        (opCounts["at_hotel"] ?? 0) +
+        (opCounts["at_event"] ?? 0);
+
+      const [{ count: plannedArrivals }, { count: plannedDepartures }] = await Promise.all([
+        db
+          .from("speaker_arrivals")
+          .select("id", { count: "exact", head: true })
+          .gte("arrival_time", nowIso)
+          .lte("arrival_time", soon48),
+        db
+          .from("speaker_departures")
+          .select("id", { count: "exact", head: true })
+          .gte("departure_time", nowIso)
+          .lte("departure_time", soon48),
+      ]);
+
       const { data: upcoming } = await db
         .from("speaker_arrivals")
-        .select("id, arrival_time, arrival_point, status, speakers(full_name)")
+        .select("id, arrival_time, arrival_point, terminal, status, speakers(full_name)")
         .gte("arrival_time", nowIso)
         .lte("arrival_time", soon)
         .order("arrival_time", { ascending: true })
+        .limit(6);
+
+      const { data: upcomingDepartures } = await db
+        .from("speaker_departures")
+        .select("id, departure_time, departure_point, terminal, status, speakers(full_name)")
+        .gte("departure_time", nowIso)
+        .lte("departure_time", soon48)
+        .order("departure_time", { ascending: true })
         .limit(6);
 
       const { data: nextTrips } = await db
@@ -94,6 +128,7 @@ function useLiveStats() {
         .lte("scheduled_at", soon)
         .order("scheduled_at", { ascending: true })
         .limit(6);
+
 
       const dayStart = new Date(now);
       dayStart.setHours(0, 0, 0, 0);
