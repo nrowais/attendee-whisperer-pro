@@ -136,17 +136,36 @@ function DailyEntryPage() {
   const nameOf = (list: any[] | undefined, id: string | null, key: string) =>
     (list ?? []).find((r) => r.id === id)?.[key] ?? "—";
 
-  const [trip, setTrip] = useState<Record<string, string>>({
+  type TripForm = {
+    speaker_id?: string;
+    driver_id?: string;
+    vehicle_id?: string;
+    pickup_location?: string;
+    dropoff_location?: string;
+    trip_type: string;
+    status: string;
+    time: string;
+  };
+  type BookingForm = {
+    speaker_id?: string;
+    hotel_id?: string;
+    room_id?: string;
+    check_out?: string;
+    notes?: string;
+    status: string;
+  };
+
+  const [trip, setTrip] = useState<TripForm>({
     trip_type: "airport_pickup",
     status: "scheduled",
     time: "08:00",
   });
-  const [booking, setBooking] = useState<Record<string, string>>({ status: "reserved" });
+  const [booking, setBooking] = useState<BookingForm>({ status: "reserved" });
 
   const roomsForHotel = useMemo(
     () =>
       (lookups.data?.rooms ?? []).filter(
-        (r) => !booking.hotel_id || r.hotel_id === booking.hotel_id,
+        (r) => !booking["hotel_id"] || r.hotel_id === booking.hotel_id,
       ),
     [lookups.data?.rooms, booking.hotel_id],
   );
