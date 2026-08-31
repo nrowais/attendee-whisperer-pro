@@ -19,13 +19,11 @@ import { Route as AuthenticatedDailyRouteImport } from './routes/_authenticated.
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedFlightAlertsRouteImport } from './routes/_authenticated.flight-alerts'
 import { Route as AuthenticatedHotelsRouteImport } from './routes/_authenticated.hotels'
-import { Route as AuthenticatedInviteesRouteImport } from './routes/_authenticated.invitees'
 import { Route as AuthenticatedMovementsRouteImport } from './routes/_authenticated.movements'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated.notifications'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated.reports'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedSpeakersRouteImport } from './routes/_authenticated.speakers'
-import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated.trips'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
 
 const IndexRoute = IndexRouteImport.update({
@@ -78,11 +76,6 @@ const AuthenticatedHotelsRoute = AuthenticatedHotelsRouteImport.update({
   path: '/hotels',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedInviteesRoute = AuthenticatedInviteesRouteImport.update({
-  id: '/invitees',
-  path: '/invitees',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedMovementsRoute = AuthenticatedMovementsRouteImport.update({
   id: '/movements',
   path: '/movements',
@@ -109,11 +102,6 @@ const AuthenticatedSpeakersRoute = AuthenticatedSpeakersRouteImport.update({
   path: '/speakers',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
-  id: '/trips',
-  path: '/trips',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -130,13 +118,11 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/flight-alerts': typeof AuthenticatedFlightAlertsRoute
   '/hotels': typeof AuthenticatedHotelsRoute
-  '/invitees': typeof AuthenticatedInviteesRoute
   '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
-  '/trips': typeof AuthenticatedTripsRoute
   '/users': typeof AuthenticatedUsersRoute
 }
 export interface FileRoutesByTo {
@@ -149,13 +135,11 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/flight-alerts': typeof AuthenticatedFlightAlertsRoute
   '/hotels': typeof AuthenticatedHotelsRoute
-  '/invitees': typeof AuthenticatedInviteesRoute
   '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
-  '/trips': typeof AuthenticatedTripsRoute
   '/users': typeof AuthenticatedUsersRoute
 }
 export interface FileRoutesById {
@@ -170,13 +154,11 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/flight-alerts': typeof AuthenticatedFlightAlertsRoute
   '/_authenticated/hotels': typeof AuthenticatedHotelsRoute
-  '/_authenticated/invitees': typeof AuthenticatedInviteesRoute
   '/_authenticated/movements': typeof AuthenticatedMovementsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/speakers': typeof AuthenticatedSpeakersRoute
-  '/_authenticated/trips': typeof AuthenticatedTripsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
 }
 export interface FileRouteTypes {
@@ -191,13 +173,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/flight-alerts'
     | '/hotels'
-    | '/invitees'
     | '/movements'
     | '/notifications'
     | '/reports'
     | '/settings'
     | '/speakers'
-    | '/trips'
     | '/users'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -210,13 +190,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/flight-alerts'
     | '/hotels'
-    | '/invitees'
     | '/movements'
     | '/notifications'
     | '/reports'
     | '/settings'
     | '/speakers'
-    | '/trips'
     | '/users'
   id:
     | '__root__'
@@ -230,13 +208,11 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/flight-alerts'
     | '/_authenticated/hotels'
-    | '/_authenticated/invitees'
     | '/_authenticated/movements'
     | '/_authenticated/notifications'
     | '/_authenticated/reports'
     | '/_authenticated/settings'
     | '/_authenticated/speakers'
-    | '/_authenticated/trips'
     | '/_authenticated/users'
   fileRoutesById: FileRoutesById
 }
@@ -319,13 +295,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHotelsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/invitees': {
-      id: '/_authenticated/invitees'
-      path: '/invitees'
-      fullPath: '/invitees'
-      preLoaderRoute: typeof AuthenticatedInviteesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/movements': {
       id: '/_authenticated/movements'
       path: '/movements'
@@ -361,13 +330,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSpeakersRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/trips': {
-      id: '/_authenticated/trips'
-      path: '/trips'
-      fullPath: '/trips'
-      preLoaderRoute: typeof AuthenticatedTripsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/users': {
       id: '/_authenticated/users'
       path: '/users'
@@ -385,13 +347,11 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFlightAlertsRoute: typeof AuthenticatedFlightAlertsRoute
   AuthenticatedHotelsRoute: typeof AuthenticatedHotelsRoute
-  AuthenticatedInviteesRoute: typeof AuthenticatedInviteesRoute
   AuthenticatedMovementsRoute: typeof AuthenticatedMovementsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSpeakersRoute: typeof AuthenticatedSpeakersRoute
-  AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
 }
 
@@ -402,13 +362,11 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFlightAlertsRoute: AuthenticatedFlightAlertsRoute,
   AuthenticatedHotelsRoute: AuthenticatedHotelsRoute,
-  AuthenticatedInviteesRoute: AuthenticatedInviteesRoute,
   AuthenticatedMovementsRoute: AuthenticatedMovementsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSpeakersRoute: AuthenticatedSpeakersRoute,
-  AuthenticatedTripsRoute: AuthenticatedTripsRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
 }
 
