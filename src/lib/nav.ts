@@ -1,6 +1,5 @@
 import {
   Activity,
-  Users,
   UserCheck,
   Mic2,
   Plane,
