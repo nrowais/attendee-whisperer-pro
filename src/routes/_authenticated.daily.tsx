@@ -33,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/daily")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: DailyEntryPage;
+  component: DailyEntryPage,
 });
 
 const db = supabase as any;
