@@ -128,6 +128,8 @@ export function CrudPage({
 
   const listFields = fields.filter((f) => f.list !== false).slice(0, 6);
   const refFields = fields.filter((f) => f.type === "ref");
+  const statusField = fields.find((f) => f.type === "select" && f.badge);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const rowsQuery = useQuery({
     queryKey: ["crud", table],
@@ -180,6 +182,11 @@ export function CrudPage({
       }),
     );
   }, [rows, search, listFields, refMaps]);
+
+  const visible = useMemo(() => {
+    if (!statusField || statusFilter === "all") return filtered;
+    return filtered.filter((row) => row[statusField.key] === statusFilter);
+  }, [filtered, statusField, statusFilter]);
 
   const saveMutation = useMutation({
     mutationFn: async (values: Row) => {
@@ -243,7 +250,10 @@ export function CrudPage({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           {compact ? (
-            <p className="text-sm font-semibold text-foreground">{subtitle ?? title}</p>
+            <div>
+              <p className="text-sm font-semibold text-foreground">{subtitle ?? title}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{visible.length} سجل</p>
+            </div>
           ) : (
             <>
               <h1 className="font-display text-2xl font-bold text-foreground">{title}</h1>
@@ -262,6 +272,21 @@ export function CrudPage({
               className="w-56 pe-9"
             />
           </div>
+          {statusField ? (
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-44">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">كل {statusField.label}</SelectItem>
+                {(statusField.options ?? []).map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : null}
           {canEdit ? (
             <Button onClick={startCreate}>
               <Plus className="size-4" />
@@ -271,14 +296,14 @@ export function CrudPage({
         </div>
       </div>
 
-      <div className="surface-card overflow-hidden">
+      <div className="surface-card overflow-x-auto">
         {rowsQuery.isLoading ? (
           <div className="space-y-3 p-6">
             {[0, 1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-10 w-full" />
             ))}
           </div>
-        ) : filtered.length === 0 ? (
+        ) : visible.length === 0 ? (
           <div className="flex flex-col items-center gap-3 p-16 text-center">
             <Inbox className="size-10 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">لا توجد بيانات بعد</p>
@@ -301,8 +326,12 @@ export function CrudPage({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((row) => (
-                <TableRow key={row["id"]}>
+              {visible.map((row) => (
+                <TableRow
+                  key={row["id"]}
+                  className={canEdit ? "cursor-pointer" : undefined}
+                  onClick={canEdit ? () => startEdit(row) : undefined}
+                >
                   {listFields.map((f) => (
                     <TableCell key={f.key} className="text-start align-middle">
                       {f.badge ? (
@@ -314,7 +343,7 @@ export function CrudPage({
                   ))}
                   {canEdit ? (
                     <TableCell>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                         <Button size="icon" variant="ghost" onClick={() => startEdit(row)}>
                           <Pencil className="size-4" />
                         </Button>
@@ -348,7 +377,10 @@ export function CrudPage({
                 key={field.key}
                 className={field.type === "textarea" ? "sm:col-span-2 space-y-2" : "space-y-2"}
               >
-                <Label htmlFor={field.key}>{field.label}</Label>
+                <Label htmlFor={field.key}>
+                  {field.label}
+                  {field.required ? <span className="text-destructive"> *</span> : null}
+                </Label>
                 {field.type === "textarea" ? (
                   <Textarea
                     id={field.key}
@@ -403,7 +435,16 @@ export function CrudPage({
           </div>
           <DialogFooter className="gap-2 sm:justify-start">
             <Button
-              onClick={() => saveMutation.mutate(form)}
+              onClick={() => {
+                const missing = fields.find(
+                  (f) => f.required && !String(form[f.key] ?? "").trim(),
+                );
+                if (missing) {
+                  toast.error(`الحقل المطلوب: ${missing.label}`);
+                  return;
+                }
+                saveMutation.mutate(form);
+              }}
               disabled={saveMutation.isPending}
             >
               حفظ
