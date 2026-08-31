@@ -37,6 +37,11 @@ function GuestsWorkspace() {
           label: "المتحدثون",
           tabs: [
             {
+              value: "board",
+              label: "لوحة الحالات",
+              content: <SpeakersStatusBoard />,
+            },
+            {
               value: "speakers",
               label: "قائمة المتحدثين",
               content: (
