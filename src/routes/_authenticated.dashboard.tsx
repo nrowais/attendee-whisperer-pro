@@ -16,6 +16,7 @@ import {
 
 import { supabase } from "@/integrations/supabase/client";
 import { eventName } from "@/lib/nav";
+import { operationalStatusOptions } from "@/lib/tableFields";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -79,12 +80,46 @@ function useLiveStats() {
         count("flight_alerts", (q: any) => q.eq("status", "pending")),
       ]);
 
+      const soon48 = new Date(now.getTime() + 48 * 60 * 60 * 1000).toISOString();
+
+      const { data: ops } = await db.from("guest_operations").select("operational_status");
+      const opCounts: Record<string, number> = {};
+      (ops ?? []).forEach((o: any) => {
+        opCounts[o.operational_status] = (opCounts[o.operational_status] ?? 0) + 1;
+      });
+      const presentNow =
+        (opCounts["arrived"] ?? 0) +
+        (opCounts["in_transport"] ?? 0) +
+        (opCounts["at_hotel"] ?? 0) +
+        (opCounts["at_event"] ?? 0);
+
+      const [{ count: plannedArrivals }, { count: plannedDepartures }] = await Promise.all([
+        db
+          .from("speaker_arrivals")
+          .select("id", { count: "exact", head: true })
+          .gte("arrival_time", nowIso)
+          .lte("arrival_time", soon48),
+        db
+          .from("speaker_departures")
+          .select("id", { count: "exact", head: true })
+          .gte("departure_time", nowIso)
+          .lte("departure_time", soon48),
+      ]);
+
       const { data: upcoming } = await db
         .from("speaker_arrivals")
-        .select("id, arrival_time, arrival_point, status, speakers(full_name)")
+        .select("id, arrival_time, arrival_point, terminal, status, speakers(full_name)")
         .gte("arrival_time", nowIso)
         .lte("arrival_time", soon)
         .order("arrival_time", { ascending: true })
+        .limit(6);
+
+      const { data: upcomingDepartures } = await db
+        .from("speaker_departures")
+        .select("id, departure_time, departure_point, terminal, status, speakers(full_name)")
+        .gte("departure_time", nowIso)
+        .lte("departure_time", soon48)
+        .order("departure_time", { ascending: true })
         .limit(6);
 
       const { data: nextTrips } = await db
@@ -94,6 +129,7 @@ function useLiveStats() {
         .lte("scheduled_at", soon)
         .order("scheduled_at", { ascending: true })
         .limit(6);
+
 
       const dayStart = new Date(now);
       dayStart.setHours(0, 0, 0, 0);
@@ -134,7 +170,12 @@ function useLiveStats() {
         todayTrips,
         todayCheckIns,
         todayArrivals,
+        opCounts,
+        presentNow,
+        plannedArrivals: plannedArrivals ?? 0,
+        plannedDepartures: plannedDepartures ?? 0,
         upcoming: upcoming ?? [],
+        upcomingDepartures: upcomingDepartures ?? [],
         nextTrips: nextTrips ?? [],
         alerts: alerts ?? [],
       };
@@ -343,6 +384,44 @@ function DashboardPage() {
         <Kpi icon={AlertTriangle} label="تنبيهات نشطة" value={data.alertsPending} sub="رحلات قريبة" to="/flight-alerts" />
       </div>
 
+      <section className="surface-card p-6">
+        <div className="mb-4">
+          <p className="font-display text-lg font-bold text-foreground">الحالة التشغيلية للضيوف</p>
+          <span className="text-xs text-muted-foreground">
+            الأرقام المجدولة من جدول الرحلات، والحالة الفعلية يسجّلها فريق العمل
+          </span>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-xl border border-border bg-secondary/40 p-4">
+            <p className="text-sm text-muted-foreground">قادمون خلال 48 ساعة (مجدول)</p>
+            <p className="mt-2 font-display text-2xl font-bold text-foreground">{data.plannedArrivals}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-secondary/40 p-4">
+            <p className="text-sm text-muted-foreground">مغادرون خلال 48 ساعة (مجدول)</p>
+            <p className="mt-2 font-display text-2xl font-bold text-foreground">{data.plannedDepartures}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-secondary/40 p-4">
+            <p className="text-sm text-muted-foreground">موجودون حالياً (فعلي)</p>
+            <p className="mt-2 font-display text-2xl font-bold text-foreground">{data.presentNow}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-secondary/40 p-4">
+            <p className="text-sm text-muted-foreground">غادروا فعلياً</p>
+            <p className="mt-2 font-display text-2xl font-bold text-foreground">
+              {data.opCounts["departed"] ?? 0}
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {operationalStatusOptions.map((opt) => (
+            <Badge key={opt.value} variant="secondary">
+              {opt.label}: {data.opCounts[opt.value] ?? 0}
+            </Badge>
+          ))}
+        </div>
+      </section>
+
+
+
       <div className="surface-card space-y-5 p-6">
         <p className="font-display text-lg font-bold text-foreground">نسب الإنجاز</p>
         <ProgressRow label="وصول المتحدثين" done={data.arrived} total={data.arrivalsTotal} />
@@ -350,7 +429,37 @@ function DashboardPage() {
         <ProgressRow label="رحلات النقل المنفذة" done={data.tripsTotal - data.tripsActive} total={data.tripsTotal} />
       </div>
 
+      <div className="surface-card p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <p className="font-display text-lg font-bold text-foreground">مغادرات مجدولة خلال 48 ساعة</p>
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/movements">
+              الكل <ArrowLeft className="size-4" />
+            </Link>
+          </Button>
+        </div>
+        {data.upcomingDepartures.length === 0 ? (
+          <p className="py-8 text-center text-sm text-muted-foreground">لا توجد مغادرات مجدولة قريباً</p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {data.upcomingDepartures.map((row: any) => (
+              <li key={row.id} className="flex items-center justify-between gap-3 py-3">
+                <div>
+                  <p className="text-sm font-medium text-foreground">{row.speakers?.full_name ?? "—"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {row.departure_point ?? "—"}
+                    {row.terminal ? ` — صالة ${row.terminal}` : ""}
+                  </p>
+                </div>
+                <span className="text-xs text-muted-foreground">{fmtTime(row.departure_time)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       <div className="grid gap-5 lg:grid-cols-2">
+
         <div className="surface-card p-6">
           <div className="mb-4 flex items-center justify-between">
             <p className="font-display text-lg font-bold text-foreground">وصول خلال 12 ساعة</p>
