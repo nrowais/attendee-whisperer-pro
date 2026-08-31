@@ -154,7 +154,7 @@ function useOperationsData() {
       });
 
       return (speakers ?? []).map((s: any) => {
-        const op = opsBy.get(s.id);
+        const op: any = opsBy.get(s.id);
         const booking = bookingBy.get(s.id);
         return {
           ...s,
@@ -192,7 +192,7 @@ function OperationsPage() {
 
       if (action.status || action.field) {
         const payload: Record<string, any> = { speaker_id: row.id };
-        if (action.status) payload.operational_status = action.status;
+        if (action.status) payload['operational_status'] = action.status;
         if (action.field) payload[action.field] = now;
         if (row.op?.id) {
           const { error } = await db.from("guest_operations").update(payload).eq("id", row.op.id);
