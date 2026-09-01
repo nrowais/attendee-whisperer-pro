@@ -114,7 +114,8 @@ function useSpeakersBoard() {
       const arrivalTimeBySpeaker = new Map<string, string>();
       (arrivals ?? []).forEach((a: any) => {
         const t = a.arrival_time ?? flightArrivalById.get(a.flight_id);
-        if (t && (!arrivalTimeBySpeaker.has(a.speaker_id) || t < arrivalTimeBySpeaker.get(a.speaker_id))) {
+        const current = arrivalTimeBySpeaker.get(a.speaker_id);
+        if (t && (!current || t < current)) {
           arrivalTimeBySpeaker.set(a.speaker_id, t);
         }
       });
