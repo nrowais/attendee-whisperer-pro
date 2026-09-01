@@ -1,0 +1,1 @@
+ALTER TABLE public.driver_cards ADD COLUMN driver_phone text;

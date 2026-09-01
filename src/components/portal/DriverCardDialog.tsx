@@ -33,6 +33,7 @@ export type DriverCardData = {
   flightTime: string; // HH:mm
   flightNo: string;
   driverName: string;
+  driverPhone: string;
   vehicle: string;
   pickup: string;
   dropoff: string;
@@ -97,6 +98,7 @@ export function buildDriverCardHtml(c: DriverCardData) {
   ].filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
   const extra: Array<[string, string]> = [
     ["السائق", c.driverName],
+    ["جوال السائق", c.driverPhone],
     ["المركبة", c.vehicle],
     ["نقطة الانطلاق", c.pickup],
     ["الوجهة", c.dropoff],
@@ -238,6 +240,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
     flightTime: "",
     flightNo: "",
     driverName: "",
+    driverPhone: "",
     vehicle: "",
     pickup: "",
     dropoff: "",
@@ -265,6 +268,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       flightTime: time,
       flightNo: trip?.flight_no ?? "",
       driverName: trip?.driver?.full_name ?? "",
+      driverPhone: trip?.driver?.phone ?? "",
       vehicle: trip?.vehicle?.plate_number ?? "",
       pickup: trip?.pickup_location ?? "",
       dropoff: trip?.dropoff_location ?? "",
@@ -298,6 +302,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
         flightTime: dt.time || f.flightTime,
         flightNo: row.flight_no ?? f.flightNo,
         driverName: row.driver_name ?? f.driverName,
+        driverPhone: row.driver_phone ?? f.driverPhone,
         hotelName: row.hotel_name ?? f.hotelName,
         hotelLocation: row.hotel_location ?? f.hotelLocation,
         hotelMapUrl: row.hotel_map_url ?? f.hotelMapUrl,
@@ -334,6 +339,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       flight_at: flightIso(),
       flight_no: form.flightNo || null,
       driver_name: form.driverName || null,
+      driver_phone: form.driverPhone || null,
       vehicle: form.vehicle || null,
       pickup_location: form.pickup || null,
       dropoff_location: form.dropoff || null,
@@ -449,6 +455,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
           {field("flightDate", "تاريخ الرحلة", "date")}
           {field("flightNo", "رقم الرحلة (اختياري)")}
           {field("driverName", "اسم السائق (اختياري)")}
+          {field("driverPhone", "رقم جوال السائق", "tel", "05xxxxxxxx")}
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">اسم الفندق</Label>
             <select
