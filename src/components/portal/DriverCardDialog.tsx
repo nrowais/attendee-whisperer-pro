@@ -131,11 +131,13 @@ export function buildDriverCardHtml(c: DriverCardData) {
         <p class="event">${esc(eventName)}</p>
         <h1>بطاقة توجيه السائق إلى المطار</h1>
         <p class="sub">يرجى تسليم هذه البطاقة للسائق قبل التوجه للمطار</p>
+        ${c.cardNo ? `<p class="serial">رقم البطاقة التسلسلي: ${esc(String(c.cardNo))}</p>` : ""}
       </div>
       <div class="logo-badge"><img src="${logoUrl()}" alt="شعار الفعالية" /></div>
     </div>
     <div class="accent"></div>
     <div class="body">
+      ${c.cardNo ? `<span class="ticket">رقم البطاقة: ${esc(String(c.cardNo))}</span>` : ""}
       ${c.ticketNo ? `<span class="ticket">رقم التذكرة: ${esc(c.ticketNo)}</span>` : ""}
       <table>${rows.map(row).join("")}${extra.map(row).join("")}</table>
     </div>
