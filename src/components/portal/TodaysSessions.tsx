@@ -137,7 +137,11 @@ export function TodaysSessions() {
     onError: (e: any) => toast.error(e?.message ?? "تعذر حفظ الجلسة"),
   });
 
-  const now = Date.now();
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <section className="surface-card p-6">
