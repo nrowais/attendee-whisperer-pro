@@ -207,6 +207,8 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
     pickup: "",
     dropoff: "",
     ticketNo: "",
+    hotelName: "",
+    hotelLocation: "",
   });
 
   const [cardId, setCardId] = useState<string | null>(null);
@@ -230,6 +232,8 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       dropoff: trip?.dropoff_location ?? "",
       ticketNo: trip?.ticket_no ? String(trip.ticket_no) : "",
       cardNo: "",
+      hotelName: trip?.hotel_name ?? "",
+      hotelLocation: trip?.hotel_location ?? "",
     });
 
     // استرجاع بطاقة محفوظة سابقاً لهذا الضيف/التذكرة
@@ -255,6 +259,8 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
         flightTime: dt.time || f.flightTime,
         flightNo: row.flight_no ?? f.flightNo,
         driverName: row.driver_name ?? f.driverName,
+        hotelName: row.hotel_name ?? f.hotelName,
+        hotelLocation: row.hotel_location ?? f.hotelLocation,
       }));
     })();
   }, [open, trip]);
@@ -282,6 +288,8 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       pickup_location: form.pickup || null,
       dropoff_location: form.dropoff || null,
       ticket_no: form.ticketNo || null,
+      hotel_name: form.hotelName || null,
+      hotel_location: form.hotelLocation || null,
     };
     const query = cardId
       ? db.from("driver_cards").update(payload).eq("id", cardId).select("id, card_no").maybeSingle()
@@ -390,6 +398,30 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
           {field("flightDate", "تاريخ الرحلة", "date")}
           {field("flightNo", "رقم الرحلة (اختياري)")}
           {field("driverName", "اسم السائق (اختياري)")}
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">اسم الفندق</Label>
+            <select
+              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              value={form.hotelName ?? ""}
+              onChange={(e) => {
+                const name = e.target.value;
+                const hotel = HOTELS.find((h) => h.name === name);
+                setForm((f) => ({
+                  ...f,
+                  hotelName: name,
+                  hotelLocation: hotel ? hotel.location : f.hotelLocation,
+                }));
+              }}
+            >
+              <option value="">اختر الفندق…</option>
+              {HOTELS.map((h) => (
+                <option key={h.name} value={h.name}>
+                  {h.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {field("hotelLocation", "موقع الفندق", "text", "مثال: حي السفارات، الرياض")}
         </div>
 
         <DialogFooter className="gap-2 sm:justify-start">
