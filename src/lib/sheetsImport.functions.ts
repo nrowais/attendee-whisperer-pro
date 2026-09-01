@@ -43,12 +43,9 @@ export const importSheetRows = createServerFn({ method: "POST" })
     let inserted = 0;
     for (let i = 0; i < data.rows.length; i += chunkSize) {
       const chunk = data.rows.slice(i, i + chunkSize);
-      const { error, count } = await supabase
-        .from(data.table)
-        .insert(chunk, { count: "exact" })
-        .select("id", { count: "exact", head: true });
+      const { data: rows, error } = await supabase.from(data.table).insert(chunk).select("id");
       if (error) throw new Error(`تعذّر استيراد الصفوف: ${error.message}`);
-      inserted += count ?? chunk.length;
+      inserted += rows?.length ?? chunk.length;
     }
 
     return { inserted, table: data.table };
