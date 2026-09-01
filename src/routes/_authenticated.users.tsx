@@ -2,12 +2,27 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import {
+  listAccountStates,
+  setUserDisabled,
+  setUserPassword,
+} from "@/lib/adminUsers.functions";
 import { useRoles, roleLabels, type AppRole } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -24,6 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 
 export const Route = createFileRoute("/_authenticated/users")({
   head: () => ({
