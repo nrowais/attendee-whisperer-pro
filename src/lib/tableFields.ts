@@ -412,6 +412,7 @@ export const driverCardFields: Field[] = [
   { key: "flight_at", label: "موعد الرحلة", type: "datetime" },
   { key: "flight_no", label: "رقم الرحلة" },
   { key: "driver_name", label: "السائق", list: false },
+  { key: "driver_phone", label: "جوال السائق", list: false },
   { key: "vehicle", label: "المركبة", list: false },
   { key: "pickup_location", label: "نقطة الانطلاق", list: false },
   { key: "dropoff_location", label: "الوجهة", list: false },

@@ -33,6 +33,7 @@ export type DriverCardData = {
   flightTime: string; // HH:mm
   flightNo: string;
   driverName: string;
+  driverPhone: string;
   vehicle: string;
   pickup: string;
   dropoff: string;
