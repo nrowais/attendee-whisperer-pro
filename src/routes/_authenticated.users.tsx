@@ -44,7 +44,9 @@ function UsersPage() {
     queryKey: ["portal-users"],
     queryFn: async () => {
       const [{ data: profiles }, { data: roles }] = await Promise.all([
-        supabase.from("profiles").select("id, full_name, email, phone, created_at"),
+        supabase
+          .from("profiles")
+          .select("id, full_name, email, phone, created_at, approval_status"),
         supabase.from("user_roles").select("user_id, role"),
       ]);
       const roleMap: Record<string, AppRole> = {};
@@ -52,6 +54,29 @@ function UsersPage() {
       return (profiles ?? []).map((p) => ({ ...p, role: roleMap[p.id] ?? "viewer" }));
     },
   });
+
+  const setApproval = useMutation({
+    mutationFn: async ({ userId, status }: { userId: string; status: "approved" | "rejected" }) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          approval_status: status,
+          approved_at: new Date().toISOString(),
+        } as any)
+        .eq("id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["portal-users"] });
+      toast.success("تم تحديث حالة الحساب");
+    },
+    onError: (error: any) => toast.error(error?.message ?? "تعذر تحديث حالة الحساب"),
+  });
+
+  const pending = (usersQuery.data ?? []).filter(
+    (u: any) => (u.approval_status ?? "approved") === "pending",
+  );
+
 
   const changeRole = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
