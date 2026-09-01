@@ -234,6 +234,7 @@ export function CrudPage({
     setEditing(null);
     const initial: Row = {};
     for (const f of fields) if (f.type === "switch") initial[f.key] = true;
+    if (filter) initial[filter.key] = filter.value;
     setForm(initial);
     setOpen(true);
   }
