@@ -403,6 +403,7 @@ export const eventFields: Field[] = [
 export const driverCardFields: Field[] = [
   { key: "card_no", label: "رقم البطاقة" },
   { key: "guest_name", label: "اسم الضيف" },
+  { key: "hotel_name", label: "الفندق" },
   { key: "terminal", label: "صالة المطار" },
   { key: "receiver_name", label: "اسم المستقبل" },
   { key: "receiver_phone", label: "جوال المستقبل" },
