@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { IMPORT_TABLES, guessColumn } from "@/lib/sheetsImport";
 import { importSheetRows } from "@/lib/sheetsImport.functions";
+import { useRoles } from "@/hooks/useAuth";
 
 const IGNORE = "__ignore__";
 
@@ -45,6 +46,7 @@ type ParsedSheet = { name: string; headers: string[]; rows: Record<string, unkno
 
 function SheetsImportPage() {
   const runImport = useServerFn(importSheetRows);
+  const { isAdmin, loading: rolesLoading } = useRoles();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [fileName, setFileName] = useState<string | null>(null);
@@ -111,6 +113,21 @@ function SheetsImportPage() {
     () => tableDef.columns.filter((c) => Object.values(mapping).includes(c.key)),
     [tableDef, mapping],
   );
+
+  if (!rolesLoading && !isAdmin) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center p-8">
+        <Card className="max-w-md text-center">
+          <CardHeader>
+            <CardTitle>خاص بالمدير</CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            استيراد البيانات من Google Sheets متاح لحساب المدير فقط.
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const submit = async () => {
     if (!sheet) return;

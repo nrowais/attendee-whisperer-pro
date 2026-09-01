@@ -16,7 +16,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export type NavItem = { to: string; label: string; icon: LucideIcon; hint?: string };
+export type NavItem = { to: string; label: string; icon: LucideIcon; hint?: string; adminOnly?: boolean };
 
 export const navItems: NavItem[] = [
   { to: "/dashboard", label: "المتابعة اللحظية", icon: Activity, hint: "الأرقام والحالة الآن" },
@@ -32,7 +32,7 @@ export const navItems: NavItem[] = [
   { to: "/tickets", label: "تذاكر النقل", icon: Ticket, hint: "ربط السائق والمركبة بالرحلة المجدولة والفعلية" },
   { to: "/hotels", label: "الإقامة", icon: BedDouble, hint: "الفنادق والغرف والحجوزات" },
   { to: "/reports", label: "التقارير", icon: BarChart3, hint: "ملخصات قابلة للتصدير" },
-  { to: "/sheets", label: "استيراد من Google Sheets", icon: Sheet, hint: "رفع ملف xlsx أو csv وإدخال بياناته للبوابة" },
+  { to: "/sheets", label: "استيراد من Google Sheets", icon: Sheet, hint: "رفع ملف xlsx أو csv وإدخال بياناته للبوابة", adminOnly: true },
   { to: "/settings", label: "الإعدادات", icon: Settings, hint: "الفعالية والفريق والصلاحيات" },
 
 ];
