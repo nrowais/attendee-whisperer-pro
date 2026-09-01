@@ -40,11 +40,20 @@ export type DriverCardData = {
   cardNo?: string;
   hotelName?: string;
   hotelLocation?: string;
+  hotelMapUrl?: string;
 };
 
-const HOTELS: Array<{ name: string; location: string }> = [
-  { name: "فندق ماريوت حي السفارات", location: "حي السفارات، الرياض" },
-  { name: "كورت يارد الرياض", location: "الرياض" },
+const HOTELS: Array<{ name: string; location: string; mapUrl?: string }> = [
+  {
+    name: "فندق ماريوت حي السفارات",
+    location: "حي السفارات، الرياض",
+    mapUrl: "https://maps.app.goo.gl/uWxNZqFduxSDVQSB6",
+  },
+  {
+    name: "كورت يارد الرياض",
+    location: "الرياض",
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=كورت+يارد+الرياض",
+  },
 ];
 
 function esc(v: string) {
