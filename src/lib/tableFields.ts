@@ -399,3 +399,18 @@ export const eventFields: Field[] = [
   },
   { key: "description", label: "الوصف", type: "textarea", list: false },
 ];
+
+export const driverCardFields: Field[] = [
+  { key: "card_no", label: "رقم البطاقة" },
+  { key: "guest_name", label: "اسم الضيف" },
+  { key: "terminal", label: "صالة المطار" },
+  { key: "receiver_name", label: "اسم المستقبل" },
+  { key: "receiver_phone", label: "جوال المستقبل" },
+  { key: "flight_at", label: "موعد الرحلة", type: "datetime" },
+  { key: "flight_no", label: "رقم الرحلة" },
+  { key: "driver_name", label: "السائق", list: false },
+  { key: "vehicle", label: "المركبة", list: false },
+  { key: "pickup_location", label: "نقطة الانطلاق", list: false },
+  { key: "dropoff_location", label: "الوجهة", list: false },
+  { key: "ticket_no", label: "رقم التذكرة", list: false },
+];
