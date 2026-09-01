@@ -14,6 +14,7 @@ import {
   Phone,
   Plus,
   Clock,
+  IdCard,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +32,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { DriverCardDialog } from "@/components/portal/DriverCardDialog";
 
 const db = supabase as any;
 
