@@ -258,6 +258,12 @@ export function SpeakersStatusBoard() {
             className="pr-9"
           />
         </div>
+        {canEdit ? (
+          <Button onClick={() => setAddOpen(true)}>
+            <Plus className="h-4 w-4" />
+            إضافة متحدث
+          </Button>
+        ) : null}
         <select
           value={directionFilter}
           onChange={(e) => setDirectionFilter(e.target.value)}
