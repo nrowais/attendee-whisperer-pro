@@ -46,6 +46,7 @@ type ParsedSheet = { name: string; headers: string[]; rows: Record<string, unkno
 
 function SheetsImportPage() {
   const runImport = useServerFn(importSheetRows);
+  const { isAdmin, loading: rolesLoading } = useRoles();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [fileName, setFileName] = useState<string | null>(null);
