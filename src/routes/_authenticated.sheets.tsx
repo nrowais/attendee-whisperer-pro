@@ -5,7 +5,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { Copy, Check, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
-import { Workspace } from "@/components/portal/Workspace";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSheetsSyncToken } from "@/lib/sheetsSync.functions";
@@ -72,10 +71,13 @@ function SheetsSyncPage() {
   };
 
   return (
-    <Workspace
-      title="المزامنة مع Google Sheets"
-      subtitle="اربط أي جدول من قاعدة البيانات بورقة في Google Sheets وسيتحدّث تلقائيًا مع كل بيانات جديدة."
-    >
+    <div className="space-y-6" dir="rtl">
+      <div>
+        <h1 className="font-display text-2xl font-bold text-foreground">المزامنة مع Google Sheets</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          اربط أي جدول من قاعدة البيانات بورقة في Google Sheets وسيتحدّث تلقائيًا مع كل بيانات جديدة.
+        </p>
+      </div>
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="text-base">طريقة الربط (٣ خطوات)</CardTitle>
@@ -135,6 +137,6 @@ function SheetsSyncPage() {
       <p className="mt-6 text-xs text-muted-foreground">
         تنبيه أمني: الصيغة تحتوي على مفتاح وصول سري — لا تشارك ملف الشيت إلا مع فريق العمل الموثوق.
       </p>
-    </Workspace>
+    </div>
   );
 }
