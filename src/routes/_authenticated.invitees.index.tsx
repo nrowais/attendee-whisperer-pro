@@ -8,7 +8,7 @@ import {
   attendanceFields,
 } from "@/lib/tableFields";
 
-export const Route = createFileRoute("/_authenticated/invitees")({
+export const Route = createFileRoute("/_authenticated/invitees/")({
   head: () => ({
     meta: [
       { title: "الضيوف والمدعوون — حوار الأمن والتاريخ" },
