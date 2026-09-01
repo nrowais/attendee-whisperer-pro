@@ -26,12 +26,13 @@ export function useAuth() {
   return { session, user: session?.user ?? null, loading };
 }
 
-export type AppRole = "admin" | "coordinator" | "viewer";
+export type AppRole = "admin" | "coordinator" | "viewer" | "operator";
 
 export const roleLabels: Record<AppRole, string> = {
   admin: "مدير النظام",
   coordinator: "منسّق",
   viewer: "مطّلع",
+  operator: "مسؤول تشغيل",
 };
 
 export function useRoles() {
@@ -50,10 +51,15 @@ export function useRoles() {
   });
 
   const roles = query.data ?? [];
+  const isOperator = roles.includes("operator");
+  const canEdit = roles.includes("admin") || roles.includes("coordinator");
   return {
     roles,
     isAdmin: roles.includes("admin"),
-    canEdit: roles.includes("admin") || roles.includes("coordinator"),
+    canEdit,
+    isOperator,
+    // صلاحية تعديل الحالة التشغيلية فقط
+    canEditOps: canEdit || isOperator,
     loading: query.isLoading,
   };
 }

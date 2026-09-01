@@ -214,7 +214,7 @@ function isActionDone(row: any, action: (typeof ACTIONS)[number]) {
 }
 
 function OperationsPage() {
-  const { canEdit } = useRoles();
+  const { canEditOps: canEdit } = useRoles();
   const { data, isLoading } = useOperationsData();
   const queryClient = useQueryClient();
   const [query, setQuery] = useState("");
