@@ -29,7 +29,12 @@ import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
 import { Route as AuthenticatedVerifyRouteImport } from './routes/_authenticated.verify'
 import { Route as AuthenticatedInviteesIndexRouteImport } from './routes/_authenticated.invitees.index'
+import { Route as AuthenticatedOpsAirportRouteImport } from './routes/_authenticated.ops.airport'
+import { Route as AuthenticatedOpsDepartingRouteImport } from './routes/_authenticated.ops.departing'
+import { Route as AuthenticatedOpsHotelRouteImport } from './routes/_authenticated.ops.hotel'
+import { Route as AuthenticatedOpsIncomingRouteImport } from './routes/_authenticated.ops.incoming'
 import { Route as AuthenticatedOpsTodayRouteImport } from './routes/_authenticated.ops.today'
+import { Route as AuthenticatedOpsTransportRouteImport } from './routes/_authenticated.ops.transport'
 import { Route as AuthenticatedSpeakersIndexRouteImport } from './routes/_authenticated.speakers.index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -134,11 +139,39 @@ const AuthenticatedInviteesIndexRoute =
     path: '/invitees/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedOpsAirportRoute = AuthenticatedOpsAirportRouteImport.update({
+  id: '/ops/airport',
+  path: '/ops/airport',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedOpsDepartingRoute =
+  AuthenticatedOpsDepartingRouteImport.update({
+    id: '/ops/departing',
+    path: '/ops/departing',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedOpsHotelRoute = AuthenticatedOpsHotelRouteImport.update({
+  id: '/ops/hotel',
+  path: '/ops/hotel',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedOpsIncomingRoute =
+  AuthenticatedOpsIncomingRouteImport.update({
+    id: '/ops/incoming',
+    path: '/ops/incoming',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedOpsTodayRoute = AuthenticatedOpsTodayRouteImport.update({
   id: '/ops/today',
   path: '/ops/today',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedOpsTransportRoute =
+  AuthenticatedOpsTransportRouteImport.update({
+    id: '/ops/transport',
+    path: '/ops/transport',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSpeakersIndexRoute =
   AuthenticatedSpeakersIndexRouteImport.update({
     id: '/speakers/',
@@ -165,7 +198,12 @@ export interface FileRoutesByFullPath {
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
   '/verify': typeof AuthenticatedVerifyRoute
+  '/ops/airport': typeof AuthenticatedOpsAirportRoute
+  '/ops/departing': typeof AuthenticatedOpsDepartingRoute
+  '/ops/hotel': typeof AuthenticatedOpsHotelRoute
+  '/ops/incoming': typeof AuthenticatedOpsIncomingRoute
   '/ops/today': typeof AuthenticatedOpsTodayRoute
+  '/ops/transport': typeof AuthenticatedOpsTransportRoute
   '/invitees/': typeof AuthenticatedInviteesIndexRoute
   '/speakers/': typeof AuthenticatedSpeakersIndexRoute
 }
@@ -188,7 +226,12 @@ export interface FileRoutesByTo {
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
   '/verify': typeof AuthenticatedVerifyRoute
+  '/ops/airport': typeof AuthenticatedOpsAirportRoute
+  '/ops/departing': typeof AuthenticatedOpsDepartingRoute
+  '/ops/hotel': typeof AuthenticatedOpsHotelRoute
+  '/ops/incoming': typeof AuthenticatedOpsIncomingRoute
   '/ops/today': typeof AuthenticatedOpsTodayRoute
+  '/ops/transport': typeof AuthenticatedOpsTransportRoute
   '/invitees': typeof AuthenticatedInviteesIndexRoute
   '/speakers': typeof AuthenticatedSpeakersIndexRoute
 }
@@ -213,7 +256,12 @@ export interface FileRoutesById {
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/verify': typeof AuthenticatedVerifyRoute
+  '/_authenticated/ops/airport': typeof AuthenticatedOpsAirportRoute
+  '/_authenticated/ops/departing': typeof AuthenticatedOpsDepartingRoute
+  '/_authenticated/ops/hotel': typeof AuthenticatedOpsHotelRoute
+  '/_authenticated/ops/incoming': typeof AuthenticatedOpsIncomingRoute
   '/_authenticated/ops/today': typeof AuthenticatedOpsTodayRoute
+  '/_authenticated/ops/transport': typeof AuthenticatedOpsTransportRoute
   '/_authenticated/invitees/': typeof AuthenticatedInviteesIndexRoute
   '/_authenticated/speakers/': typeof AuthenticatedSpeakersIndexRoute
 }
@@ -238,7 +286,12 @@ export interface FileRouteTypes {
     | '/tickets'
     | '/users'
     | '/verify'
+    | '/ops/airport'
+    | '/ops/departing'
+    | '/ops/hotel'
+    | '/ops/incoming'
     | '/ops/today'
+    | '/ops/transport'
     | '/invitees/'
     | '/speakers/'
   fileRoutesByTo: FileRoutesByTo
@@ -261,7 +314,12 @@ export interface FileRouteTypes {
     | '/tickets'
     | '/users'
     | '/verify'
+    | '/ops/airport'
+    | '/ops/departing'
+    | '/ops/hotel'
+    | '/ops/incoming'
     | '/ops/today'
+    | '/ops/transport'
     | '/invitees'
     | '/speakers'
   id:
@@ -285,7 +343,12 @@ export interface FileRouteTypes {
     | '/_authenticated/tickets'
     | '/_authenticated/users'
     | '/_authenticated/verify'
+    | '/_authenticated/ops/airport'
+    | '/_authenticated/ops/departing'
+    | '/_authenticated/ops/hotel'
+    | '/_authenticated/ops/incoming'
     | '/_authenticated/ops/today'
+    | '/_authenticated/ops/transport'
     | '/_authenticated/invitees/'
     | '/_authenticated/speakers/'
   fileRoutesById: FileRoutesById
@@ -439,11 +502,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInviteesIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/ops/airport': {
+      id: '/_authenticated/ops/airport'
+      path: '/ops/airport'
+      fullPath: '/ops/airport'
+      preLoaderRoute: typeof AuthenticatedOpsAirportRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/ops/departing': {
+      id: '/_authenticated/ops/departing'
+      path: '/ops/departing'
+      fullPath: '/ops/departing'
+      preLoaderRoute: typeof AuthenticatedOpsDepartingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/ops/hotel': {
+      id: '/_authenticated/ops/hotel'
+      path: '/ops/hotel'
+      fullPath: '/ops/hotel'
+      preLoaderRoute: typeof AuthenticatedOpsHotelRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/ops/incoming': {
+      id: '/_authenticated/ops/incoming'
+      path: '/ops/incoming'
+      fullPath: '/ops/incoming'
+      preLoaderRoute: typeof AuthenticatedOpsIncomingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/ops/today': {
       id: '/_authenticated/ops/today'
       path: '/ops/today'
       fullPath: '/ops/today'
       preLoaderRoute: typeof AuthenticatedOpsTodayRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/ops/transport': {
+      id: '/_authenticated/ops/transport'
+      path: '/ops/transport'
+      fullPath: '/ops/transport'
+      preLoaderRoute: typeof AuthenticatedOpsTransportRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/speakers/': {
@@ -472,7 +570,12 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedVerifyRoute: typeof AuthenticatedVerifyRoute
+  AuthenticatedOpsAirportRoute: typeof AuthenticatedOpsAirportRoute
+  AuthenticatedOpsDepartingRoute: typeof AuthenticatedOpsDepartingRoute
+  AuthenticatedOpsHotelRoute: typeof AuthenticatedOpsHotelRoute
+  AuthenticatedOpsIncomingRoute: typeof AuthenticatedOpsIncomingRoute
   AuthenticatedOpsTodayRoute: typeof AuthenticatedOpsTodayRoute
+  AuthenticatedOpsTransportRoute: typeof AuthenticatedOpsTransportRoute
   AuthenticatedInviteesIndexRoute: typeof AuthenticatedInviteesIndexRoute
   AuthenticatedSpeakersIndexRoute: typeof AuthenticatedSpeakersIndexRoute
 }
@@ -493,7 +596,12 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedVerifyRoute: AuthenticatedVerifyRoute,
+  AuthenticatedOpsAirportRoute: AuthenticatedOpsAirportRoute,
+  AuthenticatedOpsDepartingRoute: AuthenticatedOpsDepartingRoute,
+  AuthenticatedOpsHotelRoute: AuthenticatedOpsHotelRoute,
+  AuthenticatedOpsIncomingRoute: AuthenticatedOpsIncomingRoute,
   AuthenticatedOpsTodayRoute: AuthenticatedOpsTodayRoute,
+  AuthenticatedOpsTransportRoute: AuthenticatedOpsTransportRoute,
   AuthenticatedInviteesIndexRoute: AuthenticatedInviteesIndexRoute,
   AuthenticatedSpeakersIndexRoute: AuthenticatedSpeakersIndexRoute,
 }
