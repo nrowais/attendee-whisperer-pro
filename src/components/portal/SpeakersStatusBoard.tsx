@@ -338,9 +338,9 @@ export function SpeakersStatusBoard() {
       ) : (
         <>
           <p className="text-xs text-muted-foreground">{rows.length} متحدث</p>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="columns-1 gap-3 md:columns-2 xl:columns-3">
             {rows.map((r: any) => (
-              <div key={r.id} className="space-y-3 rounded-xl border border-border bg-card p-4">
+              <div key={r.id} className="mb-3 break-inside-avoid space-y-3 rounded-xl border border-border bg-card p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-foreground">{r.full_name}</p>
