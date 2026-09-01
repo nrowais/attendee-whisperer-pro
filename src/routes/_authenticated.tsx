@@ -9,7 +9,7 @@ import {
 import { X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
-import eventLogo from "@/assets/event-logo.png.asset.json";
+import eventLogo from "@/assets/event-logo-2026.png.asset.json";
 import { useAuth, useRoles, roleLabels } from "@/hooks/useAuth";
 import { navItems } from "@/lib/nav";
 import { Topbar } from "@/components/portal/Topbar";
