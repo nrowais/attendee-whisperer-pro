@@ -28,6 +28,26 @@ export function useAuth() {
 
 export type AppRole = "admin" | "coordinator" | "viewer" | "operator";
 
+export type ApprovalStatus = "pending" | "approved" | "rejected";
+
+export function useApproval() {
+  const { user } = useAuth();
+  const query = useQuery({
+    queryKey: ["my-approval", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("approval_status")
+        .eq("id", user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return ((data as any)?.approval_status ?? "pending") as ApprovalStatus;
+    },
+  });
+  return { status: query.data, loading: query.isLoading };
+}
+
 export const roleLabels: Record<AppRole, string> = {
   admin: "مدير النظام",
   coordinator: "منسّق",

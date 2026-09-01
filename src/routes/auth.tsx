@@ -58,8 +58,8 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
-    toast.success("تم إنشاء الحساب");
-    navigate({ to: "/dashboard" });
+    toast.success("تم إرسال طلب التسجيل — بانتظار موافقة المدير");
+    setSignedUp(true);
   }
 
   async function googleSignIn() {
