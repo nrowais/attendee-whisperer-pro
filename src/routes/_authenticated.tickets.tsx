@@ -342,6 +342,8 @@ function TicketsPage() {
                   </div>
                 </div>
 
+                <DriverCardDialog trip={t} canEdit={canEditOps} />
+
                 {canEditOps && (
                   <div className="flex flex-wrap gap-2">
                     <Button
