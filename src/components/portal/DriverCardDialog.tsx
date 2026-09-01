@@ -93,6 +93,11 @@ export function buildDriverCardHtml(c: DriverCardData) {
     ["الوجهة", c.dropoff],
   ].filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
 
+  const mapQuery = [c.hotelName, c.hotelLocation].filter((v) => v && v.trim() !== "").join("، ");
+  const mapsUrl = mapQuery
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
+    : "";
+
   const row = ([label, value]: [string, string]) =>
     `<tr><th>${esc(label)}</th><td>${esc(value)}</td></tr>`;
 
