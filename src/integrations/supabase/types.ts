@@ -110,6 +110,7 @@ export type Database = {
           flight_no: string | null
           guest_name: string | null
           hotel_location: string | null
+          hotel_map_url: string | null
           hotel_name: string | null
           id: string
           pickup_location: string | null
@@ -132,6 +133,7 @@ export type Database = {
           flight_no?: string | null
           guest_name?: string | null
           hotel_location?: string | null
+          hotel_map_url?: string | null
           hotel_name?: string | null
           id?: string
           pickup_location?: string | null
@@ -154,6 +156,7 @@ export type Database = {
           flight_no?: string | null
           guest_name?: string | null
           hotel_location?: string | null
+          hotel_map_url?: string | null
           hotel_name?: string | null
           id?: string
           pickup_location?: string | null
