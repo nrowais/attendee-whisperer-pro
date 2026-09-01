@@ -7,16 +7,16 @@ import eventLogo from "@/assets/event-logo-2026.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "حوار الأمن والتاريخ — تنظيم متكامل وأنيق" },
+      { title: "SHDC 2026 | حوار الأمن والتاريخ — الرياض" },
       {
         name: "description",
         content:
-          "بوابة إلكترونية لإدارة الفعاليات: المتحدثون، الجلسات، الدعوات، الحضور، السفر، الإقامة، النقل والطلبات.",
+          "البوابة الرسمية لمؤتمر حوار الأمن والتاريخ — الرياض 2026: إدارة المتحدثين، الجلسات، الدعوات، الحضور، السفر، الإقامة، النقل والطلبات.",
       },
-      { property: "og:title", content: "حوار الأمن والتاريخ" },
+      { property: "og:title", content: "SHDC 2026 | حوار الأمن والتاريخ — الرياض" },
       {
         property: "og:description",
-        content: "إدارة مركزية لكل تفاصيل الفعالية من الدعوة حتى المغادرة.",
+        content: "إدارة مركزية لكل تفاصيل المؤتمر من الدعوة حتى المغادرة.",
       },
     ],
   }),
@@ -54,12 +54,17 @@ function Landing() {
 
       <section className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-10 lg:grid-cols-2 lg:py-16">
         <div>
-          <span className="inline-block rounded-full bg-secondary px-4 py-1 text-xs font-medium text-secondary-foreground">
-            نظام تشغيل الفعاليات
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-block rounded-full bg-primary/10 px-4 py-1 text-xs font-bold text-primary">
+              SHDC 2026
+            </span>
+            <span className="inline-block rounded-full bg-secondary px-4 py-1 text-xs font-medium text-secondary-foreground">
+              نظام تشغيل المؤتمرات
+            </span>
+          </div>
           <h1 className="mt-5 font-display text-4xl font-bold leading-tight text-foreground lg:text-5xl">
-            كل تفاصيل فعاليتك
-            <span className="text-primary"> منظّمة</span> في بوابة واحدة
+            مؤتمر حوار الأمن والتاريخ
+            <span className="text-primary"> — الرياض 2026</span>
           </h1>
           <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground">
             من استقبال المتحدث في المطار، إلى غرفة الفندق، إلى منصّة الجلسة — تابع كل خطوة بواجهة
@@ -108,8 +113,9 @@ function Landing() {
       </section>
 
       <footer className="border-t border-border">
-        <div className="mx-auto max-w-6xl px-6 py-8 text-sm text-muted-foreground">
-          حوار الأمن والتاريخ © {new Date().getFullYear()}
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-6 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center">
+          <span>SHDC 2026 — حوار الأمن والتاريخ © {new Date().getFullYear()}</span>
+          <span>نفذ بواسطة نايف الرويس</span>
         </div>
       </footer>
     </div>
