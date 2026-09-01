@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated")({
 function PortalLayout() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const { roles, isOperator, loading: rolesLoading } = useRoles();
+  const { roles, isOperator, isAdmin, loading: rolesLoading } = useRoles();
   const { status: approvalStatus, loading: approvalLoading } = useApproval();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [openNav, setOpenNav] = useState(false);
@@ -75,7 +75,7 @@ function PortalLayout() {
   const roleLabel = roles[0] ? roleLabels[roles[0]] : "مطّلع";
   const visibleNavItems = isOperator
     ? navItems.filter((item) => item.to === "/operations")
-    : navItems;
+    : navItems.filter((item) => !item.adminOnly || isAdmin);
 
   return (
     <div className="flex min-h-screen bg-background">
