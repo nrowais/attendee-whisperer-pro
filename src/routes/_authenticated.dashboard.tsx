@@ -21,6 +21,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { UpcomingCountdown } from "@/components/portal/UpcomingCountdown";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -329,6 +331,10 @@ function DashboardPage() {
           تحديث تلقائي كل 30 ثانية
         </Badge>
       </div>
+
+      <UpcomingCountdown />
+
+
 
       <section className="surface-card p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">

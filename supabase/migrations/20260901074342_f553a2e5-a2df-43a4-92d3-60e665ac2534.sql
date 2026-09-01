@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.notify_status_change() FROM PUBLIC, anon, authenticated;

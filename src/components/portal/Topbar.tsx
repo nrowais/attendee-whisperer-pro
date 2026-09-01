@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Bell, BellRing, History, LogOut, Menu, Search } from "lucide-react";
+
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,6 +43,8 @@ export function Topbar({ email, roleLabel, onMenu, onSignOut }: Props) {
   const [now, setNow] = useState<string>("");
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
 
   const notifications = useQuery({
     queryKey: ["topbar-notifications", user?.id],
@@ -67,6 +71,44 @@ export function Topbar({ email, roleLabel, onMenu, onSignOut }: Props) {
     const id = setInterval(tick, 30_000);
     return () => clearInterval(id);
   }, []);
+
+  // إشعارات لحظية عند أي تغيير على حالات المتحدثين والضيوف
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase
+      .channel("portal-notifications")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload: any) => {
+          const row = payload.new;
+          toast(row?.title ?? "إشعار جديد", { description: row?.body ?? undefined });
+          queryClient.invalidateQueries({ queryKey: ["topbar-notifications", user.id] });
+          queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, queryClient]);
+
+  // فحص تنبيهات الرحلات (قبل الموعد بساعتين) بشكل دوري
+  useEffect(() => {
+    if (!user?.id) return;
+    const scan = () => {
+      void (supabase as any).rpc("check_flight_alerts", { window_minutes: 120 });
+    };
+    scan();
+    const id = setInterval(scan, 10 * 60_000);
+    return () => clearInterval(id);
+  }, [user?.id]);
+
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-background/85 px-4 py-3 backdrop-blur lg:px-6">
