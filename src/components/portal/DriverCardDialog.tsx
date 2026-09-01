@@ -122,7 +122,7 @@ export function buildDriverCardHtml(c: DriverCardData) {
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
 <style>
-  @page { size: A5 landscape; margin: 6mm; }
+  @page { size: A4 landscape; margin: 10mm; }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
   body { font-family: Cairo, "Segoe UI", sans-serif; color: #0f2a4a; margin: 0;
