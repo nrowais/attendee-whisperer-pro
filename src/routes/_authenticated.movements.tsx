@@ -7,8 +7,6 @@ import {
   arrivalFields,
   departureFields,
   tripFields,
-  driverFields,
-  vehicleFields,
 } from "@/lib/tableFields";
 
 export const Route = createFileRoute("/_authenticated/movements")({
@@ -92,28 +90,6 @@ function MovementsWorkspace() {
                   subtitle="جدولة ومتابعة التنقلات"
                   fields={tripFields}
                 />
-              ),
-            },
-            {
-              value: "fleet",
-              label: "السائقون والمركبات",
-              content: (
-                <div className="grid gap-6 xl:grid-cols-2">
-                  <CrudPage
-                    compact
-                    table="drivers"
-                    title="السائقون"
-                    subtitle="سجل السائقين وحالة التوفر"
-                    fields={driverFields}
-                  />
-                  <CrudPage
-                    compact
-                    table="vehicles"
-                    title="المركبات"
-                    subtitle="أسطول المركبات"
-                    fields={vehicleFields}
-                  />
-                </div>
               ),
             },
           ],
