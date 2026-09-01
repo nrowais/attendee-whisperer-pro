@@ -13,6 +13,7 @@ import {
   XCircle,
   Phone,
   Plus,
+  Clock,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -85,6 +86,8 @@ function useSpeakersBoard() {
         { data: hotels },
         { data: drivers },
         { data: vehicles },
+        { data: arrivals },
+        { data: flights },
       ] =
         await Promise.all([
           db.from("speakers").select("id, full_name, title, organization, country, phone").order("full_name"),
@@ -99,12 +102,23 @@ function useSpeakersBoard() {
           db.from("hotels").select("id, name"),
           db.from("drivers").select("id, full_name, phone"),
           db.from("vehicles").select("id, plate_number"),
+          db.from("speaker_arrivals").select("speaker_id, arrival_time, flight_id"),
+          db.from("flights").select("id, arrival_time"),
         ]);
 
       const hotelNames = new Map((hotels ?? []).map((h: any) => [h.id, h.name]));
       const driverMap = new Map((drivers ?? []).map((d: any) => [d.id, d]));
       const vehicleMap = new Map((vehicles ?? []).map((v: any) => [v.id, v]));
       const opsBySpeaker = new Map((ops ?? []).map((o: any) => [o.speaker_id, o]));
+      const flightArrivalById = new Map((flights ?? []).map((f: any) => [f.id, f.arrival_time]));
+      const arrivalTimeBySpeaker = new Map<string, string>();
+      (arrivals ?? []).forEach((a: any) => {
+        const t = a.arrival_time ?? flightArrivalById.get(a.flight_id);
+        const current = arrivalTimeBySpeaker.get(a.speaker_id);
+        if (t && (!current || t < current)) {
+          arrivalTimeBySpeaker.set(a.speaker_id, t);
+        }
+      });
       const tripBySpeaker = new Map<string, any>();
       (trips ?? []).forEach((t: any) => {
         if (t.speaker_id && !tripBySpeaker.has(t.speaker_id)) tripBySpeaker.set(t.speaker_id, t);
@@ -114,7 +128,7 @@ function useSpeakersBoard() {
         if (b.speaker_id && !bookingBySpeaker.has(b.speaker_id)) bookingBySpeaker.set(b.speaker_id, b);
       });
 
-      return (speakers ?? []).map((s: any) => {
+      const rows = (speakers ?? []).map((s: any) => {
         const op: any = opsBySpeaker.get(s.id);
         const rawTrip = tripBySpeaker.get(s.id);
         const trip = rawTrip
@@ -134,6 +148,7 @@ function useSpeakersBoard() {
         return {
           ...s,
           opStatus: (op?.operational_status as string) ?? "scheduled",
+          arrivalAt: arrivalTimeBySpeaker.get(s.id) ?? null,
           op,
           trip,
           booking: booking
@@ -141,6 +156,15 @@ function useSpeakersBoard() {
             : null,
         };
       });
+
+      rows.sort((a: any, b: any) => {
+        if (a.arrivalAt && b.arrivalAt) return new Date(a.arrivalAt).getTime() - new Date(b.arrivalAt).getTime();
+        if (a.arrivalAt) return -1;
+        if (b.arrivalAt) return 1;
+        return a.full_name.localeCompare(b.full_name, "ar");
+      });
+
+      return rows;
     },
   });
 }
@@ -304,9 +328,9 @@ export function SpeakersStatusBoard() {
 
       {/* Results */}
       {isLoading ? (
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <div className="columns-1 gap-3 md:columns-2 xl:columns-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-40 rounded-xl" />
+            <Skeleton key={i} className="mb-3 h-40 rounded-xl break-inside-avoid" />
           ))}
         </div>
       ) : rows.length === 0 ? (
@@ -316,9 +340,9 @@ export function SpeakersStatusBoard() {
       ) : (
         <>
           <p className="text-xs text-muted-foreground">{rows.length} متحدث</p>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="columns-1 gap-3 md:columns-2 xl:columns-3">
             {rows.map((r: any) => (
-              <div key={r.id} className="space-y-3 rounded-xl border border-border bg-card p-4">
+              <div key={r.id} className="mb-3 break-inside-avoid space-y-3 rounded-xl border border-border bg-card p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-foreground">{r.full_name}</p>
@@ -332,6 +356,21 @@ export function SpeakersStatusBoard() {
                 </div>
 
                 <div className="space-y-2 text-xs">
+                  {r.arrivalAt ? (
+                    <div className="flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2 text-primary">
+                      <Clock className="h-3.5 w-3.5 shrink-0" />
+                      <span>
+                        وقت الوصول: {" "}
+                        {new Date(r.arrivalAt).toLocaleString("ar-SA-u-ca-gregory", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  ) : null}
                   <div className="flex items-center gap-2 rounded-lg bg-secondary/50 px-3 py-2">
                     <Car className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                     {r.trip ? (
