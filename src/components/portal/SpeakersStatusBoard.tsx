@@ -330,9 +330,9 @@ export function SpeakersStatusBoard() {
 
       {/* Results */}
       {isLoading ? (
-        <div className="columns-1 gap-3 md:columns-2 xl:columns-3">
+        <div className="grid grid-cols-1 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="mb-3 h-40 rounded-xl break-inside-avoid" />
+            <Skeleton key={i} className="h-40 rounded-xl" />
           ))}
         </div>
       ) : rows.length === 0 ? (
@@ -341,11 +341,14 @@ export function SpeakersStatusBoard() {
         </div>
       ) : (
         <>
-          <p className="text-xs text-muted-foreground">{rows.length} متحدث</p>
-          <div className="columns-1 gap-3 md:columns-2 xl:columns-3">
-            {rows.map((r: any) => (
-              <div key={r.id} className="mb-3 break-inside-avoid space-y-3 rounded-xl border border-border bg-card p-4">
-                <div className="flex items-start justify-between gap-2">
+          <p className="text-xs text-muted-foreground">{rows.length} متحدث — مرتب حسب وقت الوصول</p>
+          <div className="grid grid-cols-1 gap-3">
+            {rows.map((r: any, index: number) => (
+              <div key={r.id} className="relative space-y-3 rounded-xl border border-border bg-card p-4">
+                <div className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow-sm">
+                  {index + 1}
+                </div>
+                <div className="flex items-start justify-between gap-2 pr-4">
                   <div className="min-w-0">
                     <DriverCardDialog
                       trip={
