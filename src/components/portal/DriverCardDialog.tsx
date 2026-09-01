@@ -87,6 +87,7 @@ export function buildDriverCardHtml(c: DriverCardData) {
   const rows: Array<[string, string]> = [
     ["اسم الضيف", c.guestName],
     ["رقم صالة المطار", c.terminal],
+    ["رقم الرحلة", c.flightNo],
     ["اسم مستقبل الضيف", c.receiverName],
     ["رقم جوال مستقبل الضيف", c.receiverPhone],
     ["وقت الرحلة", arabicTime(c.flightTime)],
@@ -95,7 +96,6 @@ export function buildDriverCardHtml(c: DriverCardData) {
     ["موقع الفندق", c.hotelLocation ?? ""],
   ].filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
   const extra: Array<[string, string]> = [
-    ["رقم الرحلة", c.flightNo],
     ["السائق", c.driverName],
     ["المركبة", c.vehicle],
     ["نقطة الانطلاق", c.pickup],
