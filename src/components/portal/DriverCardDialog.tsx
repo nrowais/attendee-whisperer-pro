@@ -494,7 +494,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
             <Download className="ml-1 h-4 w-4" />
             إنشاء تلقائي وتحميل PDF
           </Button>
-          {canEdit && trip?.id && (
+          {canEdit && (
             <Button variant="outline" onClick={() => save.mutate()} disabled={save.isPending}>
               <Save className="ml-1 h-4 w-4" />
               حفظ البيانات
