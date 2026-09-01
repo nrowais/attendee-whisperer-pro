@@ -9,7 +9,7 @@ import {
   ClipboardPlus,
   Car,
   Ticket,
-  Route as RouteIcon,
+  
   ListChecks,
   Settings,
   type LucideIcon,
