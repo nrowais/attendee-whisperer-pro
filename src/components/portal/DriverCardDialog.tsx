@@ -268,6 +268,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       cardNo: "",
       hotelName: trip?.hotel_name ?? "",
       hotelLocation: trip?.hotel_location ?? "",
+      hotelMapUrl: trip?.hotel_map_url ?? "",
     });
 
     // استرجاع بطاقة محفوظة سابقاً لهذا الضيف/التذكرة
