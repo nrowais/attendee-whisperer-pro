@@ -43,6 +43,8 @@ export function Topbar({ email, roleLabel, onMenu, onSignOut }: Props) {
   const [now, setNow] = useState<string>("");
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
 
   const notifications = useQuery({
     queryKey: ["topbar-notifications", user?.id],
