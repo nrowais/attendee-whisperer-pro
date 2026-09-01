@@ -2,71 +2,34 @@ import {
   Activity,
   UserCheck,
   Mic2,
-  BarChart3,
-  Settings,
-  ListChecks,
-  Sunrise,
-  PlaneLanding,
-  Car,
+  Plane,
   BedDouble,
-  PlaneTakeoff,
-  Inbox,
-  Loader,
-  CheckCircle2,
-  Mail,
-  User,
+  BarChart3,
+  CalendarDays,
+  ClipboardPlus,
+  Car,
+  Ticket,
+  ListChecks,
+  ShieldCheck,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 
-export type NavItem = {
-  to: string;
-  label: string;
-  icon: LucideIcon;
-  hint?: string;
-  children?: NavItem[];
-};
+export type NavItem = { to: string; label: string; icon: LucideIcon; hint?: string };
 
 export const navItems: NavItem[] = [
-  { to: "/dashboard", label: "لوحة غرفة العمليات", icon: Activity, hint: "الأرقام والحالة الآن" },
-  {
-    to: "/speakers",
-    label: "المتحدثون",
-    icon: Mic2,
-    hint: "القائمة ولوحة الحالات",
-    children: [{ to: "/speakers", label: "ملف المتحدث", icon: User }],
-  },
-  {
-    to: "/invitees",
-    label: "المدعوون",
-    icon: UserCheck,
-    hint: "قائمة المدعوين",
-    children: [{ to: "/invitees/invitations", label: "الدعوات والحضور", icon: Mail }],
-  },
-  {
-    to: "/operations",
-    label: "العمليات",
-    icon: ListChecks,
-    hint: "تسجيل الحركة لحظياً",
-    children: [
-      { to: "/ops/today", label: "عمليات اليوم", icon: Sunrise },
-      { to: "/ops/incoming", label: "القادمون", icon: PlaneLanding },
-      { to: "/ops/airport", label: "الموجودون بالمطار", icon: PlaneLanding },
-      { to: "/ops/transport", label: "النقل", icon: Car },
-      { to: "/ops/hotel", label: "الفندق", icon: BedDouble },
-      { to: "/ops/departing", label: "المغادرون", icon: PlaneTakeoff },
-    ],
-  },
-  {
-    to: "/requests/new",
-    label: "الطلبات",
-    icon: Inbox,
-    hint: "طلبات المتحدثين",
-    children: [
-      { to: "/requests/new", label: "جديدة", icon: Inbox },
-      { to: "/requests/in-progress", label: "جاري التنفيذ", icon: Loader },
-      { to: "/requests/done", label: "مكتملة", icon: CheckCircle2 },
-    ],
-  },
+  { to: "/dashboard", label: "المتابعة اللحظية", icon: Activity, hint: "الأرقام والحالة الآن" },
+  { to: "/calendar", label: "التقويم", icon: CalendarDays, hint: "كل المواعيد في شهر واحد" },
+  { to: "/daily", label: "الإدخال اليومي", icon: ClipboardPlus, hint: "نقل وإقامة يوماً بيوم" },
+
+  { to: "/operations", label: "الحالة التشغيلية", icon: ListChecks, hint: "تسجيل الوصول والنقل والفندق والمغادرة" },
+  { to: "/verify", label: "التحقق من الحالات", icon: ShieldCheck, hint: "مطابقة المجدول مع الحالة المحفوظة" },
+  { to: "/speakers", label: "المتحدثون", icon: Mic2, hint: "المتحدثون والجلسات والطلبات" },
+  { to: "/invitees", label: "الضيوف والمدعوون", icon: UserCheck, hint: "المدعوون والدعوات والحضور" },
+  { to: "/movements", label: "التنقلات", icon: Plane, hint: "الطيران والوصول والنقل الأرضي" },
+  { to: "/fleet", label: "السائقون والمركبات", icon: Car, hint: "الأسطول وتوزيع رحلات الوصول والمغادرة" },
+  { to: "/tickets", label: "تذاكر النقل", icon: Ticket, hint: "ربط السائق والمركبة بالرحلة المجدولة والفعلية" },
+  { to: "/hotels", label: "الإقامة", icon: BedDouble, hint: "الفنادق والغرف والحجوزات" },
   { to: "/reports", label: "التقارير", icon: BarChart3, hint: "ملخصات قابلة للتصدير" },
   { to: "/settings", label: "الإعدادات", icon: Settings, hint: "الفعالية والفريق والصلاحيات" },
 ];
