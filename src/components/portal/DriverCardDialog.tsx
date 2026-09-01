@@ -254,6 +254,8 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
     const base = trip?.flight_at ?? trip?.scheduled_at ?? null;
     const { date, time } = splitDateTime(base);
     setCardId(null);
+    // استكمال بيانات الفندق تلقائياً من القائمة المعتمدة عند تطابق الاسم
+    const hotelMatch = HOTELS.find((h) => h.name === (trip?.hotel_name ?? ""));
     setForm({
       guestName: trip?.guest_name ?? trip?.speaker?.full_name ?? "",
       terminal: trip?.terminal ?? "",
@@ -269,8 +271,8 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       ticketNo: trip?.ticket_no ? String(trip.ticket_no) : "",
       cardNo: "",
       hotelName: trip?.hotel_name ?? "",
-      hotelLocation: trip?.hotel_location ?? "",
-      hotelMapUrl: trip?.hotel_map_url ?? "",
+      hotelLocation: trip?.hotel_location ?? hotelMatch?.location ?? "",
+      hotelMapUrl: trip?.hotel_map_url ?? hotelMatch?.mapUrl ?? "",
     });
 
     // استرجاع بطاقة محفوظة سابقاً لهذا الضيف/التذكرة
@@ -428,7 +430,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
         <DialogHeader className="text-right">
           <DialogTitle>بطاقة توجيه السائق إلى المطار</DialogTitle>
           <DialogDescription>
-            تُحفظ البطاقة في ملف الضيف برقم تسلسلي تلقائي عند التحميل.
+            تُعبأ البطاقة تلقائياً من بيانات الضيف المسجلة (الوصول، الرحلة، الفندق)، ويمكنك تعديل أي حقل يدوياً قبل الحفظ.
           </DialogDescription>
         </DialogHeader>
 
@@ -490,9 +492,9 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
         <DialogFooter className="gap-2 sm:justify-start">
           <Button onClick={saveAndDownload} disabled={issue.isPending}>
             <Download className="ml-1 h-4 w-4" />
-            حفظ وتحميل البطاقة PDF
+            إنشاء تلقائي وتحميل PDF
           </Button>
-          {canEdit && trip?.id && (
+          {canEdit && (
             <Button variant="outline" onClick={() => save.mutate()} disabled={save.isPending}>
               <Save className="ml-1 h-4 w-4" />
               حفظ البيانات

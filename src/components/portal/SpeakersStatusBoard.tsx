@@ -105,8 +105,8 @@ function useSpeakersBoard() {
           db.from("hotels").select("id, name"),
           db.from("drivers").select("id, full_name, phone"),
           db.from("vehicles").select("id, plate_number"),
-          db.from("speaker_arrivals").select("speaker_id, arrival_time, flight_id"),
-          db.from("flights").select("id, arrival_time"),
+          db.from("speaker_arrivals").select("speaker_id, arrival_time, flight_id, terminal"),
+          db.from("flights").select("id, arrival_time, flight_number, airline"),
           db
             .from("driver_cards")
             .select("speaker_id, guest_name, card_no, ticket_no")
@@ -117,13 +117,20 @@ function useSpeakersBoard() {
       const driverMap = new Map((drivers ?? []).map((d: any) => [d.id, d]));
       const vehicleMap = new Map((vehicles ?? []).map((v: any) => [v.id, v]));
       const opsBySpeaker = new Map((ops ?? []).map((o: any) => [o.speaker_id, o]));
-      const flightArrivalById = new Map((flights ?? []).map((f: any) => [f.id, f.arrival_time]));
+      const flightById = new Map<string, any>((flights ?? []).map((f: any) => [f.id, f]));
       const arrivalTimeBySpeaker = new Map<string, string>();
+      const arrivalInfoBySpeaker = new Map<string, any>();
       (arrivals ?? []).forEach((a: any) => {
-        const t = a.arrival_time ?? flightArrivalById.get(a.flight_id);
+        const flight = a.flight_id ? flightById.get(a.flight_id) : null;
+        const t = a.arrival_time ?? flight?.arrival_time;
         const current = arrivalTimeBySpeaker.get(a.speaker_id);
         if (t && (!current || t < current)) {
           arrivalTimeBySpeaker.set(a.speaker_id, t);
+          arrivalInfoBySpeaker.set(a.speaker_id, {
+            terminal: a.terminal ?? "",
+            flightNo: flight?.flight_number ?? "",
+            airline: flight?.airline ?? "",
+          });
         }
       });
       const tripBySpeaker = new Map<string, any>();
@@ -162,6 +169,7 @@ function useSpeakersBoard() {
           ...s,
           opStatus: (op?.operational_status as string) ?? "scheduled",
           arrivalAt: arrivalTimeBySpeaker.get(s.id) ?? null,
+          arrivalInfo: arrivalInfoBySpeaker.get(s.id) ?? null,
           op,
           trip,
           booking: booking
@@ -365,16 +373,20 @@ export function SpeakersStatusBoard() {
                     <DriverCardDialog
                       trip={
                         r.trip ?? {
+                          speaker_id: r.id,
                           speaker: { full_name: r.full_name, organization: r.organization },
                           guest_name: r.full_name,
                           flight_at: r.arrivalAt,
                           scheduled_at: r.arrivalAt,
-                          pickup_location: "",
-                          dropoff_location: "",
-                          terminal: "",
+                          pickup_location: r.arrivalInfo?.terminal
+                            ? `مطار الملك خالد — صالة ${r.arrivalInfo.terminal}`
+                            : "مطار الملك خالد الدولي",
+                          dropoff_location: r.booking?.hotelName ?? "",
+                          terminal: r.arrivalInfo?.terminal ?? "",
                           receiver_name: "",
-                          receiver_phone: "",
-                          flight_no: "",
+                          receiver_phone: r.phone ?? "",
+                          flight_no: r.arrivalInfo?.flightNo ?? "",
+                          hotel_name: r.booking?.hotelName ?? "",
                         }
                       }
                       trigger={
