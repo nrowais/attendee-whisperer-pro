@@ -347,7 +347,32 @@ export function SpeakersStatusBoard() {
               <div key={r.id} className="mb-3 break-inside-avoid space-y-3 rounded-xl border border-border bg-card p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="truncate font-semibold text-foreground">{r.full_name}</p>
+                    <DriverCardDialog
+                      trip={
+                        r.trip ?? {
+                          speaker: { full_name: r.full_name, organization: r.organization },
+                          guest_name: r.full_name,
+                          flight_at: r.arrivalAt,
+                          scheduled_at: r.arrivalAt,
+                          pickup_location: "",
+                          dropoff_location: "",
+                          terminal: "",
+                          receiver_name: "",
+                          receiver_phone: "",
+                          flight_no: "",
+                        }
+                      }
+                      trigger={
+                        <button
+                          type="button"
+                          className="group flex items-center gap-1 truncate text-right font-semibold text-foreground hover:text-primary hover:underline"
+                          title="إصدار بطاقة للسائق"
+                        >
+                          <IdCard className="h-3.5 w-3.5 shrink-0 text-primary opacity-0 transition-opacity group-hover:opacity-100" />
+                          {r.full_name}
+                        </button>
+                      }
+                    />
                     <p className="truncate text-xs text-muted-foreground">
                       {[r.title, r.organization, r.country].filter(Boolean).join(" · ") || "—"}
                     </p>
