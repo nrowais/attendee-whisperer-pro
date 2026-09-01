@@ -385,6 +385,55 @@ export function SpeakersStatusBoard() {
           </div>
         </>
       )}
+
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="sm:max-w-lg" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-start font-display">إضافة متحدث جديد</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {(
+              [
+                { key: "full_name", label: "الاسم الكامل", required: true },
+                { key: "title", label: "المسمى الوظيفي" },
+                { key: "organization", label: "الجهة" },
+                { key: "country", label: "الدولة" },
+                { key: "email", label: "البريد الإلكتروني" },
+                { key: "phone", label: "رقم الجوال" },
+              ] as { key: string; label: string; required?: boolean }[]
+            ).map((f) => (
+              <div key={f.key} className="space-y-2">
+                <Label htmlFor={`add-${f.key}`}>
+                  {f.label}
+                  {f.required ? <span className="text-destructive"> *</span> : null}
+                </Label>
+                <Input
+                  id={`add-${f.key}`}
+                  value={form[f.key] ?? ""}
+                  onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+                />
+              </div>
+            ))}
+          </div>
+          <DialogFooter className="gap-2 sm:justify-start">
+            <Button
+              onClick={() => {
+                if (!form.full_name?.trim()) {
+                  toast.error("الحقل المطلوب: الاسم الكامل");
+                  return;
+                }
+                addSpeaker.mutate(form);
+              }}
+              disabled={addSpeaker.isPending}
+            >
+              حفظ
+            </Button>
+            <Button variant="outline" onClick={() => setAddOpen(false)}>
+              إلغاء
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
