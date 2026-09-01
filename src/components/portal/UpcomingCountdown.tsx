@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { AlarmClock, BedDouble, Car, PlaneLanding, PlaneTakeoff } from "lucide-react";
+import { AlarmClock, PlaneLanding, PlaneTakeoff } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
