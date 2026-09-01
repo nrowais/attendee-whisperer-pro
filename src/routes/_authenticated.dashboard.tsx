@@ -21,6 +21,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { UpcomingCountdown } from "@/components/portal/UpcomingCountdown";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
