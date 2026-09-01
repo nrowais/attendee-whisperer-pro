@@ -101,6 +101,46 @@ function UsersPage() {
         </p>
       </div>
 
+      {pending.length > 0 ? (
+        <div className="surface-card space-y-3 p-5">
+          <h2 className="font-display text-lg font-semibold text-foreground">
+            طلبات تسجيل بانتظار الموافقة ({pending.length})
+          </h2>
+          {pending.map((u: any) => (
+            <div
+              key={u.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border p-3"
+            >
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-foreground">{u.full_name ?? "—"}</p>
+                <p className="text-xs text-muted-foreground" dir="ltr">
+                  {u.email ?? "—"}
+                </p>
+              </div>
+              {isAdmin ? (
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => setApproval.mutate({ userId: u.id, status: "approved" })}
+                  >
+                    موافقة
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setApproval.mutate({ userId: u.id, status: "rejected" })}
+                  >
+                    رفض
+                  </Button>
+                </div>
+              ) : (
+                <Badge variant="secondary">بانتظار موافقة المدير</Badge>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : null}
+
       <div className="surface-card overflow-hidden">
         {usersQuery.isLoading ? (
           <div className="space-y-3 p-6">
