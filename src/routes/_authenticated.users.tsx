@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -40,6 +42,8 @@ const allRoles: AppRole[] = ["admin", "coordinator", "viewer", "operator"];
 function UsersPage() {
   const { isAdmin } = useRoles();
   const queryClient = useQueryClient();
+  const [pendingRoles, setPendingRoles] = useState<Record<string, AppRole>>({});
+
 
   const usersQuery = useQuery({
     queryKey: ["portal-users"],
@@ -57,7 +61,23 @@ function UsersPage() {
   });
 
   const setApproval = useMutation({
-    mutationFn: async ({ userId, status }: { userId: string; status: "approved" | "rejected" }) => {
+    mutationFn: async ({
+      userId,
+      status,
+      role,
+    }: {
+      userId: string;
+      status: "approved" | "rejected";
+      role?: AppRole;
+    }) => {
+      if (status === "approved" && role) {
+        const { error: delError } = await supabase.from("user_roles").delete().eq("user_id", userId);
+        if (delError) throw delError;
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({ user_id: userId, role });
+        if (roleError) throw roleError;
+      }
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -77,6 +97,7 @@ function UsersPage() {
   const pending = (usersQuery.data ?? []).filter(
     (u: any) => (u.approval_status ?? "approved") === "pending",
   );
+
 
 
   const changeRole = useMutation({
@@ -119,10 +140,33 @@ function UsersPage() {
                 </p>
               </div>
               {isAdmin ? (
-                <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Select
+                    value={pendingRoles[u.id] ?? "viewer"}
+                    onValueChange={(value) =>
+                      setPendingRoles((prev) => ({ ...prev, [u.id]: value as AppRole }))
+                    }
+                  >
+                    <SelectTrigger className="h-9 w-40">
+                      <SelectValue placeholder="الصلاحية" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allRoles.map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {roleLabels[role]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <Button
                     size="sm"
-                    onClick={() => setApproval.mutate({ userId: u.id, status: "approved" })}
+                    onClick={() =>
+                      setApproval.mutate({
+                        userId: u.id,
+                        status: "approved",
+                        role: pendingRoles[u.id] ?? "viewer",
+                      })
+                    }
                   >
                     موافقة
                   </Button>
@@ -134,6 +178,7 @@ function UsersPage() {
                     رفض
                   </Button>
                 </div>
+
               ) : (
                 <Badge variant="secondary">بانتظار موافقة المدير</Badge>
               )}
