@@ -415,5 +415,5 @@ export const driverCardFields: Field[] = [
   { key: "vehicle", label: "المركبة", list: false },
   { key: "pickup_location", label: "نقطة الانطلاق", list: false },
   { key: "dropoff_location", label: "الوجهة", list: false },
-  { key: "ticket_no", label: "رقم التذكرة", list: false },
+  { key: "ticket_no", label: "رقم التذكرة" },
 ];

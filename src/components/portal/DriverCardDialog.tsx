@@ -310,8 +310,18 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
 
   // حفظ البطاقة في ملف الضيف مع رقم تسلسلي
   const persistCard = async (): Promise<DriverCardData> => {
+    // ربط البطاقة بالمتحدث حتى لو لم تكن مرتبطة برحلة (مطابقة بالاسم)
+    let speakerId = trip?.speaker_id ?? trip?.speaker?.id ?? null;
+    if (!speakerId && form.guestName.trim()) {
+      const { data: match } = await db
+        .from("speakers")
+        .select("id")
+        .ilike("full_name", form.guestName.trim())
+        .limit(1);
+      speakerId = match?.[0]?.id ?? null;
+    }
     const payload = {
-      speaker_id: trip?.speaker_id ?? trip?.speaker?.id ?? null,
+      speaker_id: speakerId,
       trip_id: trip?.id ?? null,
       guest_name: form.guestName || null,
       terminal: form.terminal || null,
