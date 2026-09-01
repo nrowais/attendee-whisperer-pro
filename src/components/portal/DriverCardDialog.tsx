@@ -17,6 +17,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { eventName } from "@/lib/nav";
+import eventLogo from "@/assets/event-logo-2026.png";
+
+const logoUrl = () =>
+  typeof window !== "undefined" ? new URL(eventLogo, window.location.origin).href : eventLogo;
 
 const db = supabase as any;
 
