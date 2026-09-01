@@ -98,6 +98,7 @@ export function buildDriverCardHtml(c: DriverCardData) {
   ].filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
   const extra: Array<[string, string]> = [
     ["السائق", c.driverName],
+    ["جوال السائق", c.driverPhone],
     ["المركبة", c.vehicle],
     ["نقطة الانطلاق", c.pickup],
     ["الوجهة", c.dropoff],
@@ -239,6 +240,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
     flightTime: "",
     flightNo: "",
     driverName: "",
+    driverPhone: "",
     vehicle: "",
     pickup: "",
     dropoff: "",
@@ -266,6 +268,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       flightTime: time,
       flightNo: trip?.flight_no ?? "",
       driverName: trip?.driver?.full_name ?? "",
+      driverPhone: trip?.driver?.phone ?? "",
       vehicle: trip?.vehicle?.plate_number ?? "",
       pickup: trip?.pickup_location ?? "",
       dropoff: trip?.dropoff_location ?? "",
