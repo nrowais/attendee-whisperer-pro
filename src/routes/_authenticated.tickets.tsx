@@ -169,22 +169,35 @@ function TicketsPage() {
   return (
     <div className="space-y-6" dir="rtl">
       <header className="space-y-1">
-        <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
-          <Ticket className="h-6 w-6 text-primary" />
-          تذاكر النقل
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          ربط السائقين والمركبات بالرحلات المجدولة والفعلية، وتنعكس مباشرة في{" "}
-          <Link to="/speakers" className="font-semibold text-primary underline-offset-4 hover:underline">
-            لوحة الحالات
-          </Link>{" "}
-          و{" "}
-          <Link to="/fleet" className="font-semibold text-primary underline-offset-4 hover:underline">
-            صفحة الأسطول
-          </Link>
-          .
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-1">
+            <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
+              <Ticket className="h-6 w-6 text-primary" />
+              تذاكر النقل
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              ربط السائقين والمركبات بالرحلات المجدولة والفعلية، وتنعكس مباشرة في{" "}
+              <Link to="/speakers" className="font-semibold text-primary underline-offset-4 hover:underline">
+                لوحة الحالات
+              </Link>{" "}
+              و{" "}
+              <Link to="/fleet" className="font-semibold text-primary underline-offset-4 hover:underline">
+                صفحة الأسطول
+              </Link>
+              .
+            </p>
+          </div>
+          <DriverCardDialog
+            trigger={
+              <Button variant="secondary">
+                <IdCard className="ml-1 h-4 w-4" />
+                بطاقة سائق (إدخال يدوي)
+              </Button>
+            }
+          />
+        </div>
       </header>
+
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {kpis.map((k) => (
