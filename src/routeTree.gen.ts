@@ -26,10 +26,12 @@ import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authen
 import { Route as AuthenticatedOperationsRouteImport } from './routes/_authenticated.operations'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated.reports'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
+import { Route as AuthenticatedSheetsRouteImport } from './routes/_authenticated.sheets'
 import { Route as AuthenticatedSpeakersRouteImport } from './routes/_authenticated.speakers'
 import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated.tickets'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
+import { Route as ApiPublicSheetsTableRouteImport } from './routes/api/public/sheets.$table'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -117,6 +119,11 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSheetsRoute = AuthenticatedSheetsRouteImport.update({
+  id: '/sheets',
+  path: '/sheets',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSpeakersRoute = AuthenticatedSpeakersRouteImport.update({
   id: '/speakers',
   path: '/speakers',
@@ -137,6 +144,11 @@ const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   path: '/api/public/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSheetsTableRoute = ApiPublicSheetsTableRouteImport.update({
+  id: '/api/public/sheets/$table',
+  path: '/api/public/sheets/$table',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -155,10 +167,12 @@ export interface FileRoutesByFullPath {
   '/operations': typeof AuthenticatedOperationsRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/sheets': typeof AuthenticatedSheetsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -177,10 +191,12 @@ export interface FileRoutesByTo {
   '/operations': typeof AuthenticatedOperationsRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/sheets': typeof AuthenticatedSheetsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -201,10 +217,12 @@ export interface FileRoutesById {
   '/_authenticated/operations': typeof AuthenticatedOperationsRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/sheets': typeof AuthenticatedSheetsRoute
   '/_authenticated/speakers': typeof AuthenticatedSpeakersRoute
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -225,10 +243,12 @@ export interface FileRouteTypes {
     | '/operations'
     | '/reports'
     | '/settings'
+    | '/sheets'
     | '/speakers'
     | '/tickets'
     | '/users'
     | '/api/public/health'
+    | '/api/public/sheets/$table'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -247,10 +267,12 @@ export interface FileRouteTypes {
     | '/operations'
     | '/reports'
     | '/settings'
+    | '/sheets'
     | '/speakers'
     | '/tickets'
     | '/users'
     | '/api/public/health'
+    | '/api/public/sheets/$table'
   id:
     | '__root__'
     | '/'
@@ -270,10 +292,12 @@ export interface FileRouteTypes {
     | '/_authenticated/operations'
     | '/_authenticated/reports'
     | '/_authenticated/settings'
+    | '/_authenticated/sheets'
     | '/_authenticated/speakers'
     | '/_authenticated/tickets'
     | '/_authenticated/users'
     | '/api/public/health'
+    | '/api/public/sheets/$table'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -282,6 +306,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   SpeakerRoute: typeof SpeakerRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
+  ApiPublicSheetsTableRoute: typeof ApiPublicSheetsTableRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -405,6 +430,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/sheets': {
+      id: '/_authenticated/sheets'
+      path: '/sheets'
+      fullPath: '/sheets'
+      preLoaderRoute: typeof AuthenticatedSheetsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/speakers': {
       id: '/_authenticated/speakers'
       path: '/speakers'
@@ -433,6 +465,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/sheets/$table': {
+      id: '/api/public/sheets/$table'
+      path: '/api/public/sheets/$table'
+      fullPath: '/api/public/sheets/$table'
+      preLoaderRoute: typeof ApiPublicSheetsTableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -450,6 +489,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedOperationsRoute: typeof AuthenticatedOperationsRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSheetsRoute: typeof AuthenticatedSheetsRoute
   AuthenticatedSpeakersRoute: typeof AuthenticatedSpeakersRoute
   AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
@@ -469,6 +509,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedOperationsRoute: AuthenticatedOperationsRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSheetsRoute: AuthenticatedSheetsRoute,
   AuthenticatedSpeakersRoute: AuthenticatedSpeakersRoute,
   AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
@@ -484,6 +525,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   SpeakerRoute: SpeakerRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
+  ApiPublicSheetsTableRoute: ApiPublicSheetsTableRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
