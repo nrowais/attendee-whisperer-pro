@@ -272,18 +272,32 @@ export function TodaysSessions() {
                   </div>
                 </div>
                 {live ? (
-                  <Badge className="shrink-0 gap-1.5">
-                    <span className="size-1.5 animate-pulse rounded-full bg-current" />
-                    جارية الآن
-                  </Badge>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <Badge className="gap-1.5">
+                      <span className="size-1.5 animate-pulse rounded-full bg-current" />
+                      جارية الآن
+                    </Badge>
+                    {endMs !== null && (
+                      <span className="font-mono text-[11px] tabular-nums text-muted-foreground" dir="ltr">
+                        تتبقى {fmtCountdown(endMs - now)}
+                      </span>
+                    )}
+                  </div>
                 ) : done ? (
                   <Badge variant="secondary" className="shrink-0">
                     انتهت
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="shrink-0">
-                    قادمة
-                  </Badge>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <Badge variant="outline" className="gap-1.5">
+                      قادمة
+                    </Badge>
+                    {startMs !== null && (
+                      <span className="font-mono text-[11px] tabular-nums text-primary" dir="ltr">
+                        تبدأ بعد {fmtCountdown(startMs - now)}
+                      </span>
+                    )}
+                  </div>
                 )}
               </li>
             );
