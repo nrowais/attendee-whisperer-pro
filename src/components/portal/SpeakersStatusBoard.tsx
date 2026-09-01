@@ -373,16 +373,20 @@ export function SpeakersStatusBoard() {
                     <DriverCardDialog
                       trip={
                         r.trip ?? {
+                          speaker_id: r.id,
                           speaker: { full_name: r.full_name, organization: r.organization },
                           guest_name: r.full_name,
                           flight_at: r.arrivalAt,
                           scheduled_at: r.arrivalAt,
-                          pickup_location: "",
-                          dropoff_location: "",
-                          terminal: "",
+                          pickup_location: r.arrivalInfo?.terminal
+                            ? `مطار الملك خالد — صالة ${r.arrivalInfo.terminal}`
+                            : "مطار الملك خالد الدولي",
+                          dropoff_location: r.booking?.hotelName ?? "",
+                          terminal: r.arrivalInfo?.terminal ?? "",
                           receiver_name: "",
-                          receiver_phone: "",
-                          flight_no: "",
+                          receiver_phone: r.phone ?? "",
+                          flight_no: r.arrivalInfo?.flightNo ?? "",
+                          hotel_name: r.booking?.hotelName ?? "",
                         }
                       }
                       trigger={
