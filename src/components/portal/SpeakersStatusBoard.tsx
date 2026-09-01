@@ -147,11 +147,40 @@ function useSpeakersBoard() {
 
 export function SpeakersStatusBoard() {
   const { data, isLoading } = useSpeakersBoard();
+  const { canEdit } = useRoles();
+  const queryClient = useQueryClient();
   const [status, setStatus] = useState<StatusKey>("all");
   const [tripFilter, setTripFilter] = useState<string>("all");
   const [directionFilter, setDirectionFilter] = useState<string>("all");
   const [hotelFilter, setHotelFilter] = useState<string>("all");
   const [query, setQuery] = useState("");
+  const [addOpen, setAddOpen] = useState(false);
+  const [form, setForm] = useState<Record<string, string>>({});
+
+  const addSpeaker = useMutation({
+    mutationFn: async (values: Record<string, string>) => {
+      const payload: Record<string, string | null> = {};
+      for (const key of ["full_name", "title", "organization", "country", "email", "phone"]) {
+        payload[key] = values[key]?.trim() ? values[key].trim() : null;
+      }
+      const { data: inserted, error } = await db
+        .from("speakers")
+        .insert(payload)
+        .select("id")
+        .single();
+      if (error) throw error;
+      // إنشاء حالة تشغيلية مستقلة للمتحدث الجديد
+      await db.from("guest_operations").insert({ speaker_id: inserted.id, operational_status: "scheduled" });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["speakers-status-board"] });
+      queryClient.invalidateQueries({ queryKey: ["crud", "speakers"] });
+      toast.success("تمت إضافة المتحدث بنجاح");
+      setAddOpen(false);
+      setForm({});
+    },
+    onError: (error: any) => toast.error(error?.message ?? "تعذر الحفظ"),
+  });
 
   const rows = useMemo(() => {
     const tab = STATUS_TABS.find((t) => t.value === status) ?? STATUS_TABS[0]!;
