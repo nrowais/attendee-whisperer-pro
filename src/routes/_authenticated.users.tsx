@@ -136,10 +136,33 @@ function UsersPage() {
                 </p>
               </div>
               {isAdmin ? (
-                <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Select
+                    value={pendingRoles[u.id] ?? "viewer"}
+                    onValueChange={(value) =>
+                      setPendingRoles((prev) => ({ ...prev, [u.id]: value as AppRole }))
+                    }
+                  >
+                    <SelectTrigger className="h-9 w-40">
+                      <SelectValue placeholder="الصلاحية" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allRoles.map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {roleLabels[role]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <Button
                     size="sm"
-                    onClick={() => setApproval.mutate({ userId: u.id, status: "approved" })}
+                    onClick={() =>
+                      setApproval.mutate({
+                        userId: u.id,
+                        status: "approved",
+                        role: pendingRoles[u.id] ?? "viewer",
+                      })
+                    }
                   >
                     موافقة
                   </Button>
@@ -151,6 +174,7 @@ function UsersPage() {
                     رفض
                   </Button>
                 </div>
+
               ) : (
                 <Badge variant="secondary">بانتظار موافقة المدير</Badge>
               )}
