@@ -343,13 +343,34 @@ function DashboardPage() {
 
       <TodaysSessions />
 
-      <GuestJourney />
-
-
-
-
-
-
+      <section className="surface-card overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setJourneyOpen((v) => !v)}
+          className="flex w-full items-center justify-between gap-3 p-5 transition-colors hover:bg-secondary/30"
+        >
+          <div className="flex items-center gap-3">
+            <span className="rounded-xl bg-primary/10 p-2.5 text-primary">
+              <RouteIcon className="size-5" />
+            </span>
+            <div className="text-start">
+              <p className="font-display text-lg font-bold text-foreground">تتبّع رحلة الضيف</p>
+              <p className="text-xs text-muted-foreground">
+                خط زمني موحّد يربط المطار والنقل والفندق والفعالية والمغادرة
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span className="text-xs">{journeyOpen ? "إخفاء" : "عرض"}</span>
+            {journeyOpen ? <ChevronUp className="size-5" /> : <ChevronDown className="size-5" />}
+          </div>
+        </button>
+        {journeyOpen && (
+          <div className="border-t border-border px-5 pb-5 pt-0">
+            <GuestJourney />
+          </div>
+        )}
+      </section>
 
       <section className="surface-card p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
