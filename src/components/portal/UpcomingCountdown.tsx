@@ -120,7 +120,7 @@ export function UpcomingCountdown() {
         <div>
           <h2 className="font-display text-lg font-bold text-foreground">العد التنازلي للمواعيد</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            تنبيه تلقائي قبل الرحلات والنقل والإقامة بـ {ALERT_MINUTES / 60} ساعة
+            مواعيد الوصول والمغادرة من والى المطار فقط
           </p>
         </div>
         <Badge variant="secondary" className="gap-2">
