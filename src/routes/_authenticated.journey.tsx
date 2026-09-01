@@ -121,7 +121,7 @@ function useJourneys() {
           .order("starts_at", { ascending: true }),
       ]);
 
-      const hotelMap = new Map((hotels ?? []).map((h: any) => [h.id, h]));
+      const hotelMap = new Map<string, any>((hotels ?? []).map((h: any) => [h.id, h]));
       const driverMap = new Map((drivers ?? []).map((d: any) => [d.id, d]));
       const vehicleMap = new Map((vehicles ?? []).map((v: any) => [v.id, v]));
       const flightMap = new Map((flights ?? []).map((f: any) => [f.id, f]));
