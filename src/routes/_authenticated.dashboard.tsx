@@ -297,7 +297,7 @@ footer { margin-top:24px; font-size:11px; color:#7b8497; text-align:center; }
 <p class="meta">${todayLabel()}</p>
 <table><thead><tr><th style="width:48px">#</th><th>البند</th><th style="width:120px">القيمة</th></tr></thead>
 <tbody>${body}</tbody></table>
-<footer>تم إنشاء التقرير آليًا من بوابة ${eventName}</footer>
+<footer>تم إنشاء التقرير آليًا من بوابة ${eventName}<br/>نفذ بواسطة نايف الرويس</footer>
 </body></html>`);
   win.document.close();
   win.focus();

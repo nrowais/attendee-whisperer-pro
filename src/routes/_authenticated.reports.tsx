@@ -218,7 +218,7 @@ function buildReportHtml(report: ReportDef, rows: Record<string, any>[]) {
   </header>
   <div class="meta"><span>عدد السجلات: <strong>${rows.length}</strong></span><span>تاريخ التقرير: ${esc(now)}</span></div>
   <table><thead><tr><th>#</th>${head}</tr></thead><tbody>${body}</tbody></table>
-  <footer>تم إنشاء هذا التقرير آلياً من بوابة ${eventName}</footer>
+  <footer>تم إنشاء هذا التقرير آلياً من بوابة ${eventName}<br/>نفذ بواسطة نايف الرويس</footer>
   <script>window.onload = function () { setTimeout(function () { window.print(); }, 400); };<\/script>
 </body></html>`;
 }
