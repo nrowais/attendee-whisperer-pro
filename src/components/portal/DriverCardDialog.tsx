@@ -52,7 +52,7 @@ const HOTELS: Array<{ name: string; location: string; mapUrl?: string }> = [
   {
     name: "كورت يارد الرياض",
     location: "الرياض",
-    mapUrl: "https://www.google.com/maps/search/?api=1&query=كورت+يارد+الرياض",
+    mapUrl: "https://maps.app.goo.gl/Lqyq5kuELq19QdEi6",
   },
 ];
 
