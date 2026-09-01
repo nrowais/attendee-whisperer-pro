@@ -417,6 +417,7 @@ export type Database = {
           id: string
           notes: string | null
           room_id: string | null
+          room_number: string | null
           speaker_id: string | null
           status: string
           updated_at: string
@@ -430,6 +431,7 @@ export type Database = {
           id?: string
           notes?: string | null
           room_id?: string | null
+          room_number?: string | null
           speaker_id?: string | null
           status?: string
           updated_at?: string
@@ -443,6 +445,7 @@ export type Database = {
           id?: string
           notes?: string | null
           room_id?: string | null
+          room_number?: string | null
           speaker_id?: string | null
           status?: string
           updated_at?: string

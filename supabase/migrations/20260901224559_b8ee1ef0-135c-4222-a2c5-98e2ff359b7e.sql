@@ -1,0 +1,1 @@
+ALTER TABLE public.hotel_bookings ADD COLUMN IF NOT EXISTS room_number text;
