@@ -276,7 +276,7 @@ export const tripFields: Field[] = [
 export const driverFields: Field[] = [
   { key: "full_name", label: "اسم السائق", required: true },
   { key: "phone", label: "الجوال" },
-  { key: "license_number", label: "رقم الرخصة" },
+  { key: "national_id", label: "رقم الهوية" },
   { key: "is_available", label: "متاح", type: "switch" },
 ];
 
