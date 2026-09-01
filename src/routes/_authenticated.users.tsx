@@ -362,6 +362,50 @@ function UsersPage() {
           </Table>
         )}
       </div>
+
+      <Dialog
+        open={passwordTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPasswordTarget(null);
+            setNewPassword("");
+          }
+        }}
+      >
+        <DialogContent dir="rtl">
+          <DialogHeader>
+            <DialogTitle>تغيير كلمة المرور</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground" dir="ltr">
+              {passwordTarget?.email}
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="new-password">كلمة المرور الجديدة</Label>
+              <Input
+                id="new-password"
+                type="text"
+                dir="ltr"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="6 خانات على الأقل"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              disabled={changePassword.isPending || newPassword.length < 6}
+              onClick={() =>
+                passwordTarget &&
+                changePassword.mutate({ userId: passwordTarget.id, password: newPassword })
+              }
+            >
+              حفظ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 }
