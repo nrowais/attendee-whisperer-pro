@@ -82,6 +82,19 @@ function GuestsWorkspace() {
               ),
             },
             {
+              value: "driver-cards",
+              label: "بطاقات السائق",
+              content: (
+                <CrudPage
+                  compact
+                  table="driver_cards"
+                  title="بطاقات توجيه السائق"
+                  subtitle="البطاقات المحفوظة في ملفات الضيوف بأرقامها التسلسلية"
+                  fields={driverCardFields}
+                />
+              ),
+            },
+            {
               value: "requests",
               label: "الطلبات الخاصة",
               content: (
