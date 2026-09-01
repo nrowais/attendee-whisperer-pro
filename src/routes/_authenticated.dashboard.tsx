@@ -22,6 +22,7 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { UpcomingCountdown } from "@/components/portal/UpcomingCountdown";
+import { TodaysSessions } from "@/components/portal/TodaysSessions";
 
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -333,6 +334,10 @@ function DashboardPage() {
       </div>
 
       <UpcomingCountdown />
+
+      <TodaysSessions />
+
+
 
 
 
