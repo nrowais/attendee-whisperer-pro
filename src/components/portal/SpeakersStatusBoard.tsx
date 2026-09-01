@@ -355,6 +355,21 @@ export function SpeakersStatusBoard() {
                 </div>
 
                 <div className="space-y-2 text-xs">
+                  {r.arrivalAt ? (
+                    <div className="flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2 text-primary">
+                      <Clock className="h-3.5 w-3.5 shrink-0" />
+                      <span>
+                        وقت الوصول: {" "}
+                        {new Date(r.arrivalAt).toLocaleString("ar-SA-u-ca-gregory", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  ) : null}
                   <div className="flex items-center gap-2 rounded-lg bg-secondary/50 px-3 py-2">
                     <Car className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                     {r.trip ? (
