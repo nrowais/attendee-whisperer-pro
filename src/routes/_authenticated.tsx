@@ -143,6 +143,9 @@ function PortalLayout() {
 
         <main className="flex-1 p-5 lg:p-8">
           <Outlet />
+          <footer className="mt-10 border-t border-border pt-4 text-center text-xs text-muted-foreground">
+            نفذ بواسطة نايف الرويس
+          </footer>
         </main>
       </div>
     </div>
