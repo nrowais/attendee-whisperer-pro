@@ -10,7 +10,6 @@ import {
   Car,
   Ticket,
   ListChecks,
-  ShieldCheck,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -23,7 +22,6 @@ export const navItems: NavItem[] = [
   { to: "/daily", label: "الإدخال اليومي", icon: ClipboardPlus, hint: "نقل وإقامة يوماً بيوم" },
 
   { to: "/operations", label: "الحالة التشغيلية", icon: ListChecks, hint: "تسجيل الوصول والنقل والفندق والمغادرة" },
-  { to: "/verify", label: "التحقق من الحالات", icon: ShieldCheck, hint: "مطابقة المجدول مع الحالة المحفوظة" },
   { to: "/speakers", label: "المتحدثون", icon: Mic2, hint: "المتحدثون والجلسات والطلبات" },
   { to: "/invitees", label: "الضيوف والمدعوون", icon: UserCheck, hint: "المدعوون والدعوات والحضور" },
   { to: "/movements", label: "التنقلات", icon: Plane, hint: "الطيران والوصول والنقل الأرضي" },
