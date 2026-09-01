@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CalendarDays, Mic, Plane, BedDouble, Car, ClipboardList, Users, ShieldCheck } from "lucide-react";
 
 import heroImage from "@/assets/hero-event.jpg";
-import eventLogo from "@/assets/event-logo-2026.png.asset.json";
+import eventLogo from "@/assets/event-logo-2026.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
