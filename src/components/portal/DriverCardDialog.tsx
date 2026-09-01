@@ -98,8 +98,13 @@ export function buildDriverCardHtml(c: DriverCardData) {
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
     : "";
 
-  const row = ([label, value]: [string, string]) =>
-    `<tr><th>${esc(label)}</th><td>${esc(value)}</td></tr>`;
+  const row = ([label, value]: [string, string]) => {
+    const cell =
+      label === "موقع الفندق" && mapsUrl
+        ? `<a href="${mapsUrl}" target="_blank" rel="noopener" style="color:#1d4677;font-weight:700;">${esc(value)}</a>`
+        : esc(value);
+    return `<tr><th>${esc(label)}</th><td>${cell}</td></tr>`;
+  };
 
   return `<!doctype html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8" />
