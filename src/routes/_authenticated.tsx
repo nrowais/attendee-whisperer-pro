@@ -71,24 +71,48 @@ function PortalLayout() {
           {visibleNavItems.map((item) => {
             const Icon = item.icon;
             return (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpenNav(false)}
-                className="flex items-start gap-3 rounded-lg px-3 py-3 text-sm text-sidebar-foreground/85 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                activeProps={{
-                  className:
-                    "flex items-start gap-3 rounded-lg px-3 py-3 text-sm bg-sidebar-primary text-sidebar-primary-foreground font-semibold",
-                }}
-              >
-                <Icon className="mt-0.5 size-4 shrink-0" />
-                <span className="min-w-0">
-                  <span className="block">{item.label}</span>
-                  {item.hint ? (
-                    <span className="block text-[11px] font-normal opacity-70">{item.hint}</span>
-                  ) : null}
-                </span>
-              </Link>
+              <div key={item.to} className="space-y-0.5">
+                <Link
+                  to={item.to}
+                  onClick={() => setOpenNav(false)}
+                  className="flex items-start gap-3 rounded-lg px-3 py-2.5 text-sm text-sidebar-foreground/85 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  activeProps={{
+                    className:
+                      "flex items-start gap-3 rounded-lg px-3 py-2.5 text-sm bg-sidebar-primary text-sidebar-primary-foreground font-semibold",
+                  }}
+                  activeOptions={{ exact: !item.children }}
+                >
+                  <Icon className="mt-0.5 size-4 shrink-0" />
+                  <span className="min-w-0">
+                    <span className="block">{item.label}</span>
+                    {item.hint ? (
+                      <span className="block text-[11px] font-normal opacity-70">{item.hint}</span>
+                    ) : null}
+                  </span>
+                </Link>
+                {item.children?.length ? (
+                  <div className="me-4 space-y-0.5 border-e border-sidebar-border pe-3">
+                    {item.children.map((child) => {
+                      const ChildIcon = child.icon;
+                      return (
+                        <Link
+                          key={child.to}
+                          to={child.to}
+                          onClick={() => setOpenNav(false)}
+                          className="flex items-center gap-2 rounded-md px-3 py-2 text-[13px] text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                          activeProps={{
+                            className:
+                              "flex items-center gap-2 rounded-md px-3 py-2 text-[13px] bg-sidebar-accent text-sidebar-accent-foreground font-semibold",
+                          }}
+                        >
+                          <ChildIcon className="size-3.5 shrink-0" />
+                          <span className="truncate">{child.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
             );
           })}
         </nav>
