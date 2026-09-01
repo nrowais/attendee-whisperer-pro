@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  useNavigate,
+  useRouterState,
+} from "@tanstack/react-router";
 import { X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -15,12 +21,20 @@ export const Route = createFileRoute("/_authenticated")({
 function PortalLayout() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const { roles } = useRoles();
+  const { roles, isOperator, loading: rolesLoading } = useRoles();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [openNav, setOpenNav] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [loading, user, navigate]);
+
+  // مسؤول التشغيل مقيّد بصفحة الحالة التشغيلية فقط
+  useEffect(() => {
+    if (!rolesLoading && isOperator && pathname !== "/operations") {
+      navigate({ to: "/operations", replace: true });
+    }
+  }, [rolesLoading, isOperator, pathname, navigate]);
 
   if (loading || !user) {
     return (
@@ -31,6 +45,9 @@ function PortalLayout() {
   }
 
   const roleLabel = roles[0] ? roleLabels[roles[0]] : "مطّلع";
+  const visibleNavItems = isOperator
+    ? navItems.filter((item) => item.to === "/operations")
+    : navItems;
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -51,7 +68,7 @@ function PortalLayout() {
         </div>
 
         <nav className="space-y-1 px-3 py-5">
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             return (
               <Link
