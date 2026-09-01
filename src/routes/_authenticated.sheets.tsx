@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { IMPORT_TABLES, guessColumn } from "@/lib/sheetsImport";
 import { importSheetRows } from "@/lib/sheetsImport.functions";
+import { useRoles } from "@/hooks/useAuth";
 
 const IGNORE = "__ignore__";
 

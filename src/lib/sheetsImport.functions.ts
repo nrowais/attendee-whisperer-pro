@@ -35,9 +35,12 @@ export const importSheetRows = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as { supabase: any; userId: string };
 
-    const { data: canEdit, error: roleError } = await supabase.rpc("can_edit", { _user_id: userId });
+    const { data: isAdmin, error: roleError } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
     if (roleError) throw new Error(roleError.message);
-    if (!canEdit) throw new Error("غير مصرح: تحتاج صلاحية إضافة البيانات");
+    if (!isAdmin) throw new Error("غير مصرح: الاستيراد متاح لحساب المدير فقط");
 
     const chunkSize = 200;
     let inserted = 0;
