@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { CrudPage } from "@/components/portal/CrudPage";
+import { HotelCheckIn } from "@/components/portal/HotelCheckIn";
 import { Workspace } from "@/components/portal/Workspace";
-import { bookingFields, hotelFields, roomFields } from "@/lib/tableFields";
+import { bookingFields, hotelFields } from "@/lib/tableFields";
 
 export const Route = createFileRoute("/_authenticated/hotels")({
   head: () => ({
@@ -22,8 +23,13 @@ function HotelsWorkspace() {
   return (
     <Workspace
       title="الإقامة"
-      subtitle="الحجوزات الفندقية وتوزيع الغرف وحالة تسجيل الدخول."
+      subtitle="تسجيل دخول المتحدثين في فنادقهم المسجلة وإدارة أرقام الغرف."
       tabs={[
+        {
+          value: "checkin",
+          label: "تسجيل الإقامة",
+          content: <HotelCheckIn />,
+        },
         {
           value: "bookings",
           label: "الحجوزات",
@@ -45,21 +51,8 @@ function HotelsWorkspace() {
               compact
               table="hotels"
               title="الفنادق"
-              subtitle="الفنادق المتعاقد معها"
+              subtitle="الفنادق المعتمدة للمؤتمر"
               fields={hotelFields}
-            />
-          ),
-        },
-        {
-          value: "rooms",
-          label: "الغرف",
-          content: (
-            <CrudPage
-              compact
-              table="hotel_rooms"
-              title="الغرف"
-              subtitle="غرف الفنادق وأنواعها"
-              fields={roomFields}
             />
           ),
         },
