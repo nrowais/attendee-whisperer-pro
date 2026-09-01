@@ -296,6 +296,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
         driverName: row.driver_name ?? f.driverName,
         hotelName: row.hotel_name ?? f.hotelName,
         hotelLocation: row.hotel_location ?? f.hotelLocation,
+        hotelMapUrl: row.hotel_map_url ?? f.hotelMapUrl,
       }));
     })();
   }, [open, trip]);
