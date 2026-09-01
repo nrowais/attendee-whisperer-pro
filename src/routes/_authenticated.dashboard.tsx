@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   Mic,
   Users,
@@ -12,6 +13,9 @@ import {
   ArrowLeft,
   FileDown,
   FileSpreadsheet,
+  ChevronDown,
+  ChevronUp,
+  RouteIcon,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { UpcomingCountdown } from "@/components/portal/UpcomingCountdown";
 import { TodaysSessions } from "@/components/portal/TodaysSessions";
 import { GuestJourney } from "@/components/portal/GuestJourney";
+
 
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
