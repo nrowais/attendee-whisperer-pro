@@ -409,7 +409,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
                 setForm((f) => ({
                   ...f,
                   hotelName: name,
-                  hotelLocation: hotel ? hotel.location : f.hotelLocation,
+                  hotelLocation: hotel ? hotel.location : (f.hotelLocation ?? ""),
                 }));
               }}
             >
