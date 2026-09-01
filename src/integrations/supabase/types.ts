@@ -105,6 +105,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           driver_name: string | null
+          driver_phone: string | null
           dropoff_location: string | null
           flight_at: string | null
           flight_no: string | null
@@ -128,6 +129,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           driver_name?: string | null
+          driver_phone?: string | null
           dropoff_location?: string | null
           flight_at?: string | null
           flight_no?: string | null
@@ -151,6 +153,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           driver_name?: string | null
+          driver_phone?: string | null
           dropoff_location?: string | null
           flight_at?: string | null
           flight_no?: string | null
