@@ -32,7 +32,7 @@ export const navItems: NavItem[] = [
   { to: "/tickets", label: "تذاكر النقل", icon: Ticket, hint: "ربط السائق والمركبة بالرحلة المجدولة والفعلية" },
   { to: "/hotels", label: "الإقامة", icon: BedDouble, hint: "الفنادق والغرف والحجوزات" },
   { to: "/reports", label: "التقارير", icon: BarChart3, hint: "ملخصات قابلة للتصدير" },
-  { to: "/sheets", label: "مزامنة Google Sheets", icon: Sheet, hint: "ربط الجداول بجوجل شيت وتحديثها تلقائياً" },
+  { to: "/sheets", label: "استيراد من Google Sheets", icon: Sheet, hint: "رفع ملف xlsx أو csv وإدخال بياناته للبوابة" },
   { to: "/settings", label: "الإعدادات", icon: Settings, hint: "الفعالية والفريق والصلاحيات" },
 
 ];
