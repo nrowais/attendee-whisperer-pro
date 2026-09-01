@@ -326,6 +326,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       ticket_no: form.ticketNo || null,
       hotel_name: form.hotelName || null,
       hotel_location: form.hotelLocation || null,
+      hotel_map_url: form.hotelMapUrl || null,
     };
     const query = cardId
       ? db.from("driver_cards").update(payload).eq("id", cardId).select("id, card_no").maybeSingle()
