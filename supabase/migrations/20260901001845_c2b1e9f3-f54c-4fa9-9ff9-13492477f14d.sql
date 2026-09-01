@@ -1,0 +1,1 @@
+ALTER TABLE public.drivers RENAME COLUMN license_number TO national_id;
