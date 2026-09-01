@@ -274,7 +274,6 @@ export const tripFields: Field[] = [
 ];
 
 export const ticketFields: Field[] = [
-  { key: "ticket_no", label: "رقم التذكرة", type: "number", readOnly: true },
   ...tripFields.filter((f) => f.key !== "notes"),
   { key: "passengers", label: "عدد الركاب", type: "number", list: false },
   { key: "actual_pickup_at", label: "الانطلاق الفعلي", type: "datetime", list: false },
