@@ -41,7 +41,7 @@ function Landing() {
         <img
           src={eventLogo}
           alt="شعار مؤتمر حوار الأمن والتاريخ — الرياض 2026"
-          className="h-14 w-auto rounded-lg object-contain"
+          className="h-14 w-auto rounded-lg bg-white/95 p-1.5 object-contain shadow-sm"
         />
 
         <Link

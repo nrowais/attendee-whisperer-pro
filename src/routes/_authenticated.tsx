@@ -60,7 +60,7 @@ function PortalLayout() {
           <img
             src={eventLogo}
             alt="شعار مؤتمر حوار الأمن والتاريخ"
-            className="h-14 w-auto max-w-[170px] object-contain"
+            className="h-14 w-auto max-w-[170px] rounded-lg bg-white/95 p-1.5 object-contain shadow-sm"
           />
           <button className="lg:hidden" onClick={() => setOpenNav(false)} aria-label="إغلاق">
             <X className="size-5" />

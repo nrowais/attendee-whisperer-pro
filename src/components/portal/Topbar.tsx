@@ -79,7 +79,7 @@ export function Topbar({ email, roleLabel, onMenu, onSignOut }: Props) {
           <img
             src={eventLogo}
             alt="شعار الفعالية"
-            className="hidden h-9 w-auto rounded-md object-contain sm:block"
+            className="hidden h-9 w-auto rounded-md bg-white/95 p-1 object-contain shadow-sm sm:block"
           />
           <div className="min-w-0">
             <p className="truncate font-display text-sm font-bold text-foreground lg:text-base">{eventName}</p>
