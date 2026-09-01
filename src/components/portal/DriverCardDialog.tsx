@@ -17,6 +17,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { eventName } from "@/lib/nav";
+import eventLogo from "@/assets/event-logo-2026.png";
+
+const logoUrl = () =>
+  typeof window !== "undefined" ? new URL(eventLogo, window.location.origin).href : eventLogo;
 
 const db = supabase as any;
 
@@ -86,38 +90,62 @@ export function buildDriverCardHtml(c: DriverCardData) {
 <html lang="ar" dir="rtl"><head><meta charset="utf-8" />
 <title>بطاقة توجيه السائق</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
 <style>
-  @page { size: A5 landscape; margin: 10mm; }
+  @page { size: A5 landscape; margin: 8mm; }
   * { box-sizing: border-box; }
-  body { font-family: Cairo, "Segoe UI", sans-serif; color: #14213d; margin: 0; }
-  .card { border: 2px solid #14213d; border-radius: 14px; padding: 18px 20px; }
-  header { display: flex; justify-content: space-between; align-items: flex-end;
-    border-bottom: 3px solid #f77f00; padding-bottom: 10px; margin-bottom: 14px; }
-  h1 { font-size: 20px; margin: 0; color: #14213d; }
-  .sub { font-size: 12px; color: #64748b; margin: 4px 0 0; }
-  .brand { font-size: 12px; font-weight: 700; color: #f77f00; text-align: left; }
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th { background: #f1f5f9; color: #14213d; text-align: right; padding: 9px 12px;
-    width: 38%; font-weight: 600; border: 1px solid #e2e8f0; }
-  td { padding: 9px 12px; text-align: right; border: 1px solid #e2e8f0; font-weight: 700; }
-  .ticket { font-size: 12px; color: #64748b; margin-bottom: 8px; }
-  footer { margin-top: 12px; font-size: 11px; color: #94a3b8; text-align: center; }
+  body { font-family: Cairo, "Segoe UI", sans-serif; color: #0f2a4a; margin: 0;
+    background: #ffffff; }
+  .card { border-radius: 16px; overflow: hidden;
+    border: 1px solid #dbe3ee; box-shadow: 0 4px 18px rgba(15, 42, 74, .08); }
+  .head { background: linear-gradient(135deg, #0f2a4a 0%, #1d4677 60%, #27548f 100%);
+    color: #ffffff; padding: 14px 18px; display: flex; align-items: center;
+    justify-content: space-between; gap: 14px; }
+  .logo-badge { background: #ffffff; border-radius: 12px; padding: 6px 10px;
+    display: flex; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,.15); flex-shrink: 0; }
+  .logo-badge img { height: 44px; display: block; }
+  .head-text { text-align: right; }
+  .head-text .event { font-size: 11px; font-weight: 600; color: #f7a23b; margin: 0 0 3px; }
+  h1 { font-size: 19px; margin: 0; font-weight: 800; }
+  .sub { font-size: 11px; color: #c8d6e8; margin: 3px 0 0; }
+  .accent { height: 4px; background: linear-gradient(90deg, #f77f00, #f7a23b); }
+  .body { padding: 14px 18px 16px; }
+  .ticket { display: inline-block; font-size: 11px; font-weight: 700; color: #b45309;
+    background: #fff4e5; border: 1px solid #f7d9ac; border-radius: 999px;
+    padding: 3px 12px; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #eef3f9; color: #0f2a4a; text-align: right; padding: 8px 12px;
+    width: 36%; font-weight: 600; border: 1px solid #dbe3ee; }
+  th:first-child { border-radius: 0 8px 0 0; }
+  td { padding: 8px 12px; text-align: right; border: 1px solid #dbe3ee; font-weight: 700; }
+  footer { background: #f7f9fc; border-top: 1px solid #dbe3ee; padding: 8px 18px;
+    font-size: 10px; color: #7d8ea8; text-align: center; display: flex;
+    align-items: center; justify-content: center; gap: 6px; }
+  footer .dot { width: 6px; height: 6px; border-radius: 50%; background: #f77f00; display: inline-block; }
 </style></head>
 <body>
   <div class="card">
-    <header>
-      <div>
+    <div class="head">
+      <div class="head-text">
+        <p class="event">${esc(eventName)}</p>
         <h1>بطاقة توجيه السائق إلى المطار</h1>
         <p class="sub">يرجى تسليم هذه البطاقة للسائق قبل التوجه للمطار</p>
       </div>
-      <div class="brand">${esc(eventName)}</div>
-    </header>
-    ${c.ticketNo ? `<p class="ticket">رقم التذكرة: <strong>${esc(c.ticketNo)}</strong></p>` : ""}
-    <table>${rows.map(row).join("")}${extra.map(row).join("")}</table>
-    <footer>صدرت آلياً من بوابة ${esc(eventName)}</footer>
+      <div class="logo-badge"><img src="${logoUrl()}" alt="شعار الفعالية" /></div>
+    </div>
+    <div class="accent"></div>
+    <div class="body">
+      ${c.ticketNo ? `<span class="ticket">رقم التذكرة: ${esc(c.ticketNo)}</span>` : ""}
+      <table>${rows.map(row).join("")}${extra.map(row).join("")}</table>
+    </div>
+    <footer><span class="dot"></span> صدرت آلياً من بوابة ${esc(eventName)} <span class="dot"></span></footer>
   </div>
-  <script>window.onload = function () { setTimeout(function () { window.print(); }, 500); };<\/script>
+  <script>
+    var printed = false;
+    function go() { if (!printed) { printed = true; setTimeout(function () { window.print(); }, 400); } }
+    window.onload = go;
+    setTimeout(go, 2500);
+  <\/script>
 </body></html>`;
 }
 
