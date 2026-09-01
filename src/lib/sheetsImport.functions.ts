@@ -42,10 +42,37 @@ export const importSheetRows = createServerFn({ method: "POST" })
     if (roleError) throw new Error(roleError.message);
     if (!isAdmin) throw new Error("غير مصرح: الاستيراد متاح لحساب المدير فقط");
 
+    let rowsToInsert = data.rows;
+
+    // speaker_sessions requires event_id + speaker_id: resolve them automatically
+    if (data.table === "speaker_sessions") {
+      const { data: ev } = await supabase
+        .from("events")
+        .select("id")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (!ev?.id) throw new Error("لا توجد فعالية مسجلة — أنشئ فعالية أولًا قبل استيراد الجلسات");
+
+      const { data: speakers } = await supabase.from("speakers").select("id, full_name");
+      const byName = new Map<string, string>(
+        (speakers ?? []).map((s: any) => [String(s.full_name ?? "").trim(), s.id]),
+      );
+
+      rowsToInsert = data.rows.map((row) => {
+        const { speaker_name, ...rest } = row as Record<string, any>;
+        const speakerId = byName.get(String(speaker_name ?? "").trim());
+        if (!speakerId) {
+          throw new Error(`لم يتم العثور على متحدث بالاسم: ${speaker_name ?? "(فارغ)"}`);
+        }
+        return { ...rest, event_id: ev.id, speaker_id: speakerId };
+      });
+    }
+
     const chunkSize = 200;
     let inserted = 0;
-    for (let i = 0; i < data.rows.length; i += chunkSize) {
-      const chunk = data.rows.slice(i, i + chunkSize);
+    for (let i = 0; i < rowsToInsert.length; i += chunkSize) {
+      const chunk = rowsToInsert.slice(i, i + chunkSize);
       const { data: rows, error } = await supabase.from(data.table).insert(chunk).select("id");
       if (error) throw new Error(`تعذّر استيراد الصفوف: ${error.message}`);
       inserted += rows?.length ?? chunk.length;
