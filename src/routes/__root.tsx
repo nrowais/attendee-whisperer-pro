@@ -78,10 +78,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "حوار الأمن والتاريخ" },
+      { title: "SHDC 2026 | حوار الأمن والتاريخ — الرياض" },
       {
         name: "description",
-        content: "بوابة متكاملة لإدارة الفعاليات والمتحدثين والدعوات والسفر والإقامة والنقل.",
+        content: "بوابة متكاملة لإدارة مؤتمر حوار الأمن والتاريخ — الرياض 2026: المتحدثون، الدعوات، السفر، الإقامة، النقل والتقارير.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
