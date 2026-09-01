@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   Mic,
   Users,
@@ -12,6 +13,9 @@ import {
   ArrowLeft,
   FileDown,
   FileSpreadsheet,
+  ChevronDown,
+  ChevronUp,
+  RouteIcon,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { UpcomingCountdown } from "@/components/portal/UpcomingCountdown";
 import { TodaysSessions } from "@/components/portal/TodaysSessions";
 import { GuestJourney } from "@/components/portal/GuestJourney";
+
 
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -301,7 +306,7 @@ footer { margin-top:24px; font-size:11px; color:#7b8497; text-align:center; }
 
 function DashboardPage() {
   const { data, isLoading } = useLiveStats();
-
+  const [journeyOpen, setJourneyOpen] = useState(false);
 
   const summaryCards = [
     { label: "الحضور اليوم", value: data?.todayAttendance ?? 0, sub: "تسجيل دخول في الموقع", icon: UserCheck },
@@ -338,13 +343,34 @@ function DashboardPage() {
 
       <TodaysSessions />
 
-      <GuestJourney />
-
-
-
-
-
-
+      <section className="surface-card overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setJourneyOpen((v) => !v)}
+          className="flex w-full items-center justify-between gap-3 p-5 transition-colors hover:bg-secondary/30"
+        >
+          <div className="flex items-center gap-3">
+            <span className="rounded-xl bg-primary/10 p-2.5 text-primary">
+              <RouteIcon className="size-5" />
+            </span>
+            <div className="text-start">
+              <p className="font-display text-lg font-bold text-foreground">تتبّع رحلة الضيف</p>
+              <p className="text-xs text-muted-foreground">
+                خط زمني موحّد يربط المطار والنقل والفندق والفعالية والمغادرة
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span className="text-xs">{journeyOpen ? "إخفاء" : "عرض"}</span>
+            {journeyOpen ? <ChevronUp className="size-5" /> : <ChevronDown className="size-5" />}
+          </div>
+        </button>
+        {journeyOpen && (
+          <div className="border-t border-border px-5 pb-5 pt-0">
+            <GuestJourney />
+          </div>
+        )}
+      </section>
 
       <section className="surface-card p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
