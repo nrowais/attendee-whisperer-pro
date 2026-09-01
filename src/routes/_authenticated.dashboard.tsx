@@ -335,7 +335,7 @@ function DashboardPage() {
         </div>
         <Badge variant="secondary" className="gap-2">
           <span className="size-2 animate-pulse rounded-full bg-primary" />
-          تحديث تلقائي كل 30 ثانية
+          تحديث تلقائي كل 30 ثانية — اختبار نشر v1.0.1
         </Badge>
       </div>
 
