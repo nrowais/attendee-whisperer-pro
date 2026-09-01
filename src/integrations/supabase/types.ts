@@ -105,7 +105,7 @@ export type Database = {
           full_name: string
           id: string
           is_available: boolean
-          license_number: string | null
+          national_id: string | null
           phone: string | null
           updated_at: string
         }
@@ -114,7 +114,7 @@ export type Database = {
           full_name: string
           id?: string
           is_available?: boolean
-          license_number?: string | null
+          national_id?: string | null
           phone?: string | null
           updated_at?: string
         }
@@ -123,7 +123,7 @@ export type Database = {
           full_name?: string
           id?: string
           is_available?: boolean
-          license_number?: string | null
+          national_id?: string | null
           phone?: string | null
           updated_at?: string
         }
