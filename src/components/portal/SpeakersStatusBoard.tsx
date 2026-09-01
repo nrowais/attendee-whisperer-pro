@@ -60,7 +60,7 @@ const BOOKING_STATUS_LABELS: Record<string, string> = {
   cancelled: "ملغاة",
 };
 
-export function useSpeakersBoard() {
+function useSpeakersBoard() {
   return useQuery({
     queryKey: ["speakers-status-board"],
     refetchInterval: 30_000,
@@ -73,8 +73,6 @@ export function useSpeakersBoard() {
         { data: hotels },
         { data: drivers },
         { data: vehicles },
-        { data: arrivals },
-        { data: departures },
       ] =
         await Promise.all([
           db.from("speakers").select("id, full_name, title, organization, country, phone").order("full_name"),
@@ -89,18 +87,7 @@ export function useSpeakersBoard() {
           db.from("hotels").select("id, name"),
           db.from("drivers").select("id, full_name, phone"),
           db.from("vehicles").select("id, plate_number"),
-          db.from("speaker_arrivals").select("speaker_id, arrival_time, arrival_point, terminal, status"),
-          db.from("speaker_departures").select("speaker_id, departure_time, departure_point, terminal, status"),
         ]);
-
-      const arrivalBySpeaker = new Map<string, any>();
-      (arrivals ?? []).forEach((a: any) => {
-        if (a.speaker_id && !arrivalBySpeaker.has(a.speaker_id)) arrivalBySpeaker.set(a.speaker_id, a);
-      });
-      const departureBySpeaker = new Map<string, any>();
-      (departures ?? []).forEach((d: any) => {
-        if (d.speaker_id && !departureBySpeaker.has(d.speaker_id)) departureBySpeaker.set(d.speaker_id, d);
-      });
 
       const hotelNames = new Map((hotels ?? []).map((h: any) => [h.id, h.name]));
       const driverMap = new Map((drivers ?? []).map((d: any) => [d.id, d]));
@@ -137,8 +124,6 @@ export function useSpeakersBoard() {
           opStatus: (op?.operational_status as string) ?? "scheduled",
           op,
           trip,
-          arrival: arrivalBySpeaker.get(s.id) ?? null,
-          departure: departureBySpeaker.get(s.id) ?? null,
           booking: booking
             ? { ...booking, hotelName: hotelNames.get(booking.hotel_id) ?? "—" }
             : null,
