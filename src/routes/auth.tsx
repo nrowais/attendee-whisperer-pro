@@ -80,7 +80,7 @@ function AuthPage() {
         className="hidden flex-col justify-between p-12 text-primary-foreground lg:flex"
         style={{ background: "var(--gradient-brand)" }}
       >
-        <img src={eventLogo} alt="شعار مؤتمر حوار الأمن والتاريخ" className="h-20 w-auto object-contain" />
+        <img src={eventLogo} alt="شعار مؤتمر حوار الأمن والتاريخ" className="h-20 w-auto rounded-xl bg-white/95 p-2 object-contain shadow-lg" />
         <div className="space-y-4">
           <h1 className="font-display text-4xl font-bold leading-snug">
             كل تفاصيل فعاليتك
