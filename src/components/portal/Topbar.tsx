@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Separator } from "@/components/ui/separator";
 import { eventName } from "@/lib/nav";
 import { supabase } from "@/integrations/supabase/client";
-import eventLogo from "@/assets/event-logo.png.asset.json";
+import eventLogo from "@/assets/event-logo-2026.png.asset.json";
 import { useAuth } from "@/hooks/useAuth";
 
 function formatNow(d: Date) {
