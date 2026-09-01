@@ -455,6 +455,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
           {field("flightDate", "تاريخ الرحلة", "date")}
           {field("flightNo", "رقم الرحلة (اختياري)")}
           {field("driverName", "اسم السائق (اختياري)")}
+          {field("driverPhone", "رقم جوال السائق", "tel", "05xxxxxxxx")}
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">اسم الفندق</Label>
             <select
