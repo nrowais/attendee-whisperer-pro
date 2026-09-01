@@ -136,7 +136,7 @@ export function UpcomingCountdown() {
         </div>
       ) : items.length === 0 ? (
         <p className="py-6 text-center text-sm text-muted-foreground">
-          لا توجد مواعيد قادمة خلال الأيام الثلاثة القادمة
+          لا توجد مواعيد وصول أو مغادرة من المطار خلال الأيام الثلاثة القادمة
         </p>
       ) : (
         <ul className="divide-y divide-border">
