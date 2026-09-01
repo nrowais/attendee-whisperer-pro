@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useRoles, roleLabels, type AppRole } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -44,7 +45,9 @@ function UsersPage() {
     queryKey: ["portal-users"],
     queryFn: async () => {
       const [{ data: profiles }, { data: roles }] = await Promise.all([
-        supabase.from("profiles").select("id, full_name, email, phone, created_at"),
+        supabase
+          .from("profiles")
+          .select("id, full_name, email, phone, created_at, approval_status"),
         supabase.from("user_roles").select("user_id, role"),
       ]);
       const roleMap: Record<string, AppRole> = {};
@@ -52,6 +55,29 @@ function UsersPage() {
       return (profiles ?? []).map((p) => ({ ...p, role: roleMap[p.id] ?? "viewer" }));
     },
   });
+
+  const setApproval = useMutation({
+    mutationFn: async ({ userId, status }: { userId: string; status: "approved" | "rejected" }) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          approval_status: status,
+          approved_at: new Date().toISOString(),
+        } as any)
+        .eq("id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["portal-users"] });
+      toast.success("تم تحديث حالة الحساب");
+    },
+    onError: (error: any) => toast.error(error?.message ?? "تعذر تحديث حالة الحساب"),
+  });
+
+  const pending = (usersQuery.data ?? []).filter(
+    (u: any) => (u.approval_status ?? "approved") === "pending",
+  );
+
 
   const changeRole = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
@@ -76,6 +102,46 @@ function UsersPage() {
         </p>
       </div>
 
+      {pending.length > 0 ? (
+        <div className="surface-card space-y-3 p-5">
+          <h2 className="font-display text-lg font-semibold text-foreground">
+            طلبات تسجيل بانتظار الموافقة ({pending.length})
+          </h2>
+          {pending.map((u: any) => (
+            <div
+              key={u.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border p-3"
+            >
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-foreground">{u.full_name ?? "—"}</p>
+                <p className="text-xs text-muted-foreground" dir="ltr">
+                  {u.email ?? "—"}
+                </p>
+              </div>
+              {isAdmin ? (
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => setApproval.mutate({ userId: u.id, status: "approved" })}
+                  >
+                    موافقة
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setApproval.mutate({ userId: u.id, status: "rejected" })}
+                  >
+                    رفض
+                  </Button>
+                </div>
+              ) : (
+                <Badge variant="secondary">بانتظار موافقة المدير</Badge>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : null}
+
       <div className="surface-card overflow-hidden">
         {usersQuery.isLoading ? (
           <div className="space-y-3 p-6">
@@ -89,6 +155,7 @@ function UsersPage() {
                 <TableHead className="text-start">الاسم</TableHead>
                 <TableHead className="text-start">البريد الإلكتروني</TableHead>
                 <TableHead className="text-start">الصلاحية</TableHead>
+                <TableHead className="text-start">حالة الحساب</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -120,6 +187,35 @@ function UsersPage() {
                     ) : (
                       <Badge variant="secondary">{roleLabels[u.role as AppRole]}</Badge>
                     )}
+                  </TableCell>
+                  <TableCell className="text-start">
+                    {(() => {
+                      const s = u.approval_status ?? "approved";
+                      const label =
+                        s === "approved" ? "مفعّل" : s === "rejected" ? "مرفوض" : "بانتظار الموافقة";
+                      return (
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant={
+                              s === "approved" ? "default" : s === "rejected" ? "destructive" : "secondary"
+                            }
+                          >
+                            {label}
+                          </Badge>
+                          {isAdmin && s !== "approved" ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                setApproval.mutate({ userId: u.id, status: "approved" })
+                              }
+                            >
+                              تفعيل
+                            </Button>
+                          ) : null}
+                        </div>
+                      );
+                    })()}
                   </TableCell>
                 </TableRow>
               ))}
