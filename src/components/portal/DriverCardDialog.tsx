@@ -430,7 +430,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
         <DialogHeader className="text-right">
           <DialogTitle>بطاقة توجيه السائق إلى المطار</DialogTitle>
           <DialogDescription>
-            تُحفظ البطاقة في ملف الضيف برقم تسلسلي تلقائي عند التحميل.
+            تُعبأ البطاقة تلقائياً من بيانات الضيف المسجلة (الوصول، الرحلة، الفندق)، ويمكنك تعديل أي حقل يدوياً قبل الحفظ.
           </DialogDescription>
         </DialogHeader>
 
