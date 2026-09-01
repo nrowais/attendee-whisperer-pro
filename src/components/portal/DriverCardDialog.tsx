@@ -254,6 +254,8 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
     const base = trip?.flight_at ?? trip?.scheduled_at ?? null;
     const { date, time } = splitDateTime(base);
     setCardId(null);
+    // استكمال بيانات الفندق تلقائياً من القائمة المعتمدة عند تطابق الاسم
+    const hotelMatch = HOTELS.find((h) => h.name === (trip?.hotel_name ?? ""));
     setForm({
       guestName: trip?.guest_name ?? trip?.speaker?.full_name ?? "",
       terminal: trip?.terminal ?? "",
