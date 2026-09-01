@@ -37,6 +37,7 @@ export type DriverCardData = {
   pickup: string;
   dropoff: string;
   ticketNo: string;
+  cardNo?: string;
 };
 
 function esc(v: string) {
