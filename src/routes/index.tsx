@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CalendarDays, Mic, Plane, BedDouble, Car, ClipboardList, Users, ShieldCheck } from "lucide-react";
 
 import heroImage from "@/assets/hero-event.jpg";
-import eventLogo from "@/assets/event-logo-2026.png.asset.json";
+import eventLogo from "@/assets/event-logo-2026.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,7 +39,7 @@ function Landing() {
     <div className="min-h-screen bg-background">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <img
-          src={eventLogo.url}
+          src={eventLogo}
           alt="شعار مؤتمر حوار الأمن والتاريخ — الرياض 2026"
           className="h-14 w-auto rounded-lg object-contain"
         />

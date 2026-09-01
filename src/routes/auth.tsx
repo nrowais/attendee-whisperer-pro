@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
-import eventLogo from "@/assets/event-logo-2026.png.asset.json";
+import eventLogo from "@/assets/event-logo-2026.png";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,7 +80,7 @@ function AuthPage() {
         className="hidden flex-col justify-between p-12 text-primary-foreground lg:flex"
         style={{ background: "var(--gradient-brand)" }}
       >
-        <img src={eventLogo.url} alt="شعار مؤتمر حوار الأمن والتاريخ" className="h-20 w-auto object-contain" />
+        <img src={eventLogo} alt="شعار مؤتمر حوار الأمن والتاريخ" className="h-20 w-auto object-contain" />
         <div className="space-y-4">
           <h1 className="font-display text-4xl font-bold leading-snug">
             كل تفاصيل فعاليتك

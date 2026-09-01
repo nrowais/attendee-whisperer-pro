@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Separator } from "@/components/ui/separator";
 import { eventName } from "@/lib/nav";
 import { supabase } from "@/integrations/supabase/client";
-import eventLogo from "@/assets/event-logo-2026.png.asset.json";
+import eventLogo from "@/assets/event-logo-2026.png";
 import { useAuth } from "@/hooks/useAuth";
 
 function formatNow(d: Date) {
@@ -77,7 +77,7 @@ export function Topbar({ email, roleLabel, onMenu, onSignOut }: Props) {
 
         <div className="flex min-w-0 items-center gap-2">
           <img
-            src={eventLogo.url}
+            src={eventLogo}
             alt="شعار الفعالية"
             className="hidden h-9 w-auto rounded-md object-contain sm:block"
           />
