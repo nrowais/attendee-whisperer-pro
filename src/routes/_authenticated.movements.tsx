@@ -95,29 +95,25 @@ function MovementsWorkspace() {
               ),
             },
             {
-              value: "drivers",
-              label: "السائقون",
+              value: "fleet",
+              label: "السائقون والمركبات",
               content: (
-                <CrudPage
-                  compact
-                  table="drivers"
-                  title="السائقون"
-                  subtitle="سجل السائقين وحالة التوفر"
-                  fields={driverFields}
-                />
-              ),
-            },
-            {
-              value: "vehicles",
-              label: "المركبات",
-              content: (
-                <CrudPage
-                  compact
-                  table="vehicles"
-                  title="المركبات"
-                  subtitle="أسطول المركبات"
-                  fields={vehicleFields}
-                />
+                <div className="grid gap-6 xl:grid-cols-2">
+                  <CrudPage
+                    compact
+                    table="drivers"
+                    title="السائقون"
+                    subtitle="سجل السائقين وحالة التوفر"
+                    fields={driverFields}
+                  />
+                  <CrudPage
+                    compact
+                    table="vehicles"
+                    title="المركبات"
+                    subtitle="أسطول المركبات"
+                    fields={vehicleFields}
+                  />
+                </div>
               ),
             },
           ],
