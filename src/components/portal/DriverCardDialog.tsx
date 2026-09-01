@@ -38,7 +38,14 @@ export type DriverCardData = {
   dropoff: string;
   ticketNo: string;
   cardNo?: string;
+  hotelName?: string;
+  hotelLocation?: string;
 };
+
+const HOTELS: Array<{ name: string; location: string }> = [
+  { name: "فندق ماريوت حي السفارات", location: "حي السفارات، الرياض" },
+  { name: "كورت يارد الرياض", location: "الرياض" },
+];
 
 function esc(v: string) {
   return (v || "—")
@@ -75,7 +82,9 @@ export function buildDriverCardHtml(c: DriverCardData) {
     ["رقم جوال مستقبل الضيف", c.receiverPhone],
     ["وقت الرحلة", arabicTime(c.flightTime)],
     ["تاريخ الرحلة", arabicDate(c.flightDate)],
-  ];
+    ["اسم الفندق", c.hotelName ?? ""],
+    ["موقع الفندق", c.hotelLocation ?? ""],
+  ].filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
   const extra: Array<[string, string]> = [
     ["رقم الرحلة", c.flightNo],
     ["السائق", c.driverName],
