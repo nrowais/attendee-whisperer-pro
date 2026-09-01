@@ -322,7 +322,41 @@ function UsersPage() {
                       );
                     })()}
                   </TableCell>
+                  {isAdmin ? (
+                    <TableCell className="text-start">
+                      {(() => {
+                        const disabled = statesQuery.data?.[u.id]?.disabled ?? false;
+                        return (
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant={disabled ? "destructive" : "secondary"}>
+                              {disabled ? "موقوف" : "نشِط"}
+                            </Badge>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                setPasswordTarget({ id: u.id, email: u.email ?? "" })
+                              }
+                            >
+                              تغيير كلمة المرور
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant={disabled ? "default" : "destructive"}
+                              disabled={toggleDisabled.isPending}
+                              onClick={() =>
+                                toggleDisabled.mutate({ userId: u.id, disabled: !disabled })
+                              }
+                            >
+                              {disabled ? "إعادة تفعيل" : "إيقاف الحساب"}
+                            </Button>
+                          </div>
+                        );
+                      })()}
+                    </TableCell>
+                  ) : null}
                 </TableRow>
+
               ))}
             </TableBody>
           </Table>
