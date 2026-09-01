@@ -117,13 +117,20 @@ function useSpeakersBoard() {
       const driverMap = new Map((drivers ?? []).map((d: any) => [d.id, d]));
       const vehicleMap = new Map((vehicles ?? []).map((v: any) => [v.id, v]));
       const opsBySpeaker = new Map((ops ?? []).map((o: any) => [o.speaker_id, o]));
-      const flightArrivalById = new Map((flights ?? []).map((f: any) => [f.id, f.arrival_time]));
+      const flightById = new Map((flights ?? []).map((f: any) => [f.id, f]));
       const arrivalTimeBySpeaker = new Map<string, string>();
+      const arrivalInfoBySpeaker = new Map<string, any>();
       (arrivals ?? []).forEach((a: any) => {
-        const t = a.arrival_time ?? flightArrivalById.get(a.flight_id);
+        const flight = a.flight_id ? flightById.get(a.flight_id) : null;
+        const t = a.arrival_time ?? flight?.arrival_time;
         const current = arrivalTimeBySpeaker.get(a.speaker_id);
         if (t && (!current || t < current)) {
           arrivalTimeBySpeaker.set(a.speaker_id, t);
+          arrivalInfoBySpeaker.set(a.speaker_id, {
+            terminal: a.terminal ?? "",
+            flightNo: flight?.flight_number ?? "",
+            airline: flight?.airline ?? "",
+          });
         }
       });
       const tripBySpeaker = new Map<string, any>();
