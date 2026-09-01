@@ -460,9 +460,9 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
             </select>
           </div>
           {field("hotelLocation", "موقع الفندق", "text", "مثال: حي السفارات، الرياض")}
+          {field("hotelMapUrl", "رابط موقع الفندق (اختياري)", "url", "https://maps.app.goo.gl/...")}
           {form.hotelMapUrl && (
             <div className="space-y-1 sm:col-span-2">
-              <Label className="text-xs text-muted-foreground">رابط الموقع</Label>
               <a
                 href={form.hotelMapUrl}
                 target="_blank"
