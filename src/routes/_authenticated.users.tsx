@@ -57,7 +57,23 @@ function UsersPage() {
   });
 
   const setApproval = useMutation({
-    mutationFn: async ({ userId, status }: { userId: string; status: "approved" | "rejected" }) => {
+    mutationFn: async ({
+      userId,
+      status,
+      role,
+    }: {
+      userId: string;
+      status: "approved" | "rejected";
+      role?: AppRole;
+    }) => {
+      if (status === "approved" && role) {
+        const { error: delError } = await supabase.from("user_roles").delete().eq("user_id", userId);
+        if (delError) throw delError;
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({ user_id: userId, role });
+        if (roleError) throw roleError;
+      }
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -77,6 +93,7 @@ function UsersPage() {
   const pending = (usersQuery.data ?? []).filter(
     (u: any) => (u.approval_status ?? "approved") === "pending",
   );
+
 
 
   const changeRole = useMutation({
