@@ -10,7 +10,7 @@ import {
   guestOperationFields,
 } from "@/lib/tableFields";
 
-export const Route = createFileRoute("/_authenticated/speakers")({
+export const Route = createFileRoute("/_authenticated/speakers/")({
   head: () => ({
     meta: [
       { title: "الضيوف والمتحدثون — حوار الأمن والتاريخ" },

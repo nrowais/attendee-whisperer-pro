@@ -111,12 +111,14 @@ export function CrudPage({
   subtitle,
   fields,
   compact,
+  filter,
 }: {
   table: string;
   title: string;
   subtitle?: string;
   fields: Field[];
   compact?: boolean;
+  filter?: { key: string; value: string };
 }) {
   const queryClient = useQueryClient();
   const { canEdit } = useRoles();
@@ -132,12 +134,11 @@ export function CrudPage({
   const [statusFilter, setStatusFilter] = useState("all");
 
   const rowsQuery = useQuery({
-    queryKey: ["crud", table],
+    queryKey: ["crud", table, filter?.key ?? "", filter?.value ?? ""],
     queryFn: async () => {
-      const { data, error } = await db
-        .from(table)
-        .select("*")
-        .order("created_at", { ascending: false });
+      let q = db.from(table).select("*").order("created_at", { ascending: false });
+      if (filter) q = q.eq(filter.key, filter.value);
+      const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as Row[];
     },
@@ -233,6 +234,7 @@ export function CrudPage({
     setEditing(null);
     const initial: Row = {};
     for (const f of fields) if (f.type === "switch") initial[f.key] = true;
+    if (filter) initial[filter.key] = filter.value;
     setForm(initial);
     setOpen(true);
   }
