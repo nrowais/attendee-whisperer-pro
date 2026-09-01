@@ -130,6 +130,48 @@ function UsersPage() {
     onError: (error: any) => toast.error(error?.message ?? "تعذر تحديث الصلاحية"),
   });
 
+  const fetchStates = useServerFn(listAccountStates);
+  const updatePassword = useServerFn(setUserPassword);
+  const updateDisabled = useServerFn(setUserDisabled);
+
+  const statesQuery = useQuery({
+    queryKey: ["portal-user-states"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const rows = await fetchStates();
+      const map: Record<string, { disabled: boolean; lastSignInAt: string | null }> = {};
+      for (const r of rows) map[r.id] = { disabled: r.disabled, lastSignInAt: r.lastSignInAt };
+      return map;
+    },
+  });
+
+  const [passwordTarget, setPasswordTarget] = useState<{ id: string; email: string } | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+
+  const changePassword = useMutation({
+    mutationFn: async ({ userId, password }: { userId: string; password: string }) =>
+      updatePassword({ data: { userId, password } }),
+    onSuccess: () => {
+      setPasswordTarget(null);
+      setNewPassword("");
+      toast.success("تم تغيير كلمة المرور");
+    },
+    onError: (error: any) => toast.error(error?.message ?? "تعذر تغيير كلمة المرور"),
+  });
+
+  const toggleDisabled = useMutation({
+    mutationFn: async ({ userId, disabled }: { userId: string; disabled: boolean }) =>
+      updateDisabled({ data: { userId, disabled } }),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["portal-user-states"] });
+      queryClient.invalidateQueries({ queryKey: ["portal-users"] });
+      toast.success(vars.disabled ? "تم إيقاف الحساب" : "تم تفعيل الحساب");
+    },
+    onError: (error: any) => toast.error(error?.message ?? "تعذر تحديث حالة الحساب"),
+  });
+
+
+
   return (
     <div className="space-y-6">
       <div>
