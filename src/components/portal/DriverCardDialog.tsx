@@ -203,8 +203,8 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
     setForm({
       guestName: trip?.guest_name ?? trip?.speaker?.full_name ?? "",
       terminal: trip?.terminal ?? "",
-      receiverName: trip?.receiver_name ?? trip?.driver?.full_name ?? "",
-      receiverPhone: trip?.receiver_phone ?? trip?.driver?.phone ?? "",
+      receiverName: trip?.receiver_name ?? "",
+      receiverPhone: trip?.receiver_phone ?? "",
       flightDate: date,
       flightTime: time,
       flightNo: trip?.flight_no ?? "",
