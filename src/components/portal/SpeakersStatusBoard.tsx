@@ -328,9 +328,9 @@ export function SpeakersStatusBoard() {
 
       {/* Results */}
       {isLoading ? (
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <div className="columns-1 gap-3 md:columns-2 xl:columns-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-40 rounded-xl" />
+            <Skeleton key={i} className="mb-3 h-40 rounded-xl break-inside-avoid" />
           ))}
         </div>
       ) : rows.length === 0 ? (
