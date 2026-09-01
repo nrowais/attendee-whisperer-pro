@@ -1001,46 +1001,61 @@ export type Database = {
       }
       transport_trips: {
         Row: {
+          actual_dropoff_at: string | null
+          actual_pickup_at: string | null
           created_at: string
           driver_id: string | null
           dropoff_location: string | null
           event_id: string | null
           id: string
           notes: string | null
+          passengers: number
           pickup_location: string | null
           scheduled_at: string | null
           speaker_id: string | null
           status: string
+          ticket_no: number | null
+          ticket_notes: string | null
           trip_type: string
           updated_at: string
           vehicle_id: string | null
         }
         Insert: {
+          actual_dropoff_at?: string | null
+          actual_pickup_at?: string | null
           created_at?: string
           driver_id?: string | null
           dropoff_location?: string | null
           event_id?: string | null
           id?: string
           notes?: string | null
+          passengers?: number
           pickup_location?: string | null
           scheduled_at?: string | null
           speaker_id?: string | null
           status?: string
+          ticket_no?: number | null
+          ticket_notes?: string | null
           trip_type?: string
           updated_at?: string
           vehicle_id?: string | null
         }
         Update: {
+          actual_dropoff_at?: string | null
+          actual_pickup_at?: string | null
           created_at?: string
           driver_id?: string | null
           dropoff_location?: string | null
           event_id?: string | null
           id?: string
           notes?: string | null
+          passengers?: number
           pickup_location?: string | null
           scheduled_at?: string | null
           speaker_id?: string | null
           status?: string
+          ticket_no?: number | null
+          ticket_notes?: string | null
           trip_type?: string
           updated_at?: string
           vehicle_id?: string | null
