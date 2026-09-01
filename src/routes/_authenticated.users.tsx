@@ -2,12 +2,27 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import {
+  listAccountStates,
+  setUserDisabled,
+  setUserPassword,
+} from "@/lib/adminUsers.functions";
 import { useRoles, roleLabels, type AppRole } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -24,6 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 
 export const Route = createFileRoute("/_authenticated/users")({
   head: () => ({
@@ -114,6 +130,48 @@ function UsersPage() {
     onError: (error: any) => toast.error(error?.message ?? "تعذر تحديث الصلاحية"),
   });
 
+  const fetchStates = useServerFn(listAccountStates);
+  const updatePassword = useServerFn(setUserPassword);
+  const updateDisabled = useServerFn(setUserDisabled);
+
+  const statesQuery = useQuery({
+    queryKey: ["portal-user-states"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const rows = await fetchStates();
+      const map: Record<string, { disabled: boolean; lastSignInAt: string | null }> = {};
+      for (const r of rows) map[r.id] = { disabled: r.disabled, lastSignInAt: r.lastSignInAt };
+      return map;
+    },
+  });
+
+  const [passwordTarget, setPasswordTarget] = useState<{ id: string; email: string } | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+
+  const changePassword = useMutation({
+    mutationFn: async ({ userId, password }: { userId: string; password: string }) =>
+      updatePassword({ data: { userId, password } }),
+    onSuccess: () => {
+      setPasswordTarget(null);
+      setNewPassword("");
+      toast.success("تم تغيير كلمة المرور");
+    },
+    onError: (error: any) => toast.error(error?.message ?? "تعذر تغيير كلمة المرور"),
+  });
+
+  const toggleDisabled = useMutation({
+    mutationFn: async ({ userId, disabled }: { userId: string; disabled: boolean }) =>
+      updateDisabled({ data: { userId, disabled } }),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["portal-user-states"] });
+      queryClient.invalidateQueries({ queryKey: ["portal-users"] });
+      toast.success(vars.disabled ? "تم إيقاف الحساب" : "تم تفعيل الحساب");
+    },
+    onError: (error: any) => toast.error(error?.message ?? "تعذر تحديث حالة الحساب"),
+  });
+
+
+
   return (
     <div className="space-y-6">
       <div>
@@ -201,7 +259,9 @@ function UsersPage() {
                 <TableHead className="text-start">البريد الإلكتروني</TableHead>
                 <TableHead className="text-start">الصلاحية</TableHead>
                 <TableHead className="text-start">حالة الحساب</TableHead>
+                {isAdmin ? <TableHead className="text-start">إدارة الحساب</TableHead> : null}
               </TableRow>
+
             </TableHeader>
             <TableBody>
               {(usersQuery.data ?? []).map((u: any) => (
@@ -262,12 +322,90 @@ function UsersPage() {
                       );
                     })()}
                   </TableCell>
+                  {isAdmin ? (
+                    <TableCell className="text-start">
+                      {(() => {
+                        const disabled = statesQuery.data?.[u.id]?.disabled ?? false;
+                        return (
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant={disabled ? "destructive" : "secondary"}>
+                              {disabled ? "موقوف" : "نشِط"}
+                            </Badge>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                setPasswordTarget({ id: u.id, email: u.email ?? "" })
+                              }
+                            >
+                              تغيير كلمة المرور
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant={disabled ? "default" : "destructive"}
+                              disabled={toggleDisabled.isPending}
+                              onClick={() =>
+                                toggleDisabled.mutate({ userId: u.id, disabled: !disabled })
+                              }
+                            >
+                              {disabled ? "إعادة تفعيل" : "إيقاف الحساب"}
+                            </Button>
+                          </div>
+                        );
+                      })()}
+                    </TableCell>
+                  ) : null}
                 </TableRow>
+
               ))}
             </TableBody>
           </Table>
         )}
       </div>
+
+      <Dialog
+        open={passwordTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPasswordTarget(null);
+            setNewPassword("");
+          }
+        }}
+      >
+        <DialogContent dir="rtl">
+          <DialogHeader>
+            <DialogTitle>تغيير كلمة المرور</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground" dir="ltr">
+              {passwordTarget?.email}
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="new-password">كلمة المرور الجديدة</Label>
+              <Input
+                id="new-password"
+                type="text"
+                dir="ltr"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="6 خانات على الأقل"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              disabled={changePassword.isPending || newPassword.length < 6}
+              onClick={() =>
+                passwordTarget &&
+                changePassword.mutate({ userId: passwordTarget.id, password: newPassword })
+              }
+            >
+              حفظ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 }
