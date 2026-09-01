@@ -163,6 +163,11 @@ export function buildDriverCardHtml(c: DriverCardData) {
       ${c.cardNo ? `<span class="ticket">رقم البطاقة: ${esc(String(c.cardNo))}</span>` : ""}
       ${c.ticketNo ? `<span class="ticket">رقم التذكرة: ${esc(c.ticketNo)}</span>` : ""}
       <table>${rows.map(row).join("")}${extra.map(row).join("")}</table>
+      ${mapsUrl ? `
+      <a class="maps-link" href="${mapsUrl}" target="_blank" rel="noopener">
+        <span class="pin">📍</span> فتح موقع الفندق في خرائط قوقل
+      </a>
+      <p class="maps-sub">اضغط على الزر أو الرابط للوصول المباشر إلى الموقع: <a href="${mapsUrl}">${mapsUrl}</a></p>` : ""}
     </div>
     <footer><span class="dot"></span> صدرت آلياً من بوابة ${esc(eventName)} <span class="dot"></span></footer>
   </div>
