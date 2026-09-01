@@ -122,44 +122,46 @@ export function buildDriverCardHtml(c: DriverCardData) {
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
 <style>
-  @page { size: A4 landscape; margin: 10mm; }
+  @page { size: A4 portrait; margin: 8mm; }
   * { box-sizing: border-box; }
-  html, body { height: 100%; }
-  body { font-family: Cairo, "Segoe UI", sans-serif; color: #0f2a4a; margin: 0;
-    background: #ffffff; }
-  .card { border-radius: 16px; overflow: hidden; page-break-inside: avoid;
-    break-inside: avoid; border: 1px solid #dbe3ee; box-shadow: 0 4px 18px rgba(15, 42, 74, .08); }
+  html, body { height: 100%; margin: 0; }
+  body { font-family: Cairo, "Segoe UI", sans-serif; color: #0f2a4a;
+    background: #ffffff; display: flex; align-items: center; justify-content: center; }
+  .card { width: 100%; max-height: 277mm; border-radius: 16px; overflow: hidden;
+    page-break-inside: avoid; break-inside: avoid;
+    border: 1px solid #dbe3ee; box-shadow: 0 4px 18px rgba(15, 42, 74, .08);
+    display: flex; flex-direction: column; justify-content: space-between; }
   .head { background: linear-gradient(135deg, #0f2a4a 0%, #1d4677 60%, #27548f 100%);
-    color: #ffffff; padding: 12px 20px; display: flex; align-items: center;
+    color: #ffffff; padding: 14px 22px; display: flex; align-items: center;
     justify-content: space-between; gap: 14px; }
-  .logo-badge { background: #ffffff; border-radius: 12px; padding: 6px 10px;
+  .logo-badge { background: #ffffff; border-radius: 12px; padding: 7px 11px;
     display: flex; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,.15); flex-shrink: 0; }
-  .logo-badge img { height: 46px; display: block; }
+  .logo-badge img { height: 58px; display: block; }
   .head-text { text-align: right; }
-  .head-text .event { font-size: 11px; font-weight: 600; color: #f7a23b; margin: 0 0 3px; }
-  h1 { font-size: 20px; margin: 0; font-weight: 800; }
-  .sub { font-size: 11px; color: #c8d6e8; margin: 3px 0 0; }
-  .serial { font-size: 11px; font-weight: 700; color: #f7a23b; margin: 3px 0 0; }
-  .accent { height: 4px; background: linear-gradient(90deg, #f77f00, #f7a23b); }
-  .body { padding: 12px 20px 14px; }
-  .ticket { display: inline-block; font-size: 11px; font-weight: 700; color: #b45309;
+  .head-text .event { font-size: 12px; font-weight: 600; color: #f7a23b; margin: 0 0 4px; }
+  h1 { font-size: 24px; margin: 0; font-weight: 800; }
+  .sub { font-size: 12px; color: #c8d6e8; margin: 4px 0 0; }
+  .serial { font-size: 12px; font-weight: 700; color: #f7a23b; margin: 4px 0 0; }
+  .accent { height: 5px; background: linear-gradient(90deg, #f77f00, #f7a23b); }
+  .body { padding: 14px 22px 16px; }
+  .ticket { display: inline-block; font-size: 12px; font-weight: 700; color: #b45309;
     background: #fff4e5; border: 1px solid #f7d9ac; border-radius: 999px;
-    padding: 2px 12px; margin-bottom: 8px; }
-  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-  th { background: #eef3f9; color: #0f2a4a; text-align: right; padding: 7px 14px;
-    width: 34%; font-weight: 600; border: 1px solid #dbe3ee; }
-  td { padding: 7px 14px; text-align: right; border: 1px solid #dbe3ee; font-weight: 700; }
-   .maps-link { display: flex; align-items: center; justify-content: center; gap: 8px;
-     margin-top: 10px; padding: 9px 14px; border-radius: 10px; text-decoration: none;
-     background: linear-gradient(135deg, #0f2a4a, #1d4677); color: #ffffff;
-     font-size: 13px; font-weight: 700; border: 1px solid #0f2a4a; }
-   .maps-link .pin { color: #f7a23b; font-size: 15px; }
-   .maps-sub { text-align: center; font-size: 10px; color: #7d8ea8; margin-top: 4px; }
-   .maps-sub a { color: #1d4677; word-break: break-all; }
-   @media print { .maps-link { background: #0f2a4a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
-   footer { background: #f7f9fc; border-top: 1px solid #dbe3ee; padding: 7px 20px;
-    font-size: 10px; color: #7d8ea8; text-align: center; display: flex;
-    align-items: center; justify-content: center; gap: 6px; }
+    padding: 3px 14px; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th { background: #eef3f9; color: #0f2a4a; text-align: right; padding: 9px 16px;
+    width: 38%; font-weight: 600; border: 1px solid #dbe3ee; }
+  td { padding: 9px 16px; text-align: right; border: 1px solid #dbe3ee; font-weight: 700; }
+  .maps-link { display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 12px; padding: 11px 16px; border-radius: 10px; text-decoration: none;
+    background: linear-gradient(135deg, #0f2a4a, #1d4677); color: #ffffff;
+    font-size: 14px; font-weight: 700; border: 1px solid #0f2a4a; }
+  .maps-link .pin { color: #f7a23b; font-size: 16px; }
+  .maps-sub { text-align: center; font-size: 11px; color: #7d8ea8; margin-top: 5px; }
+  .maps-sub a { color: #1d4677; word-break: break-all; }
+  @media print { .maps-link { background: #0f2a4a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  footer { background: #f7f9fc; border-top: 1px solid #dbe3ee; padding: 8px 22px;
+    font-size: 11px; color: #7d8ea8; text-align: center; display: flex;
+    align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; }
   footer .dot { width: 6px; height: 6px; border-radius: 50%; background: #f77f00; display: inline-block; }
 </style></head>
 <body>
