@@ -30,6 +30,7 @@ import { Route as AuthenticatedSpeakersRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated.tickets'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
+import { Route as ApiPublicSheetsTableRouteImport } from './routes/api/public/sheets.$table'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -137,6 +138,11 @@ const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   path: '/api/public/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSheetsTableRoute = ApiPublicSheetsTableRouteImport.update({
+  id: '/api/public/sheets/$table',
+  path: '/api/public/sheets/$table',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/tickets'
     | '/users'
     | '/api/public/health'
+    | '/api/public/sheets/$table'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/tickets'
     | '/users'
     | '/api/public/health'
+    | '/api/public/sheets/$table'
   id:
     | '__root__'
     | '/'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tickets'
     | '/_authenticated/users'
     | '/api/public/health'
+    | '/api/public/sheets/$table'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -282,6 +294,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   SpeakerRoute: typeof SpeakerRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
+  ApiPublicSheetsTableRoute: typeof ApiPublicSheetsTableRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -433,6 +446,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/sheets/$table': {
+      id: '/api/public/sheets/$table'
+      path: '/api/public/sheets/$table'
+      fullPath: '/api/public/sheets/$table'
+      preLoaderRoute: typeof ApiPublicSheetsTableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -484,6 +504,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   SpeakerRoute: SpeakerRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
+  ApiPublicSheetsTableRoute: ApiPublicSheetsTableRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
