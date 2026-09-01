@@ -134,7 +134,15 @@ export function buildDriverCardHtml(c: DriverCardData) {
     width: 36%; font-weight: 600; border: 1px solid #dbe3ee; }
   th:first-child { border-radius: 0 8px 0 0; }
   td { padding: 8px 12px; text-align: right; border: 1px solid #dbe3ee; font-weight: 700; }
-  footer { background: #f7f9fc; border-top: 1px solid #dbe3ee; padding: 8px 18px;
+   .maps-link { display: flex; align-items: center; justify-content: center; gap: 8px;
+     margin-top: 12px; padding: 10px 14px; border-radius: 10px; text-decoration: none;
+     background: linear-gradient(135deg, #0f2a4a, #1d4677); color: #ffffff;
+     font-size: 13px; font-weight: 700; border: 1px solid #0f2a4a; }
+   .maps-link .pin { color: #f7a23b; font-size: 15px; }
+   .maps-sub { text-align: center; font-size: 10px; color: #7d8ea8; margin-top: 5px; }
+   .maps-sub a { color: #1d4677; word-break: break-all; }
+   @media print { .maps-link { background: #0f2a4a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+   footer { background: #f7f9fc; border-top: 1px solid #dbe3ee; padding: 8px 18px;
     font-size: 10px; color: #7d8ea8; text-align: center; display: flex;
     align-items: center; justify-content: center; gap: 6px; }
   footer .dot { width: 6px; height: 6px; border-radius: 50%; background: #f77f00; display: inline-block; }
