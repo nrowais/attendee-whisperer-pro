@@ -7,6 +7,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { eventName } from "@/lib/nav";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import eventLogo from "@/assets/event-logo-2026.png";
+
+const logoUrl = () =>
+  typeof window !== "undefined" ? new URL(eventLogo, window.location.origin).href : eventLogo;
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
