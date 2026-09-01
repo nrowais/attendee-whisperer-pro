@@ -103,9 +103,10 @@ export function buildDriverCardHtml(c: DriverCardData) {
   ].filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
 
   const mapQuery = [c.hotelName, c.hotelLocation].filter((v) => v && v.trim() !== "").join("، ");
-  const mapsUrl = mapQuery
+  const fallbackUrl = mapQuery
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
     : "";
+  const mapsUrl = c.hotelMapUrl && c.hotelMapUrl.trim() !== "" ? c.hotelMapUrl : fallbackUrl;
 
   const row = ([label, value]: [string, string]) => {
     const cell =
