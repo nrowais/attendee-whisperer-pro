@@ -141,6 +141,12 @@ function AuthPage() {
             </TabsContent>
 
             <TabsContent value="signup">
+              {signedUp ? (
+                <div className="mt-4 rounded-lg border border-border bg-secondary/50 p-4 text-sm text-muted-foreground">
+                  تم استلام طلب التسجيل ببريدك الشخصي. سيظهر الطلب في صفحة المستخدمين، ولا يمكنك
+                  الدخول إلى البوابة إلا بعد موافقة المدير.
+                </div>
+              ) : (
               <form onSubmit={signUp} className="space-y-4 pt-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">الاسم الكامل</Label>
@@ -175,9 +181,13 @@ function AuthPage() {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  إنشاء الحساب
+                  إرسال طلب التسجيل
                 </Button>
+                <p className="text-xs text-muted-foreground">
+                  سجّل ببريدك الشخصي، ويُفعّل الحساب بعد موافقة المدير.
+                </p>
               </form>
+              )}
             </TabsContent>
           </Tabs>
 
