@@ -404,6 +404,8 @@ export const driverCardFields: Field[] = [
   { key: "card_no", label: "رقم البطاقة" },
   { key: "guest_name", label: "اسم الضيف" },
   { key: "hotel_name", label: "الفندق" },
+  { key: "hotel_location", label: "موقع الفندق" },
+  { key: "hotel_map_url", label: "رابط الموقع" },
   { key: "terminal", label: "صالة المطار" },
   { key: "receiver_name", label: "اسم المستقبل" },
   { key: "receiver_phone", label: "جوال المستقبل" },

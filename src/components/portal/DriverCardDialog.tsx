@@ -40,11 +40,20 @@ export type DriverCardData = {
   cardNo?: string;
   hotelName?: string;
   hotelLocation?: string;
+  hotelMapUrl?: string;
 };
 
-const HOTELS: Array<{ name: string; location: string }> = [
-  { name: "فندق ماريوت حي السفارات", location: "حي السفارات، الرياض" },
-  { name: "كورت يارد الرياض", location: "الرياض" },
+const HOTELS: Array<{ name: string; location: string; mapUrl?: string }> = [
+  {
+    name: "فندق ماريوت حي السفارات",
+    location: "حي السفارات، الرياض",
+    mapUrl: "https://maps.app.goo.gl/uWxNZqFduxSDVQSB6",
+  },
+  {
+    name: "كورت يارد الرياض",
+    location: "الرياض",
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=كورت+يارد+الرياض",
+  },
 ];
 
 function esc(v: string) {
@@ -94,9 +103,10 @@ export function buildDriverCardHtml(c: DriverCardData) {
   ].filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
 
   const mapQuery = [c.hotelName, c.hotelLocation].filter((v) => v && v.trim() !== "").join("، ");
-  const mapsUrl = mapQuery
+  const fallbackUrl = mapQuery
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
     : "";
+  const mapsUrl = c.hotelMapUrl && c.hotelMapUrl.trim() !== "" ? c.hotelMapUrl : fallbackUrl;
 
   const row = ([label, value]: [string, string]) => {
     const cell =
@@ -232,6 +242,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
     ticketNo: "",
     hotelName: "",
     hotelLocation: "",
+    hotelMapUrl: "",
   });
 
   const [cardId, setCardId] = useState<string | null>(null);
@@ -257,6 +268,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       cardNo: "",
       hotelName: trip?.hotel_name ?? "",
       hotelLocation: trip?.hotel_location ?? "",
+      hotelMapUrl: trip?.hotel_map_url ?? "",
     });
 
     // استرجاع بطاقة محفوظة سابقاً لهذا الضيف/التذكرة
@@ -284,6 +296,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
         driverName: row.driver_name ?? f.driverName,
         hotelName: row.hotel_name ?? f.hotelName,
         hotelLocation: row.hotel_location ?? f.hotelLocation,
+        hotelMapUrl: row.hotel_map_url ?? f.hotelMapUrl,
       }));
     })();
   }, [open, trip]);
@@ -313,6 +326,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       ticket_no: form.ticketNo || null,
       hotel_name: form.hotelName || null,
       hotel_location: form.hotelLocation || null,
+      hotel_map_url: form.hotelMapUrl || null,
     };
     const query = cardId
       ? db.from("driver_cards").update(payload).eq("id", cardId).select("id, card_no").maybeSingle()
@@ -433,6 +447,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
                   ...f,
                   hotelName: name,
                   hotelLocation: hotel ? hotel.location : (f.hotelLocation ?? ""),
+                  hotelMapUrl: hotel?.mapUrl ?? (f.hotelMapUrl ?? ""),
                 }));
               }}
             >
@@ -445,6 +460,19 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
             </select>
           </div>
           {field("hotelLocation", "موقع الفندق", "text", "مثال: حي السفارات، الرياض")}
+          {field("hotelMapUrl", "رابط موقع الفندق (اختياري)", "url", "https://maps.app.goo.gl/...")}
+          {form.hotelMapUrl && (
+            <div className="space-y-1 sm:col-span-2">
+              <a
+                href={form.hotelMapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm text-primary underline hover:bg-muted"
+              >
+                📍 فتح موقع {form.hotelName || "الفندق"} في خرائط قوقل
+              </a>
+            </div>
+          )}
         </div>
 
         <DialogFooter className="gap-2 sm:justify-start">
