@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { AlarmClock, BedDouble, Car, PlaneLanding, PlaneTakeoff } from "lucide-react";
+import { AlarmClock, PlaneLanding, PlaneTakeoff } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const db = supabase as any;
 
-type Kind = "arrival" | "departure" | "transport" | "hotel";
+type Kind = "arrival" | "departure";
 
 type Item = {
   id: string;
@@ -22,8 +22,6 @@ type Item = {
 const kindMeta: Record<Kind, { label: string; icon: typeof PlaneLanding }> = {
   arrival: { label: "وصول رحلة", icon: PlaneLanding },
   departure: { label: "مغادرة رحلة", icon: PlaneTakeoff },
-  transport: { label: "نقل", icon: Car },
-  hotel: { label: "تسجيل إقامة", icon: BedDouble },
 };
 
 /** فترة التنبيه المسبق بالدقائق */
@@ -56,10 +54,9 @@ export function UpcomingCountdown() {
       const now = new Date();
       const nowIso = now.toISOString();
       const horizon = new Date(now.getTime() + 72 * 60 * 60 * 1000).toISOString();
-      const today = now.toISOString().slice(0, 10);
-      const horizonDay = new Date(now.getTime() + 72 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-      const [arrivals, departures, trips, bookings] = await Promise.all([
+
+      const [arrivals, departures] = await Promise.all([
         db
           .from("speaker_arrivals")
           .select("id, arrival_time, arrival_point, terminal, speakers(full_name)")
@@ -73,20 +70,6 @@ export function UpcomingCountdown() {
           .gte("departure_time", nowIso)
           .lte("departure_time", horizon)
           .order("departure_time", { ascending: true })
-          .limit(20),
-        db
-          .from("transport_trips")
-          .select("id, scheduled_at, trip_type, pickup_location, speakers(full_name)")
-          .gte("scheduled_at", nowIso)
-          .lte("scheduled_at", horizon)
-          .order("scheduled_at", { ascending: true })
-          .limit(20),
-        db
-          .from("hotel_bookings")
-          .select("id, check_in, speakers(full_name), hotels(name)")
-          .gte("check_in", today)
-          .lte("check_in", horizonDay)
-          .order("check_in", { ascending: true })
           .limit(20),
       ]);
 
@@ -107,24 +90,6 @@ export function UpcomingCountdown() {
           name: d.speakers?.full_name ?? "—",
           detail: [d.departure_point, d.terminal].filter(Boolean).join(" — ") || "المطار",
           at: d.departure_time,
-        });
-      }
-      for (const t of trips.data ?? []) {
-        items.push({
-          id: `transport-${t.id}`,
-          kind: "transport",
-          name: t.speakers?.full_name ?? "—",
-          detail: [t.trip_type, t.pickup_location].filter(Boolean).join(" — ") || "رحلة نقل",
-          at: t.scheduled_at,
-        });
-      }
-      for (const b of bookings.data ?? []) {
-        items.push({
-          id: `hotel-${b.id}`,
-          kind: "hotel",
-          name: b.speakers?.full_name ?? "—",
-          detail: b.hotels?.name ?? "الفندق",
-          at: `${b.check_in}T14:00:00`,
         });
       }
 
@@ -155,7 +120,7 @@ export function UpcomingCountdown() {
         <div>
           <h2 className="font-display text-lg font-bold text-foreground">العد التنازلي للمواعيد</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            تنبيه تلقائي قبل الرحلات والنقل والإقامة بـ {ALERT_MINUTES / 60} ساعة
+            مواعيد الوصول والمغادرة من والى المطار فقط
           </p>
         </div>
         <Badge variant="secondary" className="gap-2">
@@ -171,7 +136,7 @@ export function UpcomingCountdown() {
         </div>
       ) : items.length === 0 ? (
         <p className="py-6 text-center text-sm text-muted-foreground">
-          لا توجد مواعيد قادمة خلال الأيام الثلاثة القادمة
+          لا توجد مواعيد وصول أو مغادرة من المطار خلال الأيام الثلاثة القادمة
         </p>
       ) : (
         <ul className="divide-y divide-border">
