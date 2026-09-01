@@ -9,7 +9,7 @@ import {
   ClipboardPlus,
   Car,
   Ticket,
-  Route as RouteIcon,
+  
   ListChecks,
   Settings,
   type LucideIcon,
@@ -23,7 +23,7 @@ export const navItems: NavItem[] = [
   { to: "/daily", label: "الإدخال اليومي", icon: ClipboardPlus, hint: "نقل وإقامة يوماً بيوم" },
 
   { to: "/operations", label: "الحالة التشغيلية", icon: ListChecks, hint: "تسجيل الوصول والنقل والفندق والمغادرة" },
-  { to: "/journey", label: "تتبّع رحلة الضيف", icon: RouteIcon, hint: "المطار ← النقل ← الفندق ← الفعالية ← المغادرة" },
+  
   { to: "/speakers", label: "المتحدثون", icon: Mic2, hint: "المتحدثون والجلسات والطلبات" },
   { to: "/invitees", label: "الضيوف والمدعوون", icon: UserCheck, hint: "المدعوون والدعوات والحضور" },
   { to: "/movements", label: "التنقلات", icon: Plane, hint: "الطيران والوصول والنقل الأرضي" },

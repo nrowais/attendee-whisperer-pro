@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Plane,
@@ -19,27 +19,6 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-
-export const Route = createFileRoute("/_authenticated/journey")({
-  head: () => ({
-    meta: [
-      { title: "تتبّع رحلة الضيف — حوار الأمن والتاريخ" },
-      {
-        name: "description",
-        content:
-          "خط زمني موحّد يربط المطار والنقل والفندق والفعالية والمغادرة لكل ضيف ومتحدث في مكان واحد.",
-      },
-      { property: "og:title", content: "تتبّع رحلة الضيف" },
-      {
-        property: "og:description",
-        content: "ربط كامل بين أقسام المطار والنقل والإقامة والفعالية لمتابعة حركة كل ضيف.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
-  component: JourneyPage,
-});
 
 const db = supabase as any;
 
@@ -250,7 +229,7 @@ function useJourneys() {
   });
 }
 
-function JourneyPage() {
+export function GuestJourney() {
   const { data, isLoading } = useJourneys();
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<string>("all");

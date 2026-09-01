@@ -23,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { UpcomingCountdown } from "@/components/portal/UpcomingCountdown";
 import { TodaysSessions } from "@/components/portal/TodaysSessions";
+import { GuestJourney } from "@/components/portal/GuestJourney";
 
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -336,6 +337,10 @@ function DashboardPage() {
       <UpcomingCountdown />
 
       <TodaysSessions />
+
+      <GuestJourney />
+
+
 
 
 
