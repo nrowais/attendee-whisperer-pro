@@ -105,8 +105,8 @@ function useSpeakersBoard() {
           db.from("hotels").select("id, name"),
           db.from("drivers").select("id, full_name, phone"),
           db.from("vehicles").select("id, plate_number"),
-          db.from("speaker_arrivals").select("speaker_id, arrival_time, flight_id"),
-          db.from("flights").select("id, arrival_time"),
+          db.from("speaker_arrivals").select("speaker_id, arrival_time, flight_id, terminal"),
+          db.from("flights").select("id, arrival_time, flight_number, airline"),
           db
             .from("driver_cards")
             .select("speaker_id, guest_name, card_no, ticket_no")
