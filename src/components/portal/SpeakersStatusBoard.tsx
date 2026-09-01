@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
 import {
   CalendarClock,
   PlaneLanding,
@@ -11,13 +12,24 @@ import {
   Mic,
   XCircle,
   Phone,
+  Plus,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useRoles } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const db = supabase as any;
 
@@ -135,11 +147,40 @@ function useSpeakersBoard() {
 
 export function SpeakersStatusBoard() {
   const { data, isLoading } = useSpeakersBoard();
+  const { canEdit } = useRoles();
+  const queryClient = useQueryClient();
   const [status, setStatus] = useState<StatusKey>("all");
   const [tripFilter, setTripFilter] = useState<string>("all");
   const [directionFilter, setDirectionFilter] = useState<string>("all");
   const [hotelFilter, setHotelFilter] = useState<string>("all");
   const [query, setQuery] = useState("");
+  const [addOpen, setAddOpen] = useState(false);
+  const [form, setForm] = useState<Record<string, string>>({});
+
+  const addSpeaker = useMutation({
+    mutationFn: async (values: Record<string, string>) => {
+      const payload: Record<string, string | null> = {};
+      for (const key of ["full_name", "title", "organization", "country", "email", "phone"]) {
+        payload[key] = values[key]?.trim() ? values[key].trim() : null;
+      }
+      const { data: inserted, error } = await db
+        .from("speakers")
+        .insert(payload)
+        .select("id")
+        .single();
+      if (error) throw error;
+      // إنشاء حالة تشغيلية مستقلة للمتحدث الجديد
+      await db.from("guest_operations").insert({ speaker_id: inserted.id, operational_status: "scheduled" });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["speakers-status-board"] });
+      queryClient.invalidateQueries({ queryKey: ["crud", "speakers"] });
+      toast.success("تمت إضافة المتحدث بنجاح");
+      setAddOpen(false);
+      setForm({});
+    },
+    onError: (error: any) => toast.error(error?.message ?? "تعذر الحفظ"),
+  });
 
   const rows = useMemo(() => {
     const tab = STATUS_TABS.find((t) => t.value === status) ?? STATUS_TABS[0]!;
@@ -217,6 +258,12 @@ export function SpeakersStatusBoard() {
             className="pr-9"
           />
         </div>
+        {canEdit ? (
+          <Button onClick={() => setAddOpen(true)}>
+            <Plus className="h-4 w-4" />
+            إضافة متحدث
+          </Button>
+        ) : null}
         <select
           value={directionFilter}
           onChange={(e) => setDirectionFilter(e.target.value)}
@@ -338,6 +385,55 @@ export function SpeakersStatusBoard() {
           </div>
         </>
       )}
+
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="sm:max-w-lg" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-start font-display">إضافة متحدث جديد</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {(
+              [
+                { key: "full_name", label: "الاسم الكامل", required: true },
+                { key: "title", label: "المسمى الوظيفي" },
+                { key: "organization", label: "الجهة" },
+                { key: "country", label: "الدولة" },
+                { key: "email", label: "البريد الإلكتروني" },
+                { key: "phone", label: "رقم الجوال" },
+              ] as { key: string; label: string; required?: boolean }[]
+            ).map((f) => (
+              <div key={f.key} className="space-y-2">
+                <Label htmlFor={`add-${f.key}`}>
+                  {f.label}
+                  {f.required ? <span className="text-destructive"> *</span> : null}
+                </Label>
+                <Input
+                  id={`add-${f.key}`}
+                  value={form[f.key] ?? ""}
+                  onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+                />
+              </div>
+            ))}
+          </div>
+          <DialogFooter className="gap-2 sm:justify-start">
+            <Button
+              onClick={() => {
+                if (!form['full_name']?.trim()) {
+                  toast.error("الحقل المطلوب: الاسم الكامل");
+                  return;
+                }
+                addSpeaker.mutate(form);
+              }}
+              disabled={addSpeaker.isPending}
+            >
+              حفظ
+            </Button>
+            <Button variant="outline" onClick={() => setAddOpen(false)}>
+              إلغاء
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
