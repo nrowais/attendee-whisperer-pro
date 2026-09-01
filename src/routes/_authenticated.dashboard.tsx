@@ -306,7 +306,7 @@ footer { margin-top:24px; font-size:11px; color:#7b8497; text-align:center; }
 
 function DashboardPage() {
   const { data, isLoading } = useLiveStats();
-
+  const [journeyOpen, setJourneyOpen] = useState(false);
 
   const summaryCards = [
     { label: "الحضور اليوم", value: data?.todayAttendance ?? 0, sub: "تسجيل دخول في الموقع", icon: UserCheck },
