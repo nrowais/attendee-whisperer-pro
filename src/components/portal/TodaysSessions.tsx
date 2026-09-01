@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, CalendarClock, Mic, Plus } from "lucide-react";
@@ -34,6 +34,14 @@ function fmtClock(value?: string | null) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function fmtCountdown(ms: number) {
+  const total = Math.floor(Math.abs(ms) / 1000);
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
 function useTodaySessions() {
