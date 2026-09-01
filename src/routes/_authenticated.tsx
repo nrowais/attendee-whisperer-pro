@@ -68,7 +68,7 @@ function PortalLayout() {
         </div>
 
         <nav className="space-y-1 px-3 py-5">
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             return (
               <Link
