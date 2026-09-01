@@ -109,6 +109,7 @@ export function buildDriverCardHtml(c: DriverCardData) {
   .head-text .event { font-size: 11px; font-weight: 600; color: #f7a23b; margin: 0 0 3px; }
   h1 { font-size: 19px; margin: 0; font-weight: 800; }
   .sub { font-size: 11px; color: #c8d6e8; margin: 3px 0 0; }
+  .serial { font-size: 11px; font-weight: 700; color: #f7a23b; margin: 4px 0 0; }
   .accent { height: 4px; background: linear-gradient(90deg, #f77f00, #f7a23b); }
   .body { padding: 14px 18px 16px; }
   .ticket { display: inline-block; font-size: 11px; font-weight: 700; color: #b45309;
