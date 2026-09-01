@@ -90,6 +90,7 @@ function useSpeakersBoard() {
         { data: vehicles },
         { data: arrivals },
         { data: flights },
+        { data: cards },
       ] =
         await Promise.all([
           db.from("speakers").select("id, full_name, title, organization, country, phone").order("full_name"),
@@ -106,6 +107,10 @@ function useSpeakersBoard() {
           db.from("vehicles").select("id, plate_number"),
           db.from("speaker_arrivals").select("speaker_id, arrival_time, flight_id"),
           db.from("flights").select("id, arrival_time"),
+          db
+            .from("driver_cards")
+            .select("speaker_id, guest_name, card_no, ticket_no")
+            .order("created_at", { ascending: false }),
         ]);
 
       const hotelNames = new Map((hotels ?? []).map((h: any) => [h.id, h.name]));
@@ -128,6 +133,12 @@ function useSpeakersBoard() {
       const bookingBySpeaker = new Map<string, any>();
       (bookings ?? []).forEach((b: any) => {
         if (b.speaker_id && !bookingBySpeaker.has(b.speaker_id)) bookingBySpeaker.set(b.speaker_id, b);
+      });
+      const cardBySpeakerId = new Map<string, any>();
+      const cardByGuestName = new Map<string, any>();
+      (cards ?? []).forEach((c: any) => {
+        if (c.speaker_id && !cardBySpeakerId.has(c.speaker_id)) cardBySpeakerId.set(c.speaker_id, c);
+        if (c.guest_name && !cardByGuestName.has(c.guest_name)) cardByGuestName.set(c.guest_name, c);
       });
 
       const rows = (speakers ?? []).map((s: any) => {
@@ -156,6 +167,7 @@ function useSpeakersBoard() {
           booking: booking
             ? { ...booking, hotelName: hotelNames.get(booking.hotel_id) ?? "—" }
             : null,
+          card: cardBySpeakerId.get(s.id) ?? cardByGuestName.get(s.full_name) ?? null,
         };
       });
 
@@ -424,9 +436,16 @@ export function SpeakersStatusBoard() {
                           {" → "}{r.trip.actual_dropoff_at ? new Date(r.trip.actual_dropoff_at).toLocaleString("ar-SA-u-ca-gregory", { hour: "2-digit", minute: "2-digit" }) : "—"}
                         </span>
                       </span>
-                    ) : (
-                      <span className="text-muted-foreground">لا توجد رحلة نقل</span>
-                    )}
+                     ) : r.card ? (
+                       <span className="min-w-0 truncate">
+                         بطاقة سائق #{r.card.card_no}
+                         {r.card.ticket_no ? ` · تذكرة #${r.card.ticket_no}` : ""}
+                         <br />
+                         <span className="text-[10px] text-muted-foreground">لا توجد رحلة نقل مرتبطة بعد</span>
+                       </span>
+                     ) : (
+                       <span className="text-muted-foreground">لا توجد رحلة نقل مرتبطة بعد</span>
+                     )}
                   </div>
                   <div className="flex items-center gap-2 rounded-lg bg-secondary/50 px-3 py-2">
                     <BedDouble className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
