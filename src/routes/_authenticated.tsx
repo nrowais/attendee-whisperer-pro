@@ -37,13 +37,40 @@ function PortalLayout() {
     }
   }, [rolesLoading, isOperator, pathname, navigate]);
 
-  if (loading || !user) {
+  if (loading || !user || approvalLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <span className="text-sm text-muted-foreground">جارٍ التحميل…</span>
       </div>
     );
   }
+
+  if (approvalStatus && approvalStatus !== "approved") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-6">
+        <div className="surface-card max-w-md space-y-3 p-8 text-center">
+          <h1 className="font-display text-xl font-bold text-foreground">
+            {approvalStatus === "rejected" ? "تم رفض طلب الحساب" : "حسابك بانتظار الموافقة"}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {approvalStatus === "rejected"
+              ? "يرجى التواصل مع مدير النظام لمراجعة الطلب."
+              : "تم استلام طلب تسجيلك، وسيتم تفعيل الحساب بعد موافقة المدير."}
+          </p>
+          <button
+            className="text-sm font-medium text-primary underline"
+            onClick={async () => {
+              await supabase.auth.signOut();
+              navigate({ to: "/auth" });
+            }}
+          >
+            تسجيل الخروج
+          </button>
+        </div>
+      </div>
+    );
+  }
+
 
   const roleLabel = roles[0] ? roleLabels[roles[0]] : "مطّلع";
   const visibleNavItems = isOperator
