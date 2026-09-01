@@ -242,6 +242,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
     ticketNo: "",
     hotelName: "",
     hotelLocation: "",
+    hotelMapUrl: "",
   });
 
   const [cardId, setCardId] = useState<string | null>(null);
