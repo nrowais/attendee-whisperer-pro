@@ -40,6 +40,8 @@ const allRoles: AppRole[] = ["admin", "coordinator", "viewer", "operator"];
 function UsersPage() {
   const { isAdmin } = useRoles();
   const queryClient = useQueryClient();
+  const [pendingRoles, setPendingRoles] = useState<Record<string, AppRole>>({});
+
 
   const usersQuery = useQuery({
     queryKey: ["portal-users"],
