@@ -57,7 +57,7 @@ export function UpcomingCountdown() {
       const today = now.toISOString().slice(0, 10);
       const horizonDay = new Date(now.getTime() + 72 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-      const [arrivals, departures, trips, bookings] = await Promise.all([
+      const [arrivals, departures] = await Promise.all([
         db
           .from("speaker_arrivals")
           .select("id, arrival_time, arrival_point, terminal, speakers(full_name)")
@@ -71,20 +71,6 @@ export function UpcomingCountdown() {
           .gte("departure_time", nowIso)
           .lte("departure_time", horizon)
           .order("departure_time", { ascending: true })
-          .limit(20),
-        db
-          .from("transport_trips")
-          .select("id, scheduled_at, trip_type, pickup_location, speakers(full_name)")
-          .gte("scheduled_at", nowIso)
-          .lte("scheduled_at", horizon)
-          .order("scheduled_at", { ascending: true })
-          .limit(20),
-        db
-          .from("hotel_bookings")
-          .select("id, check_in, speakers(full_name), hotels(name)")
-          .gte("check_in", today)
-          .lte("check_in", horizonDay)
-          .order("check_in", { ascending: true })
           .limit(20),
       ]);
 
@@ -105,24 +91,6 @@ export function UpcomingCountdown() {
           name: d.speakers?.full_name ?? "—",
           detail: [d.departure_point, d.terminal].filter(Boolean).join(" — ") || "المطار",
           at: d.departure_time,
-        });
-      }
-      for (const t of trips.data ?? []) {
-        items.push({
-          id: `transport-${t.id}`,
-          kind: "transport",
-          name: t.speakers?.full_name ?? "—",
-          detail: [t.trip_type, t.pickup_location].filter(Boolean).join(" — ") || "رحلة نقل",
-          at: t.scheduled_at,
-        });
-      }
-      for (const b of bookings.data ?? []) {
-        items.push({
-          id: `hotel-${b.id}`,
-          kind: "hotel",
-          name: b.speakers?.full_name ?? "—",
-          detail: b.hotels?.name ?? "الفندق",
-          at: `${b.check_in}T14:00:00`,
         });
       }
 
