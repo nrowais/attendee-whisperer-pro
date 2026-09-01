@@ -1,142 +1,346 @@
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Copy, Check, RefreshCw } from "lucide-react";
+import * as XLSX from "xlsx";
+import { Upload, FileSpreadsheet, RefreshCw, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getSheetsSyncToken } from "@/lib/sheetsSync.functions";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { IMPORT_TABLES, guessColumn } from "@/lib/sheetsImport";
+import { importSheetRows } from "@/lib/sheetsImport.functions";
 
-const TABLES: Array<{ table: string; label: string }> = [
-  { table: "speakers", label: "المتحدثون" },
-  { table: "invitees", label: "الضيوف والمدعوون" },
-  { table: "invitations", label: "الدعوات" },
-  { table: "attendance", label: "الحضور" },
-  { table: "speaker_sessions", label: "الجلسات" },
-  { table: "speaker_requests", label: "الطلبات الخاصة" },
-  { table: "flights", label: "رحلات الطيران" },
-  { table: "speaker_arrivals", label: "الوصول" },
-  { table: "speaker_departures", label: "المغادرة" },
-  { table: "guest_operations", label: "الحالة التشغيلية" },
-  { table: "transport_trips", label: "رحلات النقل" },
-  { table: "driver_cards", label: "بطاقات السائقين" },
-  { table: "drivers", label: "السائقون" },
-  { table: "vehicles", label: "المركبات" },
-  { table: "hotels", label: "الفنادق" },
-  { table: "hotel_rooms", label: "الغرف" },
-  { table: "hotel_bookings", label: "الحجوزات الفندقية" },
-  { table: "staff", label: "فريق العمل" },
-  { table: "staff_assignments", label: "توزيع الفريق" },
-  { table: "events", label: "الفعاليات" },
-];
+const IGNORE = "__ignore__";
 
 export const Route = createFileRoute("/_authenticated/sheets")({
   head: () => ({
     meta: [
-      { title: "المزامنة مع Google Sheets — حوار الأمن والتاريخ" },
+      { title: "استيراد البيانات من Google Sheets وExcel — حوار الأمن والتاريخ" },
       {
         name: "description",
-        content: "ربط قاعدة بيانات البوابة بجداول Google Sheets ومزامنة البيانات تلقائيًا.",
+        content:
+          "ارفع ملف Google Sheets أو Excel أو CSV لاستيراد بيانات المتحدثين والضيوف والنقل إلى بوابة المؤتمر.",
       },
-      { property: "og:title", content: "المزامنة مع Google Sheets" },
-      { property: "og:description", content: "مزامنة تلقائية لبيانات المؤتمر مع Google Sheets." },
+      { property: "og:title", content: "استيراد البيانات إلى البوابة" },
+      {
+        property: "og:description",
+        content: "رفع ملفات الجداول ومطابقة الأعمدة وإدخال السجلات دفعة واحدة.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: SheetsSyncPage,
+  component: SheetsImportPage,
 });
 
-function SheetsSyncPage() {
-  const fetchToken = useServerFn(getSheetsSyncToken);
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["sheets-sync-token"],
-    queryFn: () => fetchToken(),
-    staleTime: Infinity,
-  });
-  const [copied, setCopied] = useState<string | null>(null);
+type ParsedSheet = { name: string; headers: string[]; rows: Record<string, unknown>[] };
 
-  const origin = typeof window !== "undefined" ? window.location.origin : "";
+function SheetsImportPage() {
+  const runImport = useServerFn(importSheetRows);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const formulaFor = (table: string) =>
-    `=IMPORTDATA("${origin}/api/public/sheets/${table}?token=${data?.token ?? ""}")`;
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [sheets, setSheets] = useState<ParsedSheet[]>([]);
+  const [sheetName, setSheetName] = useState<string>("");
+  const [tableKey, setTableKey] = useState<string>(IMPORT_TABLES[0]!.table);
+  const [mapping, setMapping] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<number | null>(null);
 
-  const copy = async (table: string) => {
-    await navigator.clipboard.writeText(formulaFor(table));
-    setCopied(table);
-    toast.success("تم نسخ الصيغة — الصقها في خلية A1 داخل Google Sheets");
-    setTimeout(() => setCopied((c) => (c === table ? null : c)), 2000);
+  const tableDef = useMemo(
+    () => IMPORT_TABLES.find((t) => t.table === tableKey)!,
+    [tableKey],
+  );
+  const sheet = useMemo(() => sheets.find((s) => s.name === sheetName), [sheets, sheetName]);
+
+  const autoMap = (headers: string[], table = tableKey) => {
+    const def = IMPORT_TABLES.find((t) => t.table === table)!;
+    const next: Record<string, string> = {};
+    for (const h of headers) next[h] = guessColumn(h, def.columns) ?? IGNORE;
+    setMapping(next);
+  };
+
+  const handleFile = async (file: File) => {
+    setResult(null);
+    try {
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { cellDates: true });
+      const parsed: ParsedSheet[] = workbook.SheetNames.map((name) => {
+        const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[name]!, {
+          defval: "",
+          raw: false,
+        });
+        const headers = rows.length ? Object.keys(rows[0]!) : [];
+        return { name, headers, rows };
+      }).filter((s) => s.rows.length > 0);
+
+      if (parsed.length === 0) {
+        toast.error("الملف لا يحتوي على بيانات");
+        return;
+      }
+      setFileName(file.name);
+      setSheets(parsed);
+      setSheetName(parsed[0]!.name);
+      autoMap(parsed[0]!.headers);
+      toast.success(`تم قراءة الملف: ${parsed[0]!.rows.length} صفًا`);
+    } catch {
+      toast.error("تعذّر قراءة الملف — تأكد أن الصيغة xlsx أو xls أو csv");
+    }
+  };
+
+  const previewRows = useMemo(() => {
+    if (!sheet) return [];
+    return sheet.rows.slice(0, 5).map((row) => {
+      const mapped: Record<string, unknown> = {};
+      for (const [header, col] of Object.entries(mapping)) {
+        if (col && col !== IGNORE) mapped[col] = row[header];
+      }
+      return mapped;
+    });
+  }, [sheet, mapping]);
+
+  const mappedColumns = useMemo(
+    () => tableDef.columns.filter((c) => Object.values(mapping).includes(c.key)),
+    [tableDef, mapping],
+  );
+
+  const submit = async () => {
+    if (!sheet) return;
+    if (mappedColumns.length === 0) {
+      toast.error("اربط عمودًا واحدًا على الأقل قبل الاستيراد");
+      return;
+    }
+    const rows = sheet.rows
+      .map((row) => {
+        const mapped: Record<string, unknown> = {};
+        for (const [header, col] of Object.entries(mapping)) {
+          if (!col || col === IGNORE) continue;
+          const def = tableDef.columns.find((c) => c.key === col);
+          let value: unknown = row[header];
+          if (value instanceof Date) value = value.toISOString();
+          if (typeof value === "string") value = value.trim();
+          if (value === "" || value === null || value === undefined) continue;
+          if (def?.type === "number") {
+            const num = Number(String(value).replace(/[^\d.-]/g, ""));
+            if (Number.isNaN(num)) continue;
+            value = num;
+          }
+          if ((def?.type === "datetime" || def?.type === "date") && typeof value === "string") {
+            const parsedDate = new Date(value);
+            if (!Number.isNaN(parsedDate.getTime())) value = parsedDate.toISOString();
+            else continue;
+          }
+          mapped[col] = value;
+        }
+        return mapped;
+      })
+      .filter((r) => Object.keys(r).length > 0);
+
+    setBusy(true);
+    try {
+      const res = await runImport({ data: { table: tableKey, rows } });
+      setResult(res.inserted);
+      toast.success(`تم استيراد ${res.inserted} سجلًا إلى ${tableDef.label}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "تعذّر الاستيراد");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
     <div className="space-y-6" dir="rtl">
       <div>
-        <h1 className="font-display text-2xl font-bold text-foreground">المزامنة مع Google Sheets</h1>
+        <h1 className="font-display text-2xl font-bold text-foreground">
+          استيراد البيانات من Google Sheets / Excel
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          اربط أي جدول من قاعدة البيانات بورقة في Google Sheets وسيتحدّث تلقائيًا مع كل بيانات جديدة.
+          المزامنة الآن باتجاه واحد: من الملف إلى البوابة. ارفع ملفك بصيغة{" "}
+          <strong>xlsx</strong> أو <strong>xls</strong> أو <strong>csv</strong>، طابق الأعمدة، ثم
+          احفظ السجلات في قاعدة البيانات.
         </p>
       </div>
-      <Card className="mb-6">
+
+      <Card>
         <CardHeader>
-          <CardTitle className="text-base">طريقة الربط (٣ خطوات)</CardTitle>
+          <CardTitle className="text-base">١. اختر الجدول وارفع الملف</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm leading-7 text-muted-foreground">
-          <p>١. افتح ملف Google Sheets جديدًا وأنشئ ورقة لكل جدول تريد مزامنته.</p>
-          <p>٢. انسخ الصيغة المقابلة من القائمة أدناه والصقها في الخلية <strong>A1</strong> في تلك الورقة.</p>
-          <p>
-            ٣. ستظهر البيانات فورًا، ويقوم Google بتحديثها تلقائيًا بشكل دوري. لتحديث فوري:
-            القائمة <strong>البيانات ← تحديث الكل</strong>.
-          </p>
-          <p className="text-xs">
-            المزامنة في اتجاه واحد: من البوابة إلى الشيت. أي إضافة أو تعديل داخل البرنامج تظهر في الشيت،
-            بينما التعديل داخل الشيت لا يؤثر على قاعدة البيانات.
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>الجدول الهدف</Label>
+              <Select
+                value={tableKey}
+                onValueChange={(v) => {
+                  setTableKey(v);
+                  setResult(null);
+                  if (sheet) autoMap(sheet.headers, v);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {IMPORT_TABLES.map((t) => (
+                    <SelectItem key={t.table} value={t.table}>
+                      {t.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>ملف البيانات</Label>
+              <input
+                ref={inputRef}
+                type="file"
+                accept=".xlsx,.xls,.csv,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) void handleFile(file);
+                  e.target.value = "";
+                }}
+              />
+              <Button variant="outline" className="w-full" onClick={() => inputRef.current?.click()}>
+                <Upload className="h-4 w-4" />
+                <span className="ms-2">{fileName ?? "اختيار ملف (xlsx / xls / csv)"}</span>
+              </Button>
+            </div>
+          </div>
+
+          {sheets.length > 1 && (
+            <div className="space-y-2">
+              <Label>الورقة داخل الملف</Label>
+              <Select
+                value={sheetName}
+                onValueChange={(v) => {
+                  setSheetName(v);
+                  const s = sheets.find((x) => x.name === v);
+                  if (s) autoMap(s.headers);
+                }}
+              >
+                <SelectTrigger className="md:w-1/2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {sheets.map((s) => (
+                    <SelectItem key={s.name} value={s.name}>
+                      {s.name} ({s.rows.length} صف)
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          <p className="text-xs text-muted-foreground">
+            نصيحة: من Google Sheets اختر ملف ← تنزيل ← Microsoft Excel (.xlsx) أو CSV، ثم ارفع الملف
+            هنا. الاستيراد لا يعدّل ملفك في Google Sheets إطلاقًا.
           </p>
         </CardContent>
       </Card>
 
-      {isLoading && (
-        <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <RefreshCw className="h-4 w-4 animate-spin" /> جارٍ تجهيز روابط المزامنة…
-        </p>
-      )}
-
-      {error && (
-        <p className="text-sm text-destructive">
-          {error instanceof Error ? error.message : "تعذّر جلب روابط المزامنة"}
-        </p>
-      )}
-
-      {data && (
-        <div className="grid gap-3 md:grid-cols-2">
-          {TABLES.map(({ table, label }) => (
-            <div
-              key={table}
-              className="flex items-center justify-between gap-3 rounded-lg border bg-card p-3"
-            >
-              <div className="min-w-0">
-                <p className="font-medium">{label}</p>
-                <p className="truncate text-xs text-muted-foreground" dir="ltr">
-                  /api/public/sheets/{table}
-                </p>
+      {sheet && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">
+              ٢. مطابقة الأعمدة — {sheet.rows.length} صفًا في «{sheet.name}»
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-3 md:grid-cols-2">
+            {sheet.headers.map((header) => (
+              <div
+                key={header}
+                className="flex items-center justify-between gap-3 rounded-lg border bg-card p-3"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{header}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    مثال: {String(sheet.rows[0]?.[header] ?? "—")}
+                  </p>
+                </div>
+                <Select
+                  value={mapping[header] ?? IGNORE}
+                  onValueChange={(v) => setMapping((m) => ({ ...m, [header]: v }))}
+                >
+                  <SelectTrigger className="w-44">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={IGNORE}>تجاهل هذا العمود</SelectItem>
+                    {tableDef.columns.map((c) => (
+                      <SelectItem key={c.key} value={c.key}>
+                        {c.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <Button size="sm" variant="outline" onClick={() => copy(table)}>
-                {copied === table ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-                <span className="ms-1">نسخ الصيغة</span>
-              </Button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </CardContent>
+        </Card>
       )}
 
-      <p className="mt-6 text-xs text-muted-foreground">
-        تنبيه أمني: الصيغة تحتوي على مفتاح وصول سري — لا تشارك ملف الشيت إلا مع فريق العمل الموثوق.
-      </p>
+      {sheet && mappedColumns.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">٣. معاينة أول ٥ سجلات قبل الحفظ</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="overflow-x-auto rounded-lg border">
+              <table className="w-full text-right text-sm">
+                <thead className="bg-muted/50">
+                  <tr>
+                    {mappedColumns.map((c) => (
+                      <th key={c.key} className="whitespace-nowrap p-2 font-medium">
+                        {c.label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {previewRows.map((row, i) => (
+                    <tr key={i} className="border-t">
+                      {mappedColumns.map((c) => (
+                        <td key={c.key} className="whitespace-nowrap p-2 text-muted-foreground">
+                          {String(row[c.key] ?? "—")}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Button onClick={submit} disabled={busy}>
+                {busy ? (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileSpreadsheet className="h-4 w-4" />
+                )}
+                <span className="ms-2">استيراد {sheet.rows.length} صفًا إلى {tableDef.label}</span>
+              </Button>
+              {result !== null && (
+                <span className="flex items-center gap-2 text-sm text-primary">
+                  <CheckCircle2 className="h-4 w-4" /> تم حفظ {result} سجلًا بنجاح
+                </span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <p className="text-xs text-muted-foreground">نفذ بواسطة نايف الرويس</p>
     </div>
   );
 }
