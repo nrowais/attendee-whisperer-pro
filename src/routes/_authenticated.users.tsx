@@ -154,6 +154,7 @@ function UsersPage() {
                 <TableHead className="text-start">الاسم</TableHead>
                 <TableHead className="text-start">البريد الإلكتروني</TableHead>
                 <TableHead className="text-start">الصلاحية</TableHead>
+                <TableHead className="text-start">حالة الحساب</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
