@@ -29,6 +29,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSpeakersRouteImport } from './routes/_authenticated.speakers'
 import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated.tickets'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
+import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -131,6 +132,11 @@ const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
+  id: '/api/public/health',
+  path: '/api/public/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByTo {
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/_authenticated/speakers': typeof AuthenticatedSpeakersRoute
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
     | '/speakers'
     | '/tickets'
     | '/users'
+    | '/api/public/health'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/speakers'
     | '/tickets'
     | '/users'
+    | '/api/public/health'
   id:
     | '__root__'
     | '/'
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | '/_authenticated/speakers'
     | '/_authenticated/tickets'
     | '/_authenticated/users'
+    | '/api/public/health'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -269,6 +281,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   SpeakerRoute: typeof SpeakerRoute
+  ApiPublicHealthRoute: typeof ApiPublicHealthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -413,6 +426,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsersRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/public/health': {
+      id: '/api/public/health'
+      path: '/api/public/health'
+      fullPath: '/api/public/health'
+      preLoaderRoute: typeof ApiPublicHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -463,6 +483,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   SpeakerRoute: SpeakerRoute,
+  ApiPublicHealthRoute: ApiPublicHealthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
