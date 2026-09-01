@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as SpeakerRouteImport } from './routes/speaker'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated.activity'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated.calendar'
+import { Route as AuthenticatedCountdownRouteImport } from './routes/_authenticated.countdown'
 import { Route as AuthenticatedDailyRouteImport } from './routes/_authenticated.daily'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedFleetRouteImport } from './routes/_authenticated.fleet'
@@ -57,6 +58,11 @@ const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
 const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
   id: '/calendar',
   path: '/calendar',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCountdownRoute = AuthenticatedCountdownRouteImport.update({
+  id: '/countdown',
+  path: '/countdown',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedDailyRoute = AuthenticatedDailyRouteImport.update({
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/speaker': typeof SpeakerRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/calendar': typeof AuthenticatedCalendarRoute
+  '/countdown': typeof AuthenticatedCountdownRoute
   '/daily': typeof AuthenticatedDailyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fleet': typeof AuthenticatedFleetRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/speaker': typeof SpeakerRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/calendar': typeof AuthenticatedCalendarRoute
+  '/countdown': typeof AuthenticatedCountdownRoute
   '/daily': typeof AuthenticatedDailyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fleet': typeof AuthenticatedFleetRoute
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/speaker': typeof SpeakerRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
+  '/_authenticated/countdown': typeof AuthenticatedCountdownRoute
   '/_authenticated/daily': typeof AuthenticatedDailyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/fleet': typeof AuthenticatedFleetRoute
@@ -205,6 +214,7 @@ export interface FileRouteTypes {
     | '/speaker'
     | '/activity'
     | '/calendar'
+    | '/countdown'
     | '/daily'
     | '/dashboard'
     | '/fleet'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/speaker'
     | '/activity'
     | '/calendar'
+    | '/countdown'
     | '/daily'
     | '/dashboard'
     | '/fleet'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/speaker'
     | '/_authenticated/activity'
     | '/_authenticated/calendar'
+    | '/_authenticated/countdown'
     | '/_authenticated/daily'
     | '/_authenticated/dashboard'
     | '/_authenticated/fleet'
@@ -313,6 +325,13 @@ declare module '@tanstack/react-router' {
       path: '/calendar'
       fullPath: '/calendar'
       preLoaderRoute: typeof AuthenticatedCalendarRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/countdown': {
+      id: '/_authenticated/countdown'
+      path: '/countdown'
+      fullPath: '/countdown'
+      preLoaderRoute: typeof AuthenticatedCountdownRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/daily': {
@@ -419,6 +438,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
+  AuthenticatedCountdownRoute: typeof AuthenticatedCountdownRoute
   AuthenticatedDailyRoute: typeof AuthenticatedDailyRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFleetRoute: typeof AuthenticatedFleetRoute
@@ -438,6 +458,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedActivityRoute: AuthenticatedActivityRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
+  AuthenticatedCountdownRoute: AuthenticatedCountdownRoute,
   AuthenticatedDailyRoute: AuthenticatedDailyRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFleetRoute: AuthenticatedFleetRoute,
