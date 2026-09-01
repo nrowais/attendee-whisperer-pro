@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const db = supabase as any;
 
-type Kind = "arrival" | "departure" | "transport" | "hotel";
+type Kind = "arrival" | "departure";
 
 type Item = {
   id: string;
@@ -22,8 +22,6 @@ type Item = {
 const kindMeta: Record<Kind, { label: string; icon: typeof PlaneLanding }> = {
   arrival: { label: "وصول رحلة", icon: PlaneLanding },
   departure: { label: "مغادرة رحلة", icon: PlaneTakeoff },
-  transport: { label: "نقل", icon: Car },
-  hotel: { label: "تسجيل إقامة", icon: BedDouble },
 };
 
 /** فترة التنبيه المسبق بالدقائق */
