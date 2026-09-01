@@ -418,7 +418,7 @@ export function SpeakersStatusBoard() {
           <DialogFooter className="gap-2 sm:justify-start">
             <Button
               onClick={() => {
-                if (!form.full_name?.trim()) {
+                if (!form['full_name']?.trim()) {
                   toast.error("الحقل المطلوب: الاسم الكامل");
                   return;
                 }
