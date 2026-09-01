@@ -54,8 +54,7 @@ export function UpcomingCountdown() {
       const now = new Date();
       const nowIso = now.toISOString();
       const horizon = new Date(now.getTime() + 72 * 60 * 60 * 1000).toISOString();
-      const today = now.toISOString().slice(0, 10);
-      const horizonDay = new Date(now.getTime() + 72 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
 
       const [arrivals, departures] = await Promise.all([
         db
