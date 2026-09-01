@@ -7,6 +7,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { eventName } from "@/lib/nav";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import eventLogo from "@/assets/event-logo-2026.png";
+
+const logoUrl = () =>
+  typeof window !== "undefined" ? new URL(eventLogo, window.location.origin).href : eventLogo;
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
@@ -192,34 +196,39 @@ function buildReportHtml(report: ReportDef, rows: Record<string, any>[]) {
 <style>
   @page { size: A4; margin: 14mm; }
   * { box-sizing: border-box; }
-  body { font-family: Cairo, "Segoe UI", sans-serif; color: #10241d; margin: 0; }
-  header { display: flex; justify-content: space-between; align-items: flex-end;
-    border-bottom: 3px solid #064e3b; padding-bottom: 12px; margin-bottom: 18px; }
-  h1 { font-size: 20px; margin: 0 0 4px; color: #064e3b; }
-  .sub { font-size: 12px; color: #5b6b66; margin: 0; }
-  .brand { font-size: 13px; font-weight: 700; color: #c9a84c; text-align: left; }
-  .meta { display: flex; gap: 18px; font-size: 12px; color: #5b6b66; margin-bottom: 12px; }
+  body { font-family: Cairo, "Segoe UI", sans-serif; color: #14213d; margin: 0; }
+  header { display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 3px solid #14213d; padding-bottom: 12px; margin-bottom: 18px; }
+  h1 { font-size: 20px; margin: 0 0 4px; color: #14213d; }
+  .sub { font-size: 12px; color: #64748b; margin: 0; }
+  .brand { font-size: 13px; font-weight: 700; color: #e8751a; text-align: left; margin-top: 6px; }
+  .logo-badge { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 6px 10px; }
+  .logo-badge img { height: 56px; display: block; }
+  .meta { display: flex; gap: 18px; font-size: 12px; color: #64748b; margin-bottom: 12px;
+    border-right: 4px solid #e8751a; padding-right: 10px; }
   table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  thead th { background: #064e3b; color: #fff; text-align: right; padding: 8px 10px; font-weight: 600; }
-  tbody td { border-bottom: 1px solid #e3ebe7; padding: 7px 10px; text-align: right; }
-  tbody tr:nth-child(even) td { background: #f6faf8; }
-  td.num { color: #8a9a95; width: 34px; }
+  thead th { background: #14213d; color: #fff; text-align: right; padding: 8px 10px; font-weight: 600; }
+  tbody td { border-bottom: 1px solid #e2e8f0; padding: 7px 10px; text-align: right; }
+  tbody tr:nth-child(even) td { background: #f6f8fc; }
+  td.num { color: #94a3b8; width: 34px; }
   thead { display: table-header-group; }
   tr { page-break-inside: avoid; }
-  footer { margin-top: 16px; font-size: 11px; color: #8a9a95; text-align: center; }
+  footer { margin-top: 16px; font-size: 11px; color: #94a3b8; text-align: center;
+    border-top: 2px solid #e8751a; padding-top: 8px; }
 </style></head>
 <body>
   <header>
     <div>
       <h1>${esc(report.title)}</h1>
       <p class="sub">${esc(report.desc)}</p>
+      <div class="brand">${eventName}</div>
     </div>
-    <div class="brand">${eventName}</div>
+    <div class="logo-badge"><img src="${logoUrl()}" alt="شعار الفعالية" /></div>
   </header>
   <div class="meta"><span>عدد السجلات: <strong>${rows.length}</strong></span><span>تاريخ التقرير: ${esc(now)}</span></div>
   <table><thead><tr><th>#</th>${head}</tr></thead><tbody>${body}</tbody></table>
   <footer>تم إنشاء هذا التقرير آلياً من بوابة ${eventName}<br/>نفذ بواسطة نايف الرويس</footer>
-  <script>window.onload = function () { setTimeout(function () { window.print(); }, 400); };<\/script>
+  <script>window.onload = function () { setTimeout(function () { window.print(); }, 700); };<\/script>
 </body></html>`;
 }
 
