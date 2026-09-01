@@ -95,6 +95,7 @@ export const IMPORT_TABLES: ImportTable[] = [
     table: "speaker_sessions",
     label: "الجلسات",
     columns: [
+      { key: "speaker_name", label: "اسم المتحدث" },
       { key: "session_title", label: "عنوان الجلسة" },
       { key: "hall", label: "القاعة" },
       { key: "starts_at", label: "البداية", type: "datetime" },
