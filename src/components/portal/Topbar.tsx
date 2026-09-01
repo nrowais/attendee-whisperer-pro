@@ -77,7 +77,7 @@ export function Topbar({ email, roleLabel, onMenu, onSignOut }: Props) {
 
         <div className="flex min-w-0 items-center gap-2">
           <img
-            src={eventLogo.url}
+            src={eventLogo}
             alt="شعار الفعالية"
             className="hidden h-9 w-auto rounded-md object-contain sm:block"
           />

@@ -58,7 +58,7 @@ function PortalLayout() {
       >
         <div className="flex items-center justify-between gap-3 border-b border-sidebar-border px-5 py-5">
           <img
-            src={eventLogo.url}
+            src={eventLogo}
             alt="شعار مؤتمر حوار الأمن والتاريخ"
             className="h-14 w-auto max-w-[170px] object-contain"
           />

@@ -39,7 +39,7 @@ function Landing() {
     <div className="min-h-screen bg-background">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <img
-          src={eventLogo.url}
+          src={eventLogo}
           alt="شعار مؤتمر حوار الأمن والتاريخ — الرياض 2026"
           className="h-14 w-auto rounded-lg object-contain"
         />
