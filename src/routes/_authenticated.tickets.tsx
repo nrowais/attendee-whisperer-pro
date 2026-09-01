@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { DriverCardDialog } from "@/components/portal/DriverCardDialog";
+
 
 const db = supabase as any;
 
