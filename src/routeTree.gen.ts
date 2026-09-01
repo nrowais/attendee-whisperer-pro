@@ -30,8 +30,6 @@ import { Route as AuthenticatedSpeakersRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated.tickets'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
 import { Route as AuthenticatedVerifyRouteImport } from './routes/_authenticated.verify'
-import { Route as AuthenticatedRequestsStatusRouteImport } from './routes/_authenticated.requests.$status'
-import { Route as AuthenticatedSpeakersSpeakerIdRouteImport } from './routes/_authenticated.speakers.$speakerId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -139,18 +137,6 @@ const AuthenticatedVerifyRoute = AuthenticatedVerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedRequestsStatusRoute =
-  AuthenticatedRequestsStatusRouteImport.update({
-    id: '/requests/$status',
-    path: '/requests/$status',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedSpeakersSpeakerIdRoute =
-  AuthenticatedSpeakersSpeakerIdRouteImport.update({
-    id: '/$speakerId',
-    path: '/$speakerId',
-    getParentRoute: () => AuthenticatedSpeakersRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -169,12 +155,10 @@ export interface FileRoutesByFullPath {
   '/operations': typeof AuthenticatedOperationsRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/speakers': typeof AuthenticatedSpeakersRouteWithChildren
+  '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
   '/verify': typeof AuthenticatedVerifyRoute
-  '/requests/$status': typeof AuthenticatedRequestsStatusRoute
-  '/speakers/$speakerId': typeof AuthenticatedSpeakersSpeakerIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -193,12 +177,10 @@ export interface FileRoutesByTo {
   '/operations': typeof AuthenticatedOperationsRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/speakers': typeof AuthenticatedSpeakersRouteWithChildren
+  '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
   '/verify': typeof AuthenticatedVerifyRoute
-  '/requests/$status': typeof AuthenticatedRequestsStatusRoute
-  '/speakers/$speakerId': typeof AuthenticatedSpeakersSpeakerIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -219,12 +201,10 @@ export interface FileRoutesById {
   '/_authenticated/operations': typeof AuthenticatedOperationsRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
-  '/_authenticated/speakers': typeof AuthenticatedSpeakersRouteWithChildren
+  '/_authenticated/speakers': typeof AuthenticatedSpeakersRoute
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/verify': typeof AuthenticatedVerifyRoute
-  '/_authenticated/requests/$status': typeof AuthenticatedRequestsStatusRoute
-  '/_authenticated/speakers/$speakerId': typeof AuthenticatedSpeakersSpeakerIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -249,8 +229,6 @@ export interface FileRouteTypes {
     | '/tickets'
     | '/users'
     | '/verify'
-    | '/requests/$status'
-    | '/speakers/$speakerId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -273,8 +251,6 @@ export interface FileRouteTypes {
     | '/tickets'
     | '/users'
     | '/verify'
-    | '/requests/$status'
-    | '/speakers/$speakerId'
   id:
     | '__root__'
     | '/'
@@ -298,8 +274,6 @@ export interface FileRouteTypes {
     | '/_authenticated/tickets'
     | '/_authenticated/users'
     | '/_authenticated/verify'
-    | '/_authenticated/requests/$status'
-    | '/_authenticated/speakers/$speakerId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -458,35 +432,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVerifyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/requests/$status': {
-      id: '/_authenticated/requests/$status'
-      path: '/requests/$status'
-      fullPath: '/requests/$status'
-      preLoaderRoute: typeof AuthenticatedRequestsStatusRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/speakers/$speakerId': {
-      id: '/_authenticated/speakers/$speakerId'
-      path: '/$speakerId'
-      fullPath: '/speakers/$speakerId'
-      preLoaderRoute: typeof AuthenticatedSpeakersSpeakerIdRouteImport
-      parentRoute: typeof AuthenticatedSpeakersRoute
-    }
   }
 }
-
-interface AuthenticatedSpeakersRouteChildren {
-  AuthenticatedSpeakersSpeakerIdRoute: typeof AuthenticatedSpeakersSpeakerIdRoute
-}
-
-const AuthenticatedSpeakersRouteChildren: AuthenticatedSpeakersRouteChildren = {
-  AuthenticatedSpeakersSpeakerIdRoute: AuthenticatedSpeakersSpeakerIdRoute,
-}
-
-const AuthenticatedSpeakersRouteWithChildren =
-  AuthenticatedSpeakersRoute._addFileChildren(
-    AuthenticatedSpeakersRouteChildren,
-  )
 
 interface AuthenticatedRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
@@ -502,11 +449,10 @@ interface AuthenticatedRouteChildren {
   AuthenticatedOperationsRoute: typeof AuthenticatedOperationsRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
-  AuthenticatedSpeakersRoute: typeof AuthenticatedSpeakersRouteWithChildren
+  AuthenticatedSpeakersRoute: typeof AuthenticatedSpeakersRoute
   AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedVerifyRoute: typeof AuthenticatedVerifyRoute
-  AuthenticatedRequestsStatusRoute: typeof AuthenticatedRequestsStatusRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -523,11 +469,10 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedOperationsRoute: AuthenticatedOperationsRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
-  AuthenticatedSpeakersRoute: AuthenticatedSpeakersRouteWithChildren,
+  AuthenticatedSpeakersRoute: AuthenticatedSpeakersRoute,
   AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedVerifyRoute: AuthenticatedVerifyRoute,
-  AuthenticatedRequestsStatusRoute: AuthenticatedRequestsStatusRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
