@@ -35,6 +35,7 @@ import { Route as AuthenticatedOpsHotelRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedOpsIncomingRouteImport } from './routes/_authenticated.ops.incoming'
 import { Route as AuthenticatedOpsTodayRouteImport } from './routes/_authenticated.ops.today'
 import { Route as AuthenticatedOpsTransportRouteImport } from './routes/_authenticated.ops.transport'
+import { Route as AuthenticatedRequestsStatusRouteImport } from './routes/_authenticated.requests.$status'
 import { Route as AuthenticatedSpeakersIndexRouteImport } from './routes/_authenticated.speakers.index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -172,6 +173,12 @@ const AuthenticatedOpsTransportRoute =
     path: '/ops/transport',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedRequestsStatusRoute =
+  AuthenticatedRequestsStatusRouteImport.update({
+    id: '/requests/$status',
+    path: '/requests/$status',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSpeakersIndexRoute =
   AuthenticatedSpeakersIndexRouteImport.update({
     id: '/speakers/',
@@ -204,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/ops/incoming': typeof AuthenticatedOpsIncomingRoute
   '/ops/today': typeof AuthenticatedOpsTodayRoute
   '/ops/transport': typeof AuthenticatedOpsTransportRoute
+  '/requests/$status': typeof AuthenticatedRequestsStatusRoute
   '/invitees/': typeof AuthenticatedInviteesIndexRoute
   '/speakers/': typeof AuthenticatedSpeakersIndexRoute
 }
@@ -232,6 +240,7 @@ export interface FileRoutesByTo {
   '/ops/incoming': typeof AuthenticatedOpsIncomingRoute
   '/ops/today': typeof AuthenticatedOpsTodayRoute
   '/ops/transport': typeof AuthenticatedOpsTransportRoute
+  '/requests/$status': typeof AuthenticatedRequestsStatusRoute
   '/invitees': typeof AuthenticatedInviteesIndexRoute
   '/speakers': typeof AuthenticatedSpeakersIndexRoute
 }
@@ -262,6 +271,7 @@ export interface FileRoutesById {
   '/_authenticated/ops/incoming': typeof AuthenticatedOpsIncomingRoute
   '/_authenticated/ops/today': typeof AuthenticatedOpsTodayRoute
   '/_authenticated/ops/transport': typeof AuthenticatedOpsTransportRoute
+  '/_authenticated/requests/$status': typeof AuthenticatedRequestsStatusRoute
   '/_authenticated/invitees/': typeof AuthenticatedInviteesIndexRoute
   '/_authenticated/speakers/': typeof AuthenticatedSpeakersIndexRoute
 }
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/ops/incoming'
     | '/ops/today'
     | '/ops/transport'
+    | '/requests/$status'
     | '/invitees/'
     | '/speakers/'
   fileRoutesByTo: FileRoutesByTo
@@ -320,6 +331,7 @@ export interface FileRouteTypes {
     | '/ops/incoming'
     | '/ops/today'
     | '/ops/transport'
+    | '/requests/$status'
     | '/invitees'
     | '/speakers'
   id:
@@ -349,6 +361,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ops/incoming'
     | '/_authenticated/ops/today'
     | '/_authenticated/ops/transport'
+    | '/_authenticated/requests/$status'
     | '/_authenticated/invitees/'
     | '/_authenticated/speakers/'
   fileRoutesById: FileRoutesById
@@ -544,6 +557,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOpsTransportRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/requests/$status': {
+      id: '/_authenticated/requests/$status'
+      path: '/requests/$status'
+      fullPath: '/requests/$status'
+      preLoaderRoute: typeof AuthenticatedRequestsStatusRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/speakers/': {
       id: '/_authenticated/speakers/'
       path: '/speakers'
@@ -576,6 +596,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedOpsIncomingRoute: typeof AuthenticatedOpsIncomingRoute
   AuthenticatedOpsTodayRoute: typeof AuthenticatedOpsTodayRoute
   AuthenticatedOpsTransportRoute: typeof AuthenticatedOpsTransportRoute
+  AuthenticatedRequestsStatusRoute: typeof AuthenticatedRequestsStatusRoute
   AuthenticatedInviteesIndexRoute: typeof AuthenticatedInviteesIndexRoute
   AuthenticatedSpeakersIndexRoute: typeof AuthenticatedSpeakersIndexRoute
 }
@@ -602,6 +623,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedOpsIncomingRoute: AuthenticatedOpsIncomingRoute,
   AuthenticatedOpsTodayRoute: AuthenticatedOpsTodayRoute,
   AuthenticatedOpsTransportRoute: AuthenticatedOpsTransportRoute,
+  AuthenticatedRequestsStatusRoute: AuthenticatedRequestsStatusRoute,
   AuthenticatedInviteesIndexRoute: AuthenticatedInviteesIndexRoute,
   AuthenticatedSpeakersIndexRoute: AuthenticatedSpeakersIndexRoute,
 }
