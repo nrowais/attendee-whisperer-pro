@@ -1016,13 +1016,19 @@ export type Database = {
           driver_id: string | null
           dropoff_location: string | null
           event_id: string | null
+          flight_at: string | null
+          flight_no: string | null
+          guest_name: string | null
           id: string
           notes: string | null
           passengers: number
           pickup_location: string | null
+          receiver_name: string | null
+          receiver_phone: string | null
           scheduled_at: string | null
           speaker_id: string | null
           status: string
+          terminal: string | null
           ticket_no: number | null
           ticket_notes: string | null
           trip_type: string
@@ -1036,13 +1042,19 @@ export type Database = {
           driver_id?: string | null
           dropoff_location?: string | null
           event_id?: string | null
+          flight_at?: string | null
+          flight_no?: string | null
+          guest_name?: string | null
           id?: string
           notes?: string | null
           passengers?: number
           pickup_location?: string | null
+          receiver_name?: string | null
+          receiver_phone?: string | null
           scheduled_at?: string | null
           speaker_id?: string | null
           status?: string
+          terminal?: string | null
           ticket_no?: number | null
           ticket_notes?: string | null
           trip_type?: string
@@ -1056,13 +1068,19 @@ export type Database = {
           driver_id?: string | null
           dropoff_location?: string | null
           event_id?: string | null
+          flight_at?: string | null
+          flight_no?: string | null
+          guest_name?: string | null
           id?: string
           notes?: string | null
           passengers?: number
           pickup_location?: string | null
+          receiver_name?: string | null
+          receiver_phone?: string | null
           scheduled_at?: string | null
           speaker_id?: string | null
           status?: string
+          terminal?: string | null
           ticket_no?: number | null
           ticket_notes?: string | null
           trip_type?: string
