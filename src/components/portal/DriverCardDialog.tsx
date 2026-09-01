@@ -492,7 +492,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
         <DialogFooter className="gap-2 sm:justify-start">
           <Button onClick={saveAndDownload} disabled={issue.isPending}>
             <Download className="ml-1 h-4 w-4" />
-            حفظ وتحميل البطاقة PDF
+            إنشاء تلقائي وتحميل PDF
           </Button>
           {canEdit && trip?.id && (
             <Button variant="outline" onClick={() => save.mutate()} disabled={save.isPending}>
