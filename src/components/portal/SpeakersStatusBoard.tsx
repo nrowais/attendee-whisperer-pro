@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import {
   CalendarClock,
   PlaneLanding,
@@ -64,19 +65,33 @@ function useSpeakersBoard() {
     queryKey: ["speakers-status-board"],
     refetchInterval: 30_000,
     queryFn: async () => {
-      const [{ data: speakers }, { data: ops }, { data: trips }, { data: bookings }, { data: hotels }] =
+      const [
+        { data: speakers },
+        { data: ops },
+        { data: trips },
+        { data: bookings },
+        { data: hotels },
+        { data: drivers },
+        { data: vehicles },
+      ] =
         await Promise.all([
           db.from("speakers").select("id, full_name, title, organization, country, phone").order("full_name"),
           db.from("guest_operations").select("*"),
           db
             .from("transport_trips")
-            .select("id, speaker_id, trip_type, status, scheduled_at, pickup_location, dropoff_location")
+            .select(
+              "id, speaker_id, driver_id, vehicle_id, trip_type, status, scheduled_at, pickup_location, dropoff_location",
+            )
             .order("scheduled_at", { ascending: false }),
           db.from("hotel_bookings").select("id, speaker_id, hotel_id, check_in, check_out, status"),
           db.from("hotels").select("id, name"),
+          db.from("drivers").select("id, full_name, phone"),
+          db.from("vehicles").select("id, plate_number"),
         ]);
 
       const hotelNames = new Map((hotels ?? []).map((h: any) => [h.id, h.name]));
+      const driverMap = new Map((drivers ?? []).map((d: any) => [d.id, d]));
+      const vehicleMap = new Map((vehicles ?? []).map((v: any) => [v.id, v]));
       const opsBySpeaker = new Map((ops ?? []).map((o: any) => [o.speaker_id, o]));
       const tripBySpeaker = new Map<string, any>();
       (trips ?? []).forEach((t: any) => {
@@ -89,7 +104,20 @@ function useSpeakersBoard() {
 
       return (speakers ?? []).map((s: any) => {
         const op: any = opsBySpeaker.get(s.id);
-        const trip = tripBySpeaker.get(s.id);
+        const rawTrip = tripBySpeaker.get(s.id);
+        const trip = rawTrip
+          ? {
+              ...rawTrip,
+              direction:
+                rawTrip.trip_type === "airport_pickup"
+                  ? "arrival"
+                  : rawTrip.trip_type === "airport_dropoff"
+                    ? "departure"
+                    : "internal",
+              driver: driverMap.get(rawTrip.driver_id) ?? null,
+              vehicle: vehicleMap.get(rawTrip.vehicle_id) ?? null,
+            }
+          : null;
         const booking = bookingBySpeaker.get(s.id);
         return {
           ...s,
@@ -109,6 +137,7 @@ export function SpeakersStatusBoard() {
   const { data, isLoading } = useSpeakersBoard();
   const [status, setStatus] = useState<StatusKey>("all");
   const [tripFilter, setTripFilter] = useState<string>("all");
+  const [directionFilter, setDirectionFilter] = useState<string>("all");
   const [hotelFilter, setHotelFilter] = useState<string>("all");
   const [query, setQuery] = useState("");
 
@@ -116,6 +145,7 @@ export function SpeakersStatusBoard() {
     const tab = STATUS_TABS.find((t) => t.value === status) ?? STATUS_TABS[0]!;
     return (data ?? []).filter((r: any) => {
       if (!tab.match(r.opStatus)) return false;
+      if (directionFilter !== "all" && r.trip?.direction !== directionFilter) return false;
       if (tripFilter === "has" && !r.trip) return false;
       if (tripFilter === "none" && r.trip) return false;
       if (!["all", "has", "none"].includes(tripFilter) && r.trip?.status !== tripFilter) return false;
@@ -130,7 +160,7 @@ export function SpeakersStatusBoard() {
       }
       return true;
     });
-  }, [data, status, tripFilter, hotelFilter, query]);
+  }, [data, status, tripFilter, directionFilter, hotelFilter, query]);
 
   const counts = useMemo(() => {
     const map: Record<string, number> = { all: (data ?? []).length };
@@ -187,6 +217,16 @@ export function SpeakersStatusBoard() {
             className="pr-9"
           />
         </div>
+        <select
+          value={directionFilter}
+          onChange={(e) => setDirectionFilter(e.target.value)}
+          className="h-10 rounded-md border border-border bg-card px-3 text-sm"
+        >
+          <option value="all">وصول ومغادرة</option>
+          <option value="arrival">رحلات الوصول</option>
+          <option value="departure">رحلات المغادرة</option>
+          <option value="internal">تنقلات داخلية</option>
+        </select>
         <select
           value={tripFilter}
           onChange={(e) => setTripFilter(e.target.value)}
@@ -253,6 +293,11 @@ export function SpeakersStatusBoard() {
                         <Badge variant="outline" className="text-[10px]">
                           {TRIP_STATUS_LABELS[r.trip.status] ?? r.trip.status}
                         </Badge>
+                        <br />
+                        <Link to="/fleet" className="text-primary underline-offset-4 hover:underline">
+                          {r.trip.driver?.full_name ?? "بدون سائق"}
+                          {r.trip.vehicle?.plate_number ? ` · ${r.trip.vehicle.plate_number}` : ""}
+                        </Link>
                       </span>
                     ) : (
                       <span className="text-muted-foreground">لا توجد رحلة نقل</span>
