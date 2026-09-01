@@ -187,6 +187,35 @@ function UsersPage() {
                       <Badge variant="secondary">{roleLabels[u.role as AppRole]}</Badge>
                     )}
                   </TableCell>
+                  <TableCell className="text-start">
+                    {(() => {
+                      const s = u.approval_status ?? "approved";
+                      const label =
+                        s === "approved" ? "مفعّل" : s === "rejected" ? "مرفوض" : "بانتظار الموافقة";
+                      return (
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant={
+                              s === "approved" ? "default" : s === "rejected" ? "destructive" : "secondary"
+                            }
+                          >
+                            {label}
+                          </Badge>
+                          {isAdmin && s !== "approved" ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                setApproval.mutate({ userId: u.id, status: "approved" })
+                              }
+                            >
+                              تفعيل
+                            </Button>
+                          ) : null}
+                        </div>
+                      );
+                    })()}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
