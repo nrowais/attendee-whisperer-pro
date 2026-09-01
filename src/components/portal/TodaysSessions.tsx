@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, CalendarClock, Mic, Plus } from "lucide-react";
@@ -34,6 +34,14 @@ function fmtClock(value?: string | null) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function fmtCountdown(ms: number) {
+  const total = Math.floor(Math.abs(ms) / 1000);
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
 function useTodaySessions() {
@@ -129,7 +137,11 @@ export function TodaysSessions() {
     onError: (e: any) => toast.error(e?.message ?? "تعذر حفظ الجلسة"),
   });
 
-  const now = Date.now();
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <section className="surface-card p-6">
@@ -260,18 +272,32 @@ export function TodaysSessions() {
                   </div>
                 </div>
                 {live ? (
-                  <Badge className="shrink-0 gap-1.5">
-                    <span className="size-1.5 animate-pulse rounded-full bg-current" />
-                    جارية الآن
-                  </Badge>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <Badge className="gap-1.5">
+                      <span className="size-1.5 animate-pulse rounded-full bg-current" />
+                      جارية الآن
+                    </Badge>
+                    {endMs !== null && (
+                      <span className="font-mono text-[11px] tabular-nums text-muted-foreground" dir="ltr">
+                        تتبقى {fmtCountdown(endMs - now)}
+                      </span>
+                    )}
+                  </div>
                 ) : done ? (
                   <Badge variant="secondary" className="shrink-0">
                     انتهت
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="shrink-0">
-                    قادمة
-                  </Badge>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <Badge variant="outline" className="gap-1.5">
+                      قادمة
+                    </Badge>
+                    {startMs !== null && (
+                      <span className="font-mono text-[11px] tabular-nums text-primary" dir="ltr">
+                        تبدأ بعد {fmtCountdown(startMs - now)}
+                      </span>
+                    )}
+                  </div>
                 )}
               </li>
             );
