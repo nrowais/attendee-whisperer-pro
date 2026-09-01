@@ -85,6 +85,8 @@ function useSpeakersBoard() {
         { data: hotels },
         { data: drivers },
         { data: vehicles },
+        { data: arrivals },
+        { data: flights },
       ] =
         await Promise.all([
           db.from("speakers").select("id, full_name, title, organization, country, phone").order("full_name"),
@@ -99,12 +101,22 @@ function useSpeakersBoard() {
           db.from("hotels").select("id, name"),
           db.from("drivers").select("id, full_name, phone"),
           db.from("vehicles").select("id, plate_number"),
+          db.from("speaker_arrivals").select("speaker_id, arrival_time, flight_id"),
+          db.from("flights").select("id, arrival_time"),
         ]);
 
       const hotelNames = new Map((hotels ?? []).map((h: any) => [h.id, h.name]));
       const driverMap = new Map((drivers ?? []).map((d: any) => [d.id, d]));
       const vehicleMap = new Map((vehicles ?? []).map((v: any) => [v.id, v]));
       const opsBySpeaker = new Map((ops ?? []).map((o: any) => [o.speaker_id, o]));
+      const flightArrivalById = new Map((flights ?? []).map((f: any) => [f.id, f.arrival_time]));
+      const arrivalTimeBySpeaker = new Map<string, string>();
+      (arrivals ?? []).forEach((a: any) => {
+        const t = a.arrival_time ?? flightArrivalById.get(a.flight_id);
+        if (t && (!arrivalTimeBySpeaker.has(a.speaker_id) || t < arrivalTimeBySpeaker.get(a.speaker_id))) {
+          arrivalTimeBySpeaker.set(a.speaker_id, t);
+        }
+      });
       const tripBySpeaker = new Map<string, any>();
       (trips ?? []).forEach((t: any) => {
         if (t.speaker_id && !tripBySpeaker.has(t.speaker_id)) tripBySpeaker.set(t.speaker_id, t);
@@ -114,7 +126,7 @@ function useSpeakersBoard() {
         if (b.speaker_id && !bookingBySpeaker.has(b.speaker_id)) bookingBySpeaker.set(b.speaker_id, b);
       });
 
-      return (speakers ?? []).map((s: any) => {
+      const rows = (speakers ?? []).map((s: any) => {
         const op: any = opsBySpeaker.get(s.id);
         const rawTrip = tripBySpeaker.get(s.id);
         const trip = rawTrip
@@ -134,6 +146,7 @@ function useSpeakersBoard() {
         return {
           ...s,
           opStatus: (op?.operational_status as string) ?? "scheduled",
+          arrivalAt: arrivalTimeBySpeaker.get(s.id) ?? null,
           op,
           trip,
           booking: booking
@@ -141,6 +154,15 @@ function useSpeakersBoard() {
             : null,
         };
       });
+
+      rows.sort((a: any, b: any) => {
+        if (a.arrivalAt && b.arrivalAt) return new Date(a.arrivalAt).getTime() - new Date(b.arrivalAt).getTime();
+        if (a.arrivalAt) return -1;
+        if (b.arrivalAt) return 1;
+        return a.full_name.localeCompare(b.full_name, "ar");
+      });
+
+      return rows;
     },
   });
 }
