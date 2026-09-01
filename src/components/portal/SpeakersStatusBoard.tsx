@@ -169,6 +169,7 @@ function useSpeakersBoard() {
           ...s,
           opStatus: (op?.operational_status as string) ?? "scheduled",
           arrivalAt: arrivalTimeBySpeaker.get(s.id) ?? null,
+          arrivalInfo: arrivalInfoBySpeaker.get(s.id) ?? null,
           op,
           trip,
           booking: booking
