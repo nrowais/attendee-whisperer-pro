@@ -68,6 +68,44 @@ export function Topbar({ email, roleLabel, onMenu, onSignOut }: Props) {
     return () => clearInterval(id);
   }, []);
 
+  // إشعارات لحظية عند أي تغيير على حالات المتحدثين والضيوف
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase
+      .channel("portal-notifications")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload: any) => {
+          const row = payload.new;
+          toast(row?.title ?? "إشعار جديد", { description: row?.body ?? undefined });
+          queryClient.invalidateQueries({ queryKey: ["topbar-notifications", user.id] });
+          queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, queryClient]);
+
+  // فحص تنبيهات الرحلات (قبل الموعد بساعتين) بشكل دوري
+  useEffect(() => {
+    if (!user?.id) return;
+    const scan = () => {
+      void (supabase as any).rpc("check_flight_alerts", { window_minutes: 120 });
+    };
+    scan();
+    const id = setInterval(scan, 10 * 60_000);
+    return () => clearInterval(id);
+  }, [user?.id]);
+
+
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-background/85 px-4 py-3 backdrop-blur lg:px-6">
       <div className="flex items-center gap-3">
