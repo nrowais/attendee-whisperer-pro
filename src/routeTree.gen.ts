@@ -29,6 +29,7 @@ import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
 import { Route as AuthenticatedVerifyRouteImport } from './routes/_authenticated.verify'
 import { Route as AuthenticatedInviteesIndexRouteImport } from './routes/_authenticated.invitees.index'
+import { Route as AuthenticatedOpsTodayRouteImport } from './routes/_authenticated.ops.today'
 import { Route as AuthenticatedSpeakersIndexRouteImport } from './routes/_authenticated.speakers.index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -133,6 +134,11 @@ const AuthenticatedInviteesIndexRoute =
     path: '/invitees/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedOpsTodayRoute = AuthenticatedOpsTodayRouteImport.update({
+  id: '/ops/today',
+  path: '/ops/today',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSpeakersIndexRoute =
   AuthenticatedSpeakersIndexRouteImport.update({
     id: '/speakers/',
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
   '/verify': typeof AuthenticatedVerifyRoute
+  '/ops/today': typeof AuthenticatedOpsTodayRoute
   '/invitees/': typeof AuthenticatedInviteesIndexRoute
   '/speakers/': typeof AuthenticatedSpeakersIndexRoute
 }
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
   '/verify': typeof AuthenticatedVerifyRoute
+  '/ops/today': typeof AuthenticatedOpsTodayRoute
   '/invitees': typeof AuthenticatedInviteesIndexRoute
   '/speakers': typeof AuthenticatedSpeakersIndexRoute
 }
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/verify': typeof AuthenticatedVerifyRoute
+  '/_authenticated/ops/today': typeof AuthenticatedOpsTodayRoute
   '/_authenticated/invitees/': typeof AuthenticatedInviteesIndexRoute
   '/_authenticated/speakers/': typeof AuthenticatedSpeakersIndexRoute
 }
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/tickets'
     | '/users'
     | '/verify'
+    | '/ops/today'
     | '/invitees/'
     | '/speakers/'
   fileRoutesByTo: FileRoutesByTo
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/tickets'
     | '/users'
     | '/verify'
+    | '/ops/today'
     | '/invitees'
     | '/speakers'
   id:
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tickets'
     | '/_authenticated/users'
     | '/_authenticated/verify'
+    | '/_authenticated/ops/today'
     | '/_authenticated/invitees/'
     | '/_authenticated/speakers/'
   fileRoutesById: FileRoutesById
@@ -427,6 +439,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInviteesIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/ops/today': {
+      id: '/_authenticated/ops/today'
+      path: '/ops/today'
+      fullPath: '/ops/today'
+      preLoaderRoute: typeof AuthenticatedOpsTodayRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/speakers/': {
       id: '/_authenticated/speakers/'
       path: '/speakers'
@@ -453,6 +472,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedVerifyRoute: typeof AuthenticatedVerifyRoute
+  AuthenticatedOpsTodayRoute: typeof AuthenticatedOpsTodayRoute
   AuthenticatedInviteesIndexRoute: typeof AuthenticatedInviteesIndexRoute
   AuthenticatedSpeakersIndexRoute: typeof AuthenticatedSpeakersIndexRoute
 }
@@ -473,6 +493,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedVerifyRoute: AuthenticatedVerifyRoute,
+  AuthenticatedOpsTodayRoute: AuthenticatedOpsTodayRoute,
   AuthenticatedInviteesIndexRoute: AuthenticatedInviteesIndexRoute,
   AuthenticatedSpeakersIndexRoute: AuthenticatedSpeakersIndexRoute,
 }
