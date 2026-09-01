@@ -114,6 +114,21 @@ function SheetsImportPage() {
     [tableDef, mapping],
   );
 
+  if (!rolesLoading && !isAdmin) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center p-8">
+        <Card className="max-w-md text-center">
+          <CardHeader>
+            <CardTitle>خاص بالمدير</CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            استيراد البيانات من Google Sheets متاح لحساب المدير فقط.
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   const submit = async () => {
     if (!sheet) return;
     if (mappedColumns.length === 0) {
