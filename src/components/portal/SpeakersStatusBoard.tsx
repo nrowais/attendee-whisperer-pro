@@ -13,6 +13,7 @@ import {
   XCircle,
   Phone,
   Plus,
+  Clock,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
