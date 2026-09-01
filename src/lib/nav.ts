@@ -9,7 +9,7 @@ import {
   ClipboardPlus,
   Car,
   Ticket,
-  
+  Timer,
   ListChecks,
   Settings,
   type LucideIcon,
