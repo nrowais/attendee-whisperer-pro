@@ -259,7 +259,9 @@ function UsersPage() {
                 <TableHead className="text-start">البريد الإلكتروني</TableHead>
                 <TableHead className="text-start">الصلاحية</TableHead>
                 <TableHead className="text-start">حالة الحساب</TableHead>
+                {isAdmin ? <TableHead className="text-start">إدارة الحساب</TableHead> : null}
               </TableRow>
+
             </TableHeader>
             <TableBody>
               {(usersQuery.data ?? []).map((u: any) => (
