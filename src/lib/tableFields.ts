@@ -273,6 +273,15 @@ export const tripFields: Field[] = [
   { key: "notes", label: "ملاحظات", type: "textarea", list: false },
 ];
 
+export const ticketFields: Field[] = [
+  ...tripFields.filter((f) => f.key !== "notes"),
+  { key: "passengers", label: "عدد الركاب", type: "number", list: false },
+  { key: "actual_pickup_at", label: "الانطلاق الفعلي", type: "datetime", list: false },
+  { key: "actual_dropoff_at", label: "الوصول الفعلي", type: "datetime", list: false },
+  { key: "ticket_notes", label: "ملاحظات التذكرة", type: "textarea", list: false },
+];
+
+
 export const driverFields: Field[] = [
   { key: "full_name", label: "اسم السائق", required: true },
   { key: "phone", label: "الجوال" },

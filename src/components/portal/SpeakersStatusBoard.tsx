@@ -80,7 +80,7 @@ function useSpeakersBoard() {
           db
             .from("transport_trips")
             .select(
-              "id, speaker_id, driver_id, vehicle_id, trip_type, status, scheduled_at, pickup_location, dropoff_location",
+              "id, ticket_no, speaker_id, driver_id, vehicle_id, trip_type, status, scheduled_at, actual_pickup_at, actual_dropoff_at, pickup_location, dropoff_location",
             )
             .order("scheduled_at", { ascending: false }),
           db.from("hotel_bookings").select("id, speaker_id, hotel_id, check_in, check_out, status"),
@@ -289,7 +289,10 @@ export function SpeakersStatusBoard() {
                     <Car className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                     {r.trip ? (
                       <span className="min-w-0 truncate">
-                        {r.trip.pickup_location ?? "—"} ← {r.trip.dropoff_location ?? "—"} ·{" "}
+                        <Link to="/tickets" className="font-mono text-primary underline-offset-4 hover:underline">
+                          تذكرة #{r.trip.ticket_no ?? "—"}
+                        </Link>{" "}
+                        · {r.trip.pickup_location ?? "—"} ← {r.trip.dropoff_location ?? "—"} ·{" "}
                         <Badge variant="outline" className="text-[10px]">
                           {TRIP_STATUS_LABELS[r.trip.status] ?? r.trip.status}
                         </Badge>
@@ -298,6 +301,12 @@ export function SpeakersStatusBoard() {
                           {r.trip.driver?.full_name ?? "بدون سائق"}
                           {r.trip.vehicle?.plate_number ? ` · ${r.trip.vehicle.plate_number}` : ""}
                         </Link>
+                        <br />
+                        <span className="text-[10px] text-muted-foreground">
+                          مجدول: {r.trip.scheduled_at ? new Date(r.trip.scheduled_at).toLocaleString("ar-SA-u-ca-gregory", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}
+                          {" · "}فعلي: {r.trip.actual_pickup_at ? new Date(r.trip.actual_pickup_at).toLocaleString("ar-SA-u-ca-gregory", { hour: "2-digit", minute: "2-digit" }) : "—"}
+                          {" → "}{r.trip.actual_dropoff_at ? new Date(r.trip.actual_dropoff_at).toLocaleString("ar-SA-u-ca-gregory", { hour: "2-digit", minute: "2-digit" }) : "—"}
+                        </span>
                       </span>
                     ) : (
                       <span className="text-muted-foreground">لا توجد رحلة نقل</span>
