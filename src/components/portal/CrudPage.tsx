@@ -134,12 +134,11 @@ export function CrudPage({
   const [statusFilter, setStatusFilter] = useState("all");
 
   const rowsQuery = useQuery({
-    queryKey: ["crud", table],
+    queryKey: ["crud", table, filter?.key ?? "", filter?.value ?? ""],
     queryFn: async () => {
-      const { data, error } = await db
-        .from(table)
-        .select("*")
-        .order("created_at", { ascending: false });
+      let q = db.from(table).select("*").order("created_at", { ascending: false });
+      if (filter) q = q.eq(filter.key, filter.value);
+      const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as Row[];
     },
