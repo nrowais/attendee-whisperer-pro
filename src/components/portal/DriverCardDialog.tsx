@@ -447,6 +447,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
                   ...f,
                   hotelName: name,
                   hotelLocation: hotel ? hotel.location : (f.hotelLocation ?? ""),
+                  hotelMapUrl: hotel?.mapUrl ?? (f.hotelMapUrl ?? ""),
                 }));
               }}
             >
@@ -459,6 +460,19 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
             </select>
           </div>
           {field("hotelLocation", "موقع الفندق", "text", "مثال: حي السفارات، الرياض")}
+          {form.hotelMapUrl && (
+            <div className="space-y-1 sm:col-span-2">
+              <Label className="text-xs text-muted-foreground">رابط الموقع</Label>
+              <a
+                href={form.hotelMapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm text-primary underline hover:bg-muted"
+              >
+                📍 فتح موقع {form.hotelName || "الفندق"} في خرائط قوقل
+              </a>
+            </div>
+          )}
         </div>
 
         <DialogFooter className="gap-2 sm:justify-start">
