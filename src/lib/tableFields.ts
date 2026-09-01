@@ -328,12 +328,7 @@ export const bookingFields: Field[] = [
     type: "ref",
     ref: { table: "hotels", labelKey: "name" },
   },
-  {
-    key: "room_id",
-    label: "الغرفة",
-    type: "ref",
-    ref: { table: "hotel_rooms", labelKey: "room_number" },
-  },
+  { key: "room_number", label: "رقم الغرفة" },
   { key: "check_in", label: "تاريخ الدخول", type: "date" },
   { key: "check_out", label: "تاريخ الخروج", type: "date" },
   {
