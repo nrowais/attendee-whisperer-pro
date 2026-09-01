@@ -8,6 +8,7 @@ import {
   sessionFields,
   requestFields,
   guestOperationFields,
+  driverCardFields,
 } from "@/lib/tableFields";
 
 export const Route = createFileRoute("/_authenticated/speakers")({
