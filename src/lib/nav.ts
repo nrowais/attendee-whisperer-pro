@@ -9,6 +9,7 @@ import {
   ClipboardPlus,
   Car,
   ListChecks,
+  ShieldCheck,
   Settings,
   type LucideIcon,
 } from "lucide-react";
