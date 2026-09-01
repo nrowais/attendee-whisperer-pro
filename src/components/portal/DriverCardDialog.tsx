@@ -93,8 +93,18 @@ export function buildDriverCardHtml(c: DriverCardData) {
     ["الوجهة", c.dropoff],
   ].filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
 
-  const row = ([label, value]: [string, string]) =>
-    `<tr><th>${esc(label)}</th><td>${esc(value)}</td></tr>`;
+  const mapQuery = [c.hotelName, c.hotelLocation].filter((v) => v && v.trim() !== "").join("، ");
+  const mapsUrl = mapQuery
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
+    : "";
+
+  const row = ([label, value]: [string, string]) => {
+    const cell =
+      label === "موقع الفندق" && mapsUrl
+        ? `<a href="${mapsUrl}" target="_blank" rel="noopener" style="color:#1d4677;font-weight:700;">${esc(value)}</a>`
+        : esc(value);
+    return `<tr><th>${esc(label)}</th><td>${cell}</td></tr>`;
+  };
 
   return `<!doctype html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8" />
@@ -129,7 +139,15 @@ export function buildDriverCardHtml(c: DriverCardData) {
     width: 36%; font-weight: 600; border: 1px solid #dbe3ee; }
   th:first-child { border-radius: 0 8px 0 0; }
   td { padding: 8px 12px; text-align: right; border: 1px solid #dbe3ee; font-weight: 700; }
-  footer { background: #f7f9fc; border-top: 1px solid #dbe3ee; padding: 8px 18px;
+   .maps-link { display: flex; align-items: center; justify-content: center; gap: 8px;
+     margin-top: 12px; padding: 10px 14px; border-radius: 10px; text-decoration: none;
+     background: linear-gradient(135deg, #0f2a4a, #1d4677); color: #ffffff;
+     font-size: 13px; font-weight: 700; border: 1px solid #0f2a4a; }
+   .maps-link .pin { color: #f7a23b; font-size: 15px; }
+   .maps-sub { text-align: center; font-size: 10px; color: #7d8ea8; margin-top: 5px; }
+   .maps-sub a { color: #1d4677; word-break: break-all; }
+   @media print { .maps-link { background: #0f2a4a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+   footer { background: #f7f9fc; border-top: 1px solid #dbe3ee; padding: 8px 18px;
     font-size: 10px; color: #7d8ea8; text-align: center; display: flex;
     align-items: center; justify-content: center; gap: 6px; }
   footer .dot { width: 6px; height: 6px; border-radius: 50%; background: #f77f00; display: inline-block; }
@@ -150,6 +168,11 @@ export function buildDriverCardHtml(c: DriverCardData) {
       ${c.cardNo ? `<span class="ticket">رقم البطاقة: ${esc(String(c.cardNo))}</span>` : ""}
       ${c.ticketNo ? `<span class="ticket">رقم التذكرة: ${esc(c.ticketNo)}</span>` : ""}
       <table>${rows.map(row).join("")}${extra.map(row).join("")}</table>
+      ${mapsUrl ? `
+      <a class="maps-link" href="${mapsUrl}" target="_blank" rel="noopener">
+        <span class="pin">📍</span> فتح موقع الفندق في خرائط قوقل
+      </a>
+      <p class="maps-sub">اضغط على الزر أو الرابط للوصول المباشر إلى الموقع: <a href="${mapsUrl}">${mapsUrl}</a></p>` : ""}
     </div>
     <footer><span class="dot"></span> صدرت آلياً من بوابة ${esc(eventName)} <span class="dot"></span></footer>
   </div>
