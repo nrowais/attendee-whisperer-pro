@@ -8,6 +8,7 @@ import {
   sessionFields,
   requestFields,
   guestOperationFields,
+  driverCardFields,
 } from "@/lib/tableFields";
 
 export const Route = createFileRoute("/_authenticated/speakers")({
@@ -77,6 +78,19 @@ function GuestsWorkspace() {
                   title="الجلسات"
                   subtitle="جدول جلسات المتحدثين"
                   fields={sessionFields}
+                />
+              ),
+            },
+            {
+              value: "driver-cards",
+              label: "بطاقات السائق",
+              content: (
+                <CrudPage
+                  compact
+                  table="driver_cards"
+                  title="بطاقات توجيه السائق"
+                  subtitle="البطاقات المحفوظة في ملفات الضيوف بأرقامها التسلسلية"
+                  fields={driverCardFields}
                 />
               ),
             },

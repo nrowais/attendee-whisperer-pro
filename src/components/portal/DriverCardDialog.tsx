@@ -37,6 +37,7 @@ export type DriverCardData = {
   pickup: string;
   dropoff: string;
   ticketNo: string;
+  cardNo?: string;
 };
 
 function esc(v: string) {
@@ -108,6 +109,7 @@ export function buildDriverCardHtml(c: DriverCardData) {
   .head-text .event { font-size: 11px; font-weight: 600; color: #f7a23b; margin: 0 0 3px; }
   h1 { font-size: 19px; margin: 0; font-weight: 800; }
   .sub { font-size: 11px; color: #c8d6e8; margin: 3px 0 0; }
+  .serial { font-size: 11px; font-weight: 700; color: #f7a23b; margin: 4px 0 0; }
   .accent { height: 4px; background: linear-gradient(90deg, #f77f00, #f7a23b); }
   .body { padding: 14px 18px 16px; }
   .ticket { display: inline-block; font-size: 11px; font-weight: 700; color: #b45309;
@@ -130,11 +132,13 @@ export function buildDriverCardHtml(c: DriverCardData) {
         <p class="event">${esc(eventName)}</p>
         <h1>بطاقة توجيه السائق إلى المطار</h1>
         <p class="sub">يرجى تسليم هذه البطاقة للسائق قبل التوجه للمطار</p>
+        ${c.cardNo ? `<p class="serial">رقم البطاقة التسلسلي: ${esc(String(c.cardNo))}</p>` : ""}
       </div>
       <div class="logo-badge"><img src="${logoUrl()}" alt="شعار الفعالية" /></div>
     </div>
     <div class="accent"></div>
     <div class="body">
+      ${c.cardNo ? `<span class="ticket">رقم البطاقة: ${esc(String(c.cardNo))}</span>` : ""}
       ${c.ticketNo ? `<span class="ticket">رقم التذكرة: ${esc(c.ticketNo)}</span>` : ""}
       <table>${rows.map(row).join("")}${extra.map(row).join("")}</table>
     </div>
@@ -196,10 +200,13 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
     ticketNo: "",
   });
 
+  const [cardId, setCardId] = useState<string | null>(null);
+
   useEffect(() => {
     if (!open) return;
     const base = trip?.flight_at ?? trip?.scheduled_at ?? null;
     const { date, time } = splitDateTime(base);
+    setCardId(null);
     setForm({
       guestName: trip?.guest_name ?? trip?.speaker?.full_name ?? "",
       terminal: trip?.terminal ?? "",
@@ -213,18 +220,96 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       pickup: trip?.pickup_location ?? "",
       dropoff: trip?.dropoff_location ?? "",
       ticketNo: trip?.ticket_no ? String(trip.ticket_no) : "",
+      cardNo: "",
     });
+
+    // استرجاع بطاقة محفوظة سابقاً لهذا الضيف/التذكرة
+    (async () => {
+      let q = db.from("driver_cards").select("*").order("created_at", { ascending: false }).limit(1);
+      if (trip?.id) q = q.eq("trip_id", trip.id);
+      else if (trip?.speaker_id) q = q.eq("speaker_id", trip.speaker_id);
+      else if (trip?.speaker?.full_name) q = q.eq("guest_name", trip.speaker.full_name);
+      else return;
+      const { data } = await q;
+      const row = data?.[0];
+      if (!row) return;
+      const dt = splitDateTime(row.flight_at);
+      setCardId(row.id);
+      setForm((f) => ({
+        ...f,
+        cardNo: String(row.card_no),
+        guestName: row.guest_name ?? f.guestName,
+        terminal: row.terminal ?? f.terminal,
+        receiverName: row.receiver_name ?? f.receiverName,
+        receiverPhone: row.receiver_phone ?? f.receiverPhone,
+        flightDate: dt.date || f.flightDate,
+        flightTime: dt.time || f.flightTime,
+        flightNo: row.flight_no ?? f.flightNo,
+        driverName: row.driver_name ?? f.driverName,
+      }));
+    })();
   }, [open, trip]);
+
+  const flightIso = () =>
+    form.flightDate && form.flightTime
+      ? new Date(`${form.flightDate}T${form.flightTime}:00`).toISOString()
+      : form.flightDate
+        ? new Date(`${form.flightDate}T00:00:00`).toISOString()
+        : null;
+
+  // حفظ البطاقة في ملف الضيف مع رقم تسلسلي
+  const persistCard = async (): Promise<DriverCardData> => {
+    const payload = {
+      speaker_id: trip?.speaker_id ?? trip?.speaker?.id ?? null,
+      trip_id: trip?.id ?? null,
+      guest_name: form.guestName || null,
+      terminal: form.terminal || null,
+      receiver_name: form.receiverName || null,
+      receiver_phone: form.receiverPhone || null,
+      flight_at: flightIso(),
+      flight_no: form.flightNo || null,
+      driver_name: form.driverName || null,
+      vehicle: form.vehicle || null,
+      pickup_location: form.pickup || null,
+      dropoff_location: form.dropoff || null,
+      ticket_no: form.ticketNo || null,
+    };
+    const query = cardId
+      ? db.from("driver_cards").update(payload).eq("id", cardId).select("id, card_no").maybeSingle()
+      : db.from("driver_cards").insert(payload).select("id, card_no").maybeSingle();
+    const { data, error } = await query;
+    if (error) throw error;
+    if (data) {
+      setCardId(data.id);
+      setForm((f) => ({ ...f, cardNo: String(data.card_no) }));
+      return { ...form, cardNo: String(data.card_no) };
+    }
+    return form;
+  };
+
+  const issue = useMutation({
+    mutationFn: persistCard,
+    onSuccess: (c) => {
+      qc.invalidateQueries({ queryKey: ["crud", "driver_cards"] });
+      toast.success(`تم حفظ البطاقة في ملف الضيف برقم ${c.cardNo ?? ""}`);
+    },
+    onError: (e: any) => toast.error(e.message ?? "تعذر حفظ البطاقة"),
+  });
+
+  const saveAndDownload = async () => {
+    let card = form;
+    try {
+      card = await issue.mutateAsync();
+    } catch {
+      // نُكمل التحميل حتى لو تعذر الحفظ
+    }
+    downloadDriverCardPdf(card);
+  };
 
   const save = useMutation({
     mutationFn: async () => {
+      await persistCard();
       if (!trip?.id) return;
-      const flightAt =
-        form.flightDate && form.flightTime
-          ? new Date(`${form.flightDate}T${form.flightTime}:00`).toISOString()
-          : form.flightDate
-            ? new Date(`${form.flightDate}T00:00:00`).toISOString()
-            : null;
       const { error } = await db
         .from("transport_trips")
         .update({
@@ -233,14 +318,15 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
           receiver_name: form.receiverName || null,
           receiver_phone: form.receiverPhone || null,
           flight_no: form.flightNo || null,
-          flight_at: flightAt,
+          flight_at: flightIso(),
         })
         .eq("id", trip.id);
       if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["transport-tickets"] });
-      toast.success("تم حفظ بيانات البطاقة");
+      qc.invalidateQueries({ queryKey: ["crud", "driver_cards"] });
+      toast.success("تم حفظ بيانات البطاقة في ملف الضيف");
     },
     onError: (e: any) => toast.error(e.message ?? "تعذر الحفظ"),
   });
@@ -255,7 +341,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       <Label className="text-xs text-muted-foreground">{label}</Label>
       <Input
         type={type}
-        value={form[key]}
+        value={form[key] ?? ""}
         placeholder={placeholder}
         onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
       />
@@ -276,9 +362,15 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
         <DialogHeader className="text-right">
           <DialogTitle>بطاقة توجيه السائق إلى المطار</DialogTitle>
           <DialogDescription>
-            أدخل البيانات يدوياً ثم حمّل البطاقة بصيغة PDF لتسليمها للسائق.
+            تُحفظ البطاقة في ملف الضيف برقم تسلسلي تلقائي عند التحميل.
           </DialogDescription>
         </DialogHeader>
+
+        {form.cardNo && (
+          <div className="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-xs font-bold text-accent-foreground">
+            رقم البطاقة التسلسلي: {form.cardNo}
+          </div>
+        )}
 
         <div className="grid gap-3 sm:grid-cols-2">
           {field("guestName", "اسم الضيف")}
@@ -292,9 +384,9 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
         </div>
 
         <DialogFooter className="gap-2 sm:justify-start">
-          <Button onClick={() => downloadDriverCardPdf(form)}>
+          <Button onClick={saveAndDownload} disabled={issue.isPending}>
             <Download className="ml-1 h-4 w-4" />
-            تحميل البطاقة PDF
+            حفظ وتحميل البطاقة PDF
           </Button>
           {canEdit && trip?.id && (
             <Button variant="outline" onClick={() => save.mutate()} disabled={save.isPending}>

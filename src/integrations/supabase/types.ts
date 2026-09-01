@@ -99,6 +99,84 @@ export type Database = {
           },
         ]
       }
+      driver_cards: {
+        Row: {
+          card_no: number
+          created_at: string
+          created_by: string | null
+          driver_name: string | null
+          dropoff_location: string | null
+          flight_at: string | null
+          flight_no: string | null
+          guest_name: string | null
+          id: string
+          pickup_location: string | null
+          receiver_name: string | null
+          receiver_phone: string | null
+          speaker_id: string | null
+          terminal: string | null
+          ticket_no: string | null
+          trip_id: string | null
+          updated_at: string
+          vehicle: string | null
+        }
+        Insert: {
+          card_no?: number
+          created_at?: string
+          created_by?: string | null
+          driver_name?: string | null
+          dropoff_location?: string | null
+          flight_at?: string | null
+          flight_no?: string | null
+          guest_name?: string | null
+          id?: string
+          pickup_location?: string | null
+          receiver_name?: string | null
+          receiver_phone?: string | null
+          speaker_id?: string | null
+          terminal?: string | null
+          ticket_no?: string | null
+          trip_id?: string | null
+          updated_at?: string
+          vehicle?: string | null
+        }
+        Update: {
+          card_no?: number
+          created_at?: string
+          created_by?: string | null
+          driver_name?: string | null
+          dropoff_location?: string | null
+          flight_at?: string | null
+          flight_no?: string | null
+          guest_name?: string | null
+          id?: string
+          pickup_location?: string | null
+          receiver_name?: string | null
+          receiver_phone?: string | null
+          speaker_id?: string | null
+          terminal?: string | null
+          ticket_no?: string | null
+          trip_id?: string | null
+          updated_at?: string
+          vehicle?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_cards_speaker_id_fkey"
+            columns: ["speaker_id"]
+            isOneToOne: false
+            referencedRelation: "speakers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_cards_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "transport_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drivers: {
         Row: {
           created_at: string
