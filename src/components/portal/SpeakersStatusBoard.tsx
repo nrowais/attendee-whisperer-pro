@@ -137,6 +137,8 @@ export function useSpeakersBoard() {
           opStatus: (op?.operational_status as string) ?? "scheduled",
           op,
           trip,
+          arrival: arrivalBySpeaker.get(s.id) ?? null,
+          departure: departureBySpeaker.get(s.id) ?? null,
           booking: booking
             ? { ...booking, hotelName: hotelNames.get(booking.hotel_id) ?? "—" }
             : null,
