@@ -10,7 +10,7 @@ import { X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import eventLogo from "@/assets/event-logo-2026.png";
-import { useAuth, useRoles, roleLabels } from "@/hooks/useAuth";
+import { useAuth, useRoles, useApproval, roleLabels } from "@/hooks/useAuth";
 import { navItems } from "@/lib/nav";
 import { Topbar } from "@/components/portal/Topbar";
 
@@ -22,6 +22,7 @@ function PortalLayout() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const { roles, isOperator, loading: rolesLoading } = useRoles();
+  const { status: approvalStatus, loading: approvalLoading } = useApproval();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [openNav, setOpenNav] = useState(false);
 
