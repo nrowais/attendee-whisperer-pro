@@ -54,20 +54,42 @@ export const importSheetRows = createServerFn({ method: "POST" })
         .maybeSingle();
       if (!ev?.id) throw new Error("لا توجد فعالية مسجلة — أنشئ فعالية أولًا قبل استيراد الجلسات");
 
+      const norm = (v: unknown) =>
+        String(v ?? "")
+          .replace(/[\u200f\u200e]/g, "")
+          .replace(/\s+/g, " ")
+          .trim();
+
       const { data: speakers } = await supabase.from("speakers").select("id, full_name");
       const byName = new Map<string, string>(
-        (speakers ?? []).map((s: any) => [String(s.full_name ?? "").trim(), s.id]),
+        (speakers ?? []).map((s: any) => [norm(s.full_name), s.id]),
       );
 
-      rowsToInsert = data.rows.map((row) => {
+      const prepared: Record<string, unknown>[] = [];
+      for (const row of data.rows) {
         const { speaker_name, ...rest } = row as Record<string, any>;
-        const speakerId = byName.get(String(speaker_name ?? "").trim());
+        const name = norm(speaker_name);
+        if (!name) continue; // skip rows without a speaker name
+        let speakerId = byName.get(name);
         if (!speakerId) {
-          throw new Error(`لم يتم العثور على متحدث بالاسم: ${speaker_name ?? "(فارغ)"}`);
+          const { data: created, error: createErr } = await supabase
+            .from("speakers")
+            .insert({ full_name: name })
+            .select("id")
+            .single();
+          if (createErr) throw new Error(`تعذّر إنشاء المتحدث "${name}": ${createErr.message}`);
+          speakerId = created.id as string;
+          byName.set(name, speakerId);
         }
-        return { ...rest, event_id: ev.id, speaker_id: speakerId };
-      });
+        prepared.push({ ...rest, event_id: ev.id, speaker_id: speakerId });
+      }
+
+      if (prepared.length === 0) {
+        throw new Error("لا توجد صفوف تحتوي على اسم متحدث — تأكد من مطابقة عمود «اسم المتحدث»");
+      }
+      rowsToInsert = prepared;
     }
+
 
     const chunkSize = 200;
     let inserted = 0;
