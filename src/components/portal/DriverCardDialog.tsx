@@ -184,7 +184,7 @@ export function buildDriverCardHtml(c: DriverCardData) {
       </a>
       <p class="maps-sub">اضغط على الزر أو الرابط للوصول المباشر إلى الموقع: <a href="${mapsUrl}">${mapsUrl}</a></p>` : ""}
     </div>
-    <footer><span class="dot"></span> صدرت آلياً من بوابة ${esc(eventName} <span class="dot"></span> نفذ بواسطة نايف الرويس</footer>
+    <footer><span class="dot"></span> صدرت آلياً من بوابة ${esc(eventName)} <span class="dot"></span> نفذ بواسطة نايف الرويس</footer>
   </div>
   <script>
     var printed = false;
