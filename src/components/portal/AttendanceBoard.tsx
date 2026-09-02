@@ -5,6 +5,7 @@ import {
   BadgeCheck,
   CheckCircle2,
   Clock,
+  LogOut,
   RotateCcw,
   Search,
   UserPlus,
@@ -72,6 +73,7 @@ type Row = {
   invitee_type: string;
   attendanceId: string | null;
   checkedInAt: string | null;
+  checkedOutAt: string | null;
 };
 
 function useBoard() {
@@ -82,7 +84,7 @@ function useBoard() {
       const [{ data: events }, { data: invitees }, { data: attendance }] = await Promise.all([
         db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
         db.from("invitees").select("id, full_name, organization, phone, email, invitee_type"),
-        db.from("attendance").select("id, invitee_id, checked_in_at, event_id"),
+        db.from("attendance").select("id, invitee_id, checked_in_at, checked_out_at, event_id"),
       ]);
       const eventId: string | null = events?.[0]?.id ?? null;
       const attMap = new Map<string, any>();
@@ -96,6 +98,7 @@ function useBoard() {
           ...i,
           attendanceId: att?.id ?? null,
           checkedInAt: att?.checked_in_at ?? null,
+          checkedOutAt: att?.checked_out_at ?? null,
         };
       });
       rows.sort((a, b) => a.full_name.localeCompare(b.full_name, "ar"));
@@ -169,6 +172,24 @@ export function AttendanceBoard() {
       toast.success(`تم التراجع عن حضور: ${row.full_name}`);
     },
     onError: (e: any) => toast.error(e?.message ?? "تعذّر التراجع"),
+  });
+
+  const checkOut = useMutation({
+    mutationFn: async (row: Row) => {
+      const { error } = await db
+        .from("attendance")
+        .update({ checked_out_at: new Date().toISOString() })
+        .eq("id", row.attendanceId);
+      if (error) throw error;
+      return row;
+    },
+    onSuccess: (row) => {
+      setHighlighted(row.id);
+      setTimeout(() => setHighlighted((h) => (h === row.id ? null : h)), 3000);
+      invalidate();
+      toast.success(`تم تسجيل خروج: ${row.full_name}`);
+    },
+    onError: (e: any) => toast.error(e?.message ?? "تعذّر تسجيل الخروج"),
   });
 
   const addGuest = useMutation({
@@ -402,9 +423,20 @@ export function AttendanceBoard() {
                     {[r.organization, r.phone].filter(Boolean).join(" · ") || "—"}
                     {present && r.checkedInAt && (
                       <span className="text-primary">
-                        {" · حضر "}
+                        {" · دخل "}
                         <span dir="ltr" style={{ unicodeBidi: "embed" }}>
                           {new Date(r.checkedInAt).toLocaleTimeString("ar-SA", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </span>
+                    )}
+                    {r.checkedOutAt && (
+                      <span className="text-muted-foreground">
+                        {" · خرج "}
+                        <span dir="ltr" style={{ unicodeBidi: "embed" }}>
+                          {new Date(r.checkedOutAt).toLocaleTimeString("ar-SA", {
                             hour: "2-digit",
                             minute: "2-digit",
                           })}
@@ -415,20 +447,39 @@ export function AttendanceBoard() {
                 </div>
 
                 {present ? (
-                  canDelete ? (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="gap-1"
-                      disabled={undo.isPending}
-                      onClick={() => undo.mutate(r)}
-                    >
-                      <RotateCcw className="size-4" />
-                      تراجع
-                    </Button>
-                  ) : (
-                    <Badge className="bg-primary/15 text-primary">تم الحضور</Badge>
-                  )
+                  <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+                    {r.checkedOutAt ? (
+                      <Badge variant="secondary" className="gap-1">
+                        <LogOut className="size-3" />
+                        تم تسجيل الخروج
+                      </Badge>
+                    ) : (
+                      canRegister && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="gap-1"
+                          disabled={checkOut.isPending}
+                          onClick={() => checkOut.mutate(r)}
+                        >
+                          <LogOut className="size-4" />
+                          تسجيل الخروج
+                        </Button>
+                      )
+                    )}
+                    {canDelete && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="gap-1"
+                        disabled={undo.isPending}
+                        onClick={() => undo.mutate(r)}
+                      >
+                        <RotateCcw className="size-4" />
+                        تراجع
+                      </Button>
+                    )}
+                  </div>
                 ) : (
                   canRegister && (
                     <Button
