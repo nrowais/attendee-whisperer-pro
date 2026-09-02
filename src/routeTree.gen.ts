@@ -14,7 +14,6 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as SpeakerRouteImport } from './routes/speaker'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated.activity'
-import { Route as AuthenticatedAirportRouteImport } from './routes/_authenticated.airport'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated.calendar'
 import { Route as AuthenticatedDailyRouteImport } from './routes/_authenticated.daily'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
@@ -25,14 +24,12 @@ import { Route as AuthenticatedInviteesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedMovementsRouteImport } from './routes/_authenticated.movements'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated.notifications'
 import { Route as AuthenticatedOperationsRouteImport } from './routes/_authenticated.operations'
-import { Route as AuthenticatedReceptionRouteImport } from './routes/_authenticated.reception'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated.reports'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedSheetsRouteImport } from './routes/_authenticated.sheets'
 import { Route as AuthenticatedSpeakersRouteImport } from './routes/_authenticated.speakers'
 import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated.tickets'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
-import { Route as ApiPublicFlightsSyncRouteImport } from './routes/api/public/flights-sync'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicSheetsTableRouteImport } from './routes/api/public/sheets.$table'
 
@@ -58,11 +55,6 @@ const SpeakerRoute = SpeakerRouteImport.update({
 const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedAirportRoute = AuthenticatedAirportRouteImport.update({
-  id: '/airport',
-  path: '/airport',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
@@ -117,11 +109,6 @@ const AuthenticatedOperationsRoute = AuthenticatedOperationsRouteImport.update({
   path: '/operations',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedReceptionRoute = AuthenticatedReceptionRouteImport.update({
-  id: '/reception',
-  path: '/reception',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -152,11 +139,6 @@ const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const ApiPublicFlightsSyncRoute = ApiPublicFlightsSyncRouteImport.update({
-  id: '/api/public/flights-sync',
-  path: '/api/public/flights-sync',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   id: '/api/public/health',
   path: '/api/public/health',
@@ -173,7 +155,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/speaker': typeof SpeakerRoute
   '/activity': typeof AuthenticatedActivityRoute
-  '/airport': typeof AuthenticatedAirportRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/daily': typeof AuthenticatedDailyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -184,14 +165,12 @@ export interface FileRoutesByFullPath {
   '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/operations': typeof AuthenticatedOperationsRoute
-  '/reception': typeof AuthenticatedReceptionRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/sheets': typeof AuthenticatedSheetsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
-  '/api/public/flights-sync': typeof ApiPublicFlightsSyncRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
@@ -200,7 +179,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/speaker': typeof SpeakerRoute
   '/activity': typeof AuthenticatedActivityRoute
-  '/airport': typeof AuthenticatedAirportRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/daily': typeof AuthenticatedDailyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -211,14 +189,12 @@ export interface FileRoutesByTo {
   '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/operations': typeof AuthenticatedOperationsRoute
-  '/reception': typeof AuthenticatedReceptionRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/sheets': typeof AuthenticatedSheetsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
-  '/api/public/flights-sync': typeof ApiPublicFlightsSyncRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
@@ -229,7 +205,6 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/speaker': typeof SpeakerRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
-  '/_authenticated/airport': typeof AuthenticatedAirportRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/daily': typeof AuthenticatedDailyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -240,14 +215,12 @@ export interface FileRoutesById {
   '/_authenticated/movements': typeof AuthenticatedMovementsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/operations': typeof AuthenticatedOperationsRoute
-  '/_authenticated/reception': typeof AuthenticatedReceptionRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/sheets': typeof AuthenticatedSheetsRoute
   '/_authenticated/speakers': typeof AuthenticatedSpeakersRoute
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
-  '/api/public/flights-sync': typeof ApiPublicFlightsSyncRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
@@ -258,7 +231,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/speaker'
     | '/activity'
-    | '/airport'
     | '/calendar'
     | '/daily'
     | '/dashboard'
@@ -269,14 +241,12 @@ export interface FileRouteTypes {
     | '/movements'
     | '/notifications'
     | '/operations'
-    | '/reception'
     | '/reports'
     | '/settings'
     | '/sheets'
     | '/speakers'
     | '/tickets'
     | '/users'
-    | '/api/public/flights-sync'
     | '/api/public/health'
     | '/api/public/sheets/$table'
   fileRoutesByTo: FileRoutesByTo
@@ -285,7 +255,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/speaker'
     | '/activity'
-    | '/airport'
     | '/calendar'
     | '/daily'
     | '/dashboard'
@@ -296,14 +265,12 @@ export interface FileRouteTypes {
     | '/movements'
     | '/notifications'
     | '/operations'
-    | '/reception'
     | '/reports'
     | '/settings'
     | '/sheets'
     | '/speakers'
     | '/tickets'
     | '/users'
-    | '/api/public/flights-sync'
     | '/api/public/health'
     | '/api/public/sheets/$table'
   id:
@@ -313,7 +280,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/speaker'
     | '/_authenticated/activity'
-    | '/_authenticated/airport'
     | '/_authenticated/calendar'
     | '/_authenticated/daily'
     | '/_authenticated/dashboard'
@@ -324,14 +290,12 @@ export interface FileRouteTypes {
     | '/_authenticated/movements'
     | '/_authenticated/notifications'
     | '/_authenticated/operations'
-    | '/_authenticated/reception'
     | '/_authenticated/reports'
     | '/_authenticated/settings'
     | '/_authenticated/sheets'
     | '/_authenticated/speakers'
     | '/_authenticated/tickets'
     | '/_authenticated/users'
-    | '/api/public/flights-sync'
     | '/api/public/health'
     | '/api/public/sheets/$table'
   fileRoutesById: FileRoutesById
@@ -341,7 +305,6 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   SpeakerRoute: typeof SpeakerRoute
-  ApiPublicFlightsSyncRoute: typeof ApiPublicFlightsSyncRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicSheetsTableRoute: typeof ApiPublicSheetsTableRoute
 }
@@ -381,13 +344,6 @@ declare module '@tanstack/react-router' {
       path: '/activity'
       fullPath: '/activity'
       preLoaderRoute: typeof AuthenticatedActivityRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/airport': {
-      id: '/_authenticated/airport'
-      path: '/airport'
-      fullPath: '/airport'
-      preLoaderRoute: typeof AuthenticatedAirportRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/calendar': {
@@ -460,13 +416,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOperationsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/reception': {
-      id: '/_authenticated/reception'
-      path: '/reception'
-      fullPath: '/reception'
-      preLoaderRoute: typeof AuthenticatedReceptionRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/reports': {
       id: '/_authenticated/reports'
       path: '/reports'
@@ -509,13 +458,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsersRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/api/public/flights-sync': {
-      id: '/api/public/flights-sync'
-      path: '/api/public/flights-sync'
-      fullPath: '/api/public/flights-sync'
-      preLoaderRoute: typeof ApiPublicFlightsSyncRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/health': {
       id: '/api/public/health'
       path: '/api/public/health'
@@ -535,7 +477,6 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
-  AuthenticatedAirportRoute: typeof AuthenticatedAirportRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedDailyRoute: typeof AuthenticatedDailyRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -546,7 +487,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMovementsRoute: typeof AuthenticatedMovementsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOperationsRoute: typeof AuthenticatedOperationsRoute
-  AuthenticatedReceptionRoute: typeof AuthenticatedReceptionRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSheetsRoute: typeof AuthenticatedSheetsRoute
@@ -557,7 +497,6 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedActivityRoute: AuthenticatedActivityRoute,
-  AuthenticatedAirportRoute: AuthenticatedAirportRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedDailyRoute: AuthenticatedDailyRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
@@ -568,7 +507,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMovementsRoute: AuthenticatedMovementsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOperationsRoute: AuthenticatedOperationsRoute,
-  AuthenticatedReceptionRoute: AuthenticatedReceptionRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSheetsRoute: AuthenticatedSheetsRoute,
@@ -586,7 +524,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   SpeakerRoute: SpeakerRoute,
-  ApiPublicFlightsSyncRoute: ApiPublicFlightsSyncRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicSheetsTableRoute: ApiPublicSheetsTableRoute,
 }
