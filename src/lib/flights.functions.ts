@@ -78,7 +78,7 @@ async function updateFlightFromLive(
     throw new Error("لم يتم العثور على الرحلة في AviationStack بهذا التاريخ.");
   }
 
-  const live = json.data[0];
+  const live = json.data[0]!;
   const delay = live.arrival?.delay ?? live.departure?.delay ?? 0;
   const liveStatus = live.flight_status ?? "unknown";
 
@@ -87,8 +87,8 @@ async function updateFlightFromLive(
     live_delay_minutes: delay,
     live_actual_arrival: toIso(live.arrival?.actual ?? live.arrival?.estimated),
     live_actual_departure: toIso(live.departure?.actual ?? live.departure?.estimated),
-    live_gate: live.arrival?.gate ?? live.departure?.gate,
-    live_terminal: live.arrival?.terminal ?? live.departure?.terminal,
+    live_gate: (live.arrival?.gate ?? live.departure?.gate) ?? null,
+    live_terminal: (live.arrival?.terminal ?? live.departure?.terminal) ?? null,
     live_last_synced_at: new Date().toISOString(),
     live_data: live as any,
   };
