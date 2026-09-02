@@ -274,6 +274,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
     // استكمال بيانات الفندق تلقائياً من القائمة المعتمدة عند تطابق الاسم
     const hotelMatch = HOTELS.find((h) => h.name === (trip?.hotel_name ?? ""));
     setForm({
+      cardType: defaultType,
       guestName: trip?.guest_name ?? trip?.speaker?.full_name ?? "",
       terminal: trip?.terminal ?? "",
       receiverName: trip?.receiver_name ?? "",
@@ -293,9 +294,14 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       hotelMapUrl: trip?.hotel_map_url ?? hotelMatch?.mapUrl ?? "",
     });
 
-    // استرجاع بطاقة محفوظة سابقاً لهذا الضيف/التذكرة
+    // استرجاع بطاقة محفوظة سابقاً لهذا الضيف/التذكرة (من نفس النوع)
     (async () => {
-      let q = db.from("driver_cards").select("*").order("created_at", { ascending: false }).limit(1);
+      let q = db
+        .from("driver_cards")
+        .select("*")
+        .eq("card_type", defaultType)
+        .order("created_at", { ascending: false })
+        .limit(1);
       if (trip?.id) q = q.eq("trip_id", trip.id);
       else if (trip?.speaker_id) q = q.eq("speaker_id", trip.speaker_id);
       else if (trip?.speaker?.full_name) q = q.eq("guest_name", trip.speaker.full_name);
