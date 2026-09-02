@@ -373,7 +373,14 @@ function OperationsPage() {
       ) : (
         <div className="space-y-3">
           {rows.map((r: any) => (
-            <div key={r.id} className="space-y-3 rounded-xl border border-border bg-card p-4">
+            <div
+              key={r.id}
+              id={`op-row-${r.id}`}
+              className={cn(
+                "space-y-3 rounded-xl border bg-card p-4 transition-colors duration-500",
+                highlighted === r.id ? "border-primary ring-2 ring-primary/30" : "border-border"
+              )}
+            >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="truncate font-semibold text-foreground">{r.full_name}</p>
