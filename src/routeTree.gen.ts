@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as SpeakerRouteImport } from './routes/speaker'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated.activity'
+import { Route as AuthenticatedAirportRouteImport } from './routes/_authenticated.airport'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated.calendar'
 import { Route as AuthenticatedDailyRouteImport } from './routes/_authenticated.daily'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
@@ -55,6 +56,11 @@ const SpeakerRoute = SpeakerRouteImport.update({
 const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAirportRoute = AuthenticatedAirportRouteImport.update({
+  id: '/airport',
+  path: '/airport',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/speaker': typeof SpeakerRoute
   '/activity': typeof AuthenticatedActivityRoute
+  '/airport': typeof AuthenticatedAirportRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/daily': typeof AuthenticatedDailyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/speaker': typeof SpeakerRoute
   '/activity': typeof AuthenticatedActivityRoute
+  '/airport': typeof AuthenticatedAirportRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/daily': typeof AuthenticatedDailyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/speaker': typeof SpeakerRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
+  '/_authenticated/airport': typeof AuthenticatedAirportRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/daily': typeof AuthenticatedDailyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/speaker'
     | '/activity'
+    | '/airport'
     | '/calendar'
     | '/daily'
     | '/dashboard'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/speaker'
     | '/activity'
+    | '/airport'
     | '/calendar'
     | '/daily'
     | '/dashboard'
@@ -280,6 +291,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/speaker'
     | '/_authenticated/activity'
+    | '/_authenticated/airport'
     | '/_authenticated/calendar'
     | '/_authenticated/daily'
     | '/_authenticated/dashboard'
@@ -344,6 +356,13 @@ declare module '@tanstack/react-router' {
       path: '/activity'
       fullPath: '/activity'
       preLoaderRoute: typeof AuthenticatedActivityRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/airport': {
+      id: '/_authenticated/airport'
+      path: '/airport'
+      fullPath: '/airport'
+      preLoaderRoute: typeof AuthenticatedAirportRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/calendar': {
@@ -477,6 +496,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
+  AuthenticatedAirportRoute: typeof AuthenticatedAirportRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedDailyRoute: typeof AuthenticatedDailyRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -497,6 +517,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedActivityRoute: AuthenticatedActivityRoute,
+  AuthenticatedAirportRoute: AuthenticatedAirportRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedDailyRoute: AuthenticatedDailyRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,

@@ -28,6 +28,7 @@ export const navItems: NavItem[] = [
   { to: "/speakers", label: "المتحدثون", icon: Mic2, hint: "المتحدثون والجلسات والطلبات" },
   { to: "/invitees", label: "الضيوف والمدعوون", icon: UserCheck, hint: "المدعوون والدعوات والحضور" },
   { to: "/movements", label: "التنقلات", icon: Plane, hint: "الطيران والوصول والنقل الأرضي" },
+  { to: "/airport", label: "شاشة المطار", icon: Plane, hint: "متابعة حالة الرحلات والتأخيرات" },
   { to: "/fleet", label: "السائقون والمركبات", icon: Car, hint: "الأسطول وتوزيع رحلات الوصول والمغادرة" },
   { to: "/tickets", label: "تذاكر النقل", icon: Ticket, hint: "ربط السائق والمركبة بالرحلة المجدولة والفعلية" },
   { to: "/hotels", label: "الإقامة", icon: BedDouble, hint: "الفنادق والغرف والحجوزات" },

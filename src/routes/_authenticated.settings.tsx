@@ -1,8 +1,14 @@
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { CrudPage } from "@/components/portal/CrudPage";
 import { Workspace } from "@/components/portal/Workspace";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { useRoles } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import {
   eventFields,
   staffFields,
