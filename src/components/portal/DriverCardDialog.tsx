@@ -456,11 +456,35 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       </DialogTrigger>
       <DialogContent dir="rtl" className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader className="text-right">
-          <DialogTitle>بطاقة توجيه السائق إلى المطار</DialogTitle>
+          <DialogTitle>
+            {form.cardType === "trip" ? "بطاقة توجيه سائق — مشوار" : "بطاقة توجيه السائق إلى المطار"}
+          </DialogTitle>
           <DialogDescription>
-            تُعبأ البطاقة تلقائياً من بيانات الضيف المسجلة (الوصول، الرحلة، الفندق)، ويمكنك تعديل أي حقل يدوياً قبل الحفظ.
+            {form.cardType === "trip"
+              ? "بطاقة مشوار عادي: تُعبأ من بيانات الرحلة ويمكنك تعديل أي حقل يدوياً قبل الحفظ."
+              : "تُعبأ البطاقة تلقائياً من بيانات الضيف المسجلة (الوصول، الرحلة، الفندق)، ويمكنك تعديل أي حقل يدوياً قبل الحفظ."}
           </DialogDescription>
         </DialogHeader>
+
+        {/* اختيار نوع البطاقة */}
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant={form.cardType === "airport" ? "default" : "outline"}
+            onClick={() => setForm((f) => ({ ...f, cardType: "airport" }))}
+          >
+            بطاقة مطار
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={form.cardType === "trip" ? "default" : "outline"}
+            onClick={() => setForm((f) => ({ ...f, cardType: "trip" }))}
+          >
+            بطاقة مشوار عادي
+          </Button>
+        </div>
 
         {form.cardNo && (
           <div className="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-xs font-bold text-accent-foreground">
@@ -470,51 +494,67 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
 
         <div className="grid gap-3 sm:grid-cols-2">
           {field("guestName", "اسم الضيف")}
-          {field("terminal", "رقم صالة المطار", "text", "مثال: صالة 1")}
-          {field("receiverName", "اسم مستقبل الضيف")}
-          {field("receiverPhone", "رقم جوال مستقبل الضيف", "tel", "05xxxxxxxx")}
-          {field("flightTime", "وقت الرحلة", "time")}
-          {field("flightDate", "تاريخ الرحلة", "date")}
-          {field("flightNo", "رقم الرحلة (اختياري)")}
-          {field("driverName", "اسم السائق (اختياري)")}
-          {field("driverPhone", "رقم جوال السائق", "tel", "05xxxxxxxx")}
-          <div className="space-y-1">
-            <Label className="text-xs text-muted-foreground">اسم الفندق</Label>
-            <select
-              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              value={form.hotelName ?? ""}
-              onChange={(e) => {
-                const name = e.target.value;
-                const hotel = HOTELS.find((h) => h.name === name);
-                setForm((f) => ({
-                  ...f,
-                  hotelName: name,
-                  hotelLocation: hotel ? hotel.location : (f.hotelLocation ?? ""),
-                  hotelMapUrl: hotel?.mapUrl ?? (f.hotelMapUrl ?? ""),
-                }));
-              }}
-            >
-              <option value="">اختر الفندق…</option>
-              {HOTELS.map((h) => (
-                <option key={h.name} value={h.name}>
-                  {h.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          {field("hotelLocation", "موقع الفندق", "text", "مثال: حي السفارات، الرياض")}
-          {field("hotelMapUrl", "رابط موقع الفندق (اختياري)", "url", "https://maps.app.goo.gl/...")}
-          {form.hotelMapUrl && (
-            <div className="space-y-1 sm:col-span-2">
-              <a
-                href={form.hotelMapUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm text-primary underline hover:bg-muted"
-              >
-                📍 فتح موقع {form.hotelName || "الفندق"} في خرائط قوقل
-              </a>
-            </div>
+          {form.cardType === "trip" ? (
+            <>
+              {field("flightDate", "التاريخ", "date")}
+              {field("flightTime", "الوقت", "time")}
+              {field("pickup", "نقطة الانطلاق")}
+              {field("dropoff", "الوجهة")}
+              {field("receiverName", "اسم مستقبل الضيف (اختياري)")}
+              {field("receiverPhone", "رقم جوال مستقبل الضيف", "tel", "05xxxxxxxx")}
+              {field("driverName", "اسم السائق (اختياري)")}
+              {field("driverPhone", "رقم جوال السائق", "tel", "05xxxxxxxx")}
+              {field("vehicle", "المركبة (اختياري)")}
+            </>
+          ) : (
+            <>
+              {field("terminal", "رقم صالة المطار", "text", "مثال: صالة 1")}
+              {field("receiverName", "اسم مستقبل الضيف")}
+              {field("receiverPhone", "رقم جوال مستقبل الضيف", "tel", "05xxxxxxxx")}
+              {field("flightTime", "وقت الرحلة", "time")}
+              {field("flightDate", "تاريخ الرحلة", "date")}
+              {field("flightNo", "رقم الرحلة (اختياري)")}
+              {field("driverName", "اسم السائق (اختياري)")}
+              {field("driverPhone", "رقم جوال السائق", "tel", "05xxxxxxxx")}
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">اسم الفندق</Label>
+                <select
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  value={form.hotelName ?? ""}
+                  onChange={(e) => {
+                    const name = e.target.value;
+                    const hotel = HOTELS.find((h) => h.name === name);
+                    setForm((f) => ({
+                      ...f,
+                      hotelName: name,
+                      hotelLocation: hotel ? hotel.location : (f.hotelLocation ?? ""),
+                      hotelMapUrl: hotel?.mapUrl ?? (f.hotelMapUrl ?? ""),
+                    }));
+                  }}
+                >
+                  <option value="">اختر الفندق…</option>
+                  {HOTELS.map((h) => (
+                    <option key={h.name} value={h.name}>
+                      {h.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {field("hotelLocation", "موقع الفندق", "text", "مثال: حي السفارات، الرياض")}
+              {field("hotelMapUrl", "رابط موقع الفندق (اختياري)", "url", "https://maps.app.goo.gl/...")}
+              {form.hotelMapUrl && (
+                <div className="space-y-1 sm:col-span-2">
+                  <a
+                    href={form.hotelMapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm text-primary underline hover:bg-muted"
+                  >
+                    📍 فتح موقع {form.hotelName || "الفندق"} في خرائط قوقل
+                  </a>
+                </div>
+              )}
+            </>
           )}
         </div>
 
