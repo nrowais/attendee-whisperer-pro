@@ -13,6 +13,7 @@ import eventLogo from "@/assets/event-logo-2026.png";
 import { useAuth, useRoles, useApproval, roleLabels } from "@/hooks/useAuth";
 import { navItems } from "@/lib/nav";
 import { Topbar } from "@/components/portal/Topbar";
+import { useRealtimeSync } from "@/hooks/useRealtimeSync";
 
 export const Route = createFileRoute("/_authenticated")({
   component: PortalLayout,
@@ -26,6 +27,9 @@ function PortalLayout() {
   const { status: approvalStatus, loading: approvalLoading } = useApproval();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [openNav, setOpenNav] = useState(false);
+
+  // مزامنة لحظية شاملة بين جميع أقسام البوابة
+  useRealtimeSync();
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
