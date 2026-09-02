@@ -44,6 +44,33 @@ export type Database = {
         }
         Relationships: []
       }
+      app_settings: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: string | null
+        }
+        Relationships: []
+      }
       attendance: {
         Row: {
           checked_in_at: string
@@ -315,6 +342,14 @@ export type Database = {
           destination: string | null
           flight_number: string | null
           id: string
+          live_actual_arrival: string | null
+          live_actual_departure: string | null
+          live_data: Json | null
+          live_delay_minutes: number | null
+          live_gate: string | null
+          live_last_synced_at: string | null
+          live_status: string | null
+          live_terminal: string | null
           origin: string | null
           updated_at: string
         }
@@ -327,6 +362,14 @@ export type Database = {
           destination?: string | null
           flight_number?: string | null
           id?: string
+          live_actual_arrival?: string | null
+          live_actual_departure?: string | null
+          live_data?: Json | null
+          live_delay_minutes?: number | null
+          live_gate?: string | null
+          live_last_synced_at?: string | null
+          live_status?: string | null
+          live_terminal?: string | null
           origin?: string | null
           updated_at?: string
         }
@@ -339,6 +382,14 @@ export type Database = {
           destination?: string | null
           flight_number?: string | null
           id?: string
+          live_actual_arrival?: string | null
+          live_actual_departure?: string | null
+          live_data?: Json | null
+          live_delay_minutes?: number | null
+          live_gate?: string | null
+          live_last_synced_at?: string | null
+          live_status?: string | null
+          live_terminal?: string | null
           origin?: string | null
           updated_at?: string
         }
