@@ -220,6 +220,7 @@ function OperationsPage() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [pending, setPending] = useState<string | null>(null);
+  const [highlighted, setHighlighted] = useState<string | null>(null);
   const [confirmUndo, setConfirmUndo] = useState<{ row: any; action: (typeof ACTIONS)[number] } | null>(null);
 
   const mutation = useMutation({
@@ -285,6 +286,21 @@ function OperationsPage() {
     onSettled: () => setPending(null),
     onSuccess: (_d, { row, action, undo }) => {
       toast.success(`${row.full_name}: ${undo ? "تم التراجع عن" : "تم تسجيل"} ${action.label}`);
+      // أبقِ المتحدث ظاهراً: أعد فلتر الحالة إلى "الكل" إن لم تعد حالته الجديدة ضمن الفلتر
+      const nextStatus = undo
+        ? (REVERT_STATUS[action.key] ?? row.opStatus)
+        : (action.status ?? row.opStatus);
+      if (statusFilter !== "all" && nextStatus !== statusFilter) {
+        setStatusFilter("all");
+      }
+      // ظلّل بطاقة المتحدث وانتقل إليها بعد التحديث لتسهيل متابعة التعديل
+      setHighlighted(row.id);
+      setTimeout(() => {
+        document
+          .getElementById(`op-row-${row.id}`)
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 150);
+      setTimeout(() => setHighlighted(null), 4000);
       queryClient.invalidateQueries({ queryKey: ["operations-manage"] });
       queryClient.invalidateQueries({ queryKey: ["speakers-status-board"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
