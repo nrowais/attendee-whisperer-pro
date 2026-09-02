@@ -37,10 +37,16 @@ function InviteesWorkspace() {
           label: "المدعوون والحضور",
           tabs: [
             {
+              value: "checkin",
+              label: "تسجيل الحضور",
+              content: <AttendanceBoard />,
+            },
+            {
               value: "invitees",
               label: "المدعوون",
               content: (
                 <CrudPage
+
                   compact
                   table="invitees"
                   title="المدعوون"
