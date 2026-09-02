@@ -119,7 +119,10 @@ export function CrudPage({
   compact?: boolean;
 }) {
   const queryClient = useQueryClient();
-  const { canEdit } = useRoles();
+  const { canEdit: canEditAll, canRegister, canDelete: canDeleteRole } = useRoles();
+  const registrationTables = ["invitees", "invitations", "attendance"];
+  const canEdit = canEditAll || (canRegister && registrationTables.includes(table));
+  const canDelete = canDeleteRole;
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Row | null>(null);
@@ -347,13 +350,15 @@ export function CrudPage({
                         <Button size="icon" variant="ghost" onClick={() => startEdit(row)}>
                           <Pencil className="size-4" />
                         </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => setDeleteId(row["id"])}
-                        >
-                          <Trash2 className="size-4 text-destructive" />
-                        </Button>
+                        {canDelete ? (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => setDeleteId(row["id"])}
+                          >
+                            <Trash2 className="size-4 text-destructive" />
+                          </Button>
+                        ) : null}
                       </div>
                     </TableCell>
                   ) : null}

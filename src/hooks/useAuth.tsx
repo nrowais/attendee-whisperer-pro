@@ -26,7 +26,13 @@ export function useAuth() {
   return { session, user: session?.user ?? null, loading };
 }
 
-export type AppRole = "admin" | "coordinator" | "viewer" | "operator";
+export type AppRole =
+  | "admin"
+  | "coordinator"
+  | "viewer"
+  | "operator"
+  | "field_staff"
+  | "registration";
 
 export type ApprovalStatus = "pending" | "approved" | "rejected";
 
@@ -53,6 +59,8 @@ export const roleLabels: Record<AppRole, string> = {
   coordinator: "منسّق",
   viewer: "مطّلع",
   operator: "مسؤول تشغيل",
+  field_staff: "موظف مطار/فندق",
+  registration: "موظف تسجيل الحضور",
 };
 
 export function useRoles() {
@@ -72,14 +80,22 @@ export function useRoles() {
 
   const roles = query.data ?? [];
   const isOperator = roles.includes("operator");
+  const isFieldStaff = roles.includes("field_staff");
+  const isRegistration = roles.includes("registration");
   const canEdit = roles.includes("admin") || roles.includes("coordinator");
   return {
     roles,
     isAdmin: roles.includes("admin"),
     canEdit,
     isOperator,
+    isFieldStaff,
+    isRegistration,
     // صلاحية تعديل الحالة التشغيلية فقط
-    canEditOps: canEdit || isOperator,
+    canEditOps: canEdit || isOperator || isFieldStaff,
+    // صلاحية تسجيل الحضور وإضافة المدعوين
+    canRegister: canEdit || isRegistration,
+    // الحذف مقصور على المدير والمنسّق
+    canDelete: canEdit,
     loading: query.isLoading,
   };
 }
