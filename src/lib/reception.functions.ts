@@ -25,7 +25,7 @@ export const getReceptionBoard = createServerFn({ method: "GET" })
 
     if (error) throw new Error(error.message);
 
-    const logistics: Record<string, { driver?: string; phone?: string; vehicle?: string }> = {};
+    const logistics: Record<string, { driver?: string | undefined; phone?: string | undefined; vehicle?: string | undefined }> = {};
     for (const t of trips ?? []) {
       if (!t.speaker_id || logistics[t.speaker_id]) continue;
       logistics[t.speaker_id] = {
@@ -130,5 +130,5 @@ export const syncAllSpeakerFlights = createServerFn({ method: "POST" })
     const supabase = context.supabase as any;
     const { data: allowed } = await supabase.rpc("can_update_ops", { _user_id: context.userId });
     if (!allowed) throw new Error("لا تملك صلاحية التحديث");
-    return syncSpeakerFlights(supabase, { date: data.date, source: "manual-sync-all" });
+    return syncSpeakerFlights(supabase, data.date ? { date: data.date, source: "manual-sync-all" } : { source: "manual-sync-all" });
   });
