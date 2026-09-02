@@ -1,0 +1,1 @@
+ALTER TABLE public.driver_cards ADD COLUMN IF NOT EXISTS card_type text NOT NULL DEFAULT 'airport';
