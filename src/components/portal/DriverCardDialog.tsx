@@ -313,6 +313,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       setCardId(row.id);
       setForm((f) => ({
         ...f,
+        cardType: row.card_type === "trip" ? "trip" : "airport",
         cardNo: String(row.card_no),
         guestName: row.guest_name ?? f.guestName,
         terminal: row.terminal ?? f.terminal,
@@ -328,7 +329,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
         hotelMapUrl: row.hotel_map_url ?? f.hotelMapUrl,
       }));
     })();
-  }, [open, trip]);
+  }, [open, trip, defaultType]);
 
   const flightIso = () =>
     form.flightDate && form.flightTime
@@ -350,6 +351,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       speakerId = match?.[0]?.id ?? null;
     }
     const payload = {
+      card_type: form.cardType,
       speaker_id: speakerId,
       trip_id: trip?.id ?? null,
       guest_name: form.guestName || null,
