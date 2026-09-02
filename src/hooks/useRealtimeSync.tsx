@@ -17,6 +17,7 @@ const SYNCED_TABLES = [
   "speaker_departures",
   "flights",
   "flight_alerts",
+  "flight_status_history",
   "hotels",
   "hotel_rooms",
   "hotel_bookings",
@@ -57,6 +58,7 @@ const GLOBAL_KEYS = [
   "upcoming-countdown",
   "flight-alerts-log",
   "airport-board",
+  "reception-board",
   "activity-logs",
   "report",
 ];
