@@ -173,6 +173,24 @@ export function AttendanceBoard() {
     onError: (e: any) => toast.error(e?.message ?? "تعذّر التراجع"),
   });
 
+  const checkOut = useMutation({
+    mutationFn: async (row: Row) => {
+      const { error } = await db
+        .from("attendance")
+        .update({ checked_out_at: new Date().toISOString() })
+        .eq("id", row.attendanceId);
+      if (error) throw error;
+      return row;
+    },
+    onSuccess: (row) => {
+      setHighlighted(row.id);
+      setTimeout(() => setHighlighted((h) => (h === row.id ? null : h)), 3000);
+      invalidate();
+      toast.success(`تم تسجيل خروج: ${row.full_name}`);
+    },
+    onError: (e: any) => toast.error(e?.message ?? "تعذّر تسجيل الخروج"),
+  });
+
   const addGuest = useMutation({
     mutationFn: async () => {
       const name = newGuest.full_name.trim();
