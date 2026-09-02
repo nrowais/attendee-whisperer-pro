@@ -21,7 +21,8 @@ export const Route = createFileRoute("/_authenticated")({
 function PortalLayout() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const { roles, isOperator, isAdmin, loading: rolesLoading } = useRoles();
+  const { roles, isOperator, isFieldStaff, isRegistration, isAdmin, loading: rolesLoading } =
+    useRoles();
   const { status: approvalStatus, loading: approvalLoading } = useApproval();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [openNav, setOpenNav] = useState(false);
@@ -32,10 +33,13 @@ function PortalLayout() {
 
   // مسؤول التشغيل مقيّد بصفحة الحالة التشغيلية فقط
   useEffect(() => {
-    if (!rolesLoading && isOperator && pathname !== "/operations") {
+    if (rolesLoading) return;
+    if ((isOperator || isFieldStaff) && pathname !== "/operations") {
       navigate({ to: "/operations", replace: true });
+    } else if (isRegistration && !isOperator && !isFieldStaff && pathname !== "/invitees") {
+      navigate({ to: "/invitees", replace: true });
     }
-  }, [rolesLoading, isOperator, pathname, navigate]);
+  }, [rolesLoading, isOperator, isFieldStaff, isRegistration, pathname, navigate]);
 
   if (loading || !user || approvalLoading) {
     return (
@@ -73,9 +77,12 @@ function PortalLayout() {
 
 
   const roleLabel = roles[0] ? roleLabels[roles[0]] : "مطّلع";
-  const visibleNavItems = isOperator
-    ? navItems.filter((item) => item.to === "/operations")
-    : navItems.filter((item) => !item.adminOnly || isAdmin);
+  const visibleNavItems =
+    isOperator || isFieldStaff
+      ? navItems.filter((item) => item.to === "/operations")
+      : isRegistration
+        ? navItems.filter((item) => item.to === "/invitees")
+        : navItems.filter((item) => !item.adminOnly || isAdmin);
 
   return (
     <div className="flex min-h-screen bg-background">
