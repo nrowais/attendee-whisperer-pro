@@ -195,6 +195,15 @@ function TicketsPage() {
               </Button>
             }
           />
+          <DriverCardDialog
+            defaultType="trip"
+            trigger={
+              <Button variant="secondary">
+                <IdCard className="ml-1 h-4 w-4" />
+                بطاقة مشوار عادي (إدخال يدوي)
+              </Button>
+            }
+          />
         </div>
       </header>
 
@@ -342,7 +351,20 @@ function TicketsPage() {
                   </div>
                 </div>
 
-                <DriverCardDialog trip={t} canEdit={canEditOps} />
+                <div className="flex flex-wrap gap-2">
+                  <DriverCardDialog trip={t} canEdit={canEditOps} />
+                  <DriverCardDialog
+                    trip={t}
+                    canEdit={canEditOps}
+                    defaultType="trip"
+                    trigger={
+                      <Button size="sm" variant="outline">
+                        <IdCard className="ml-1 h-4 w-4" />
+                        بطاقة مشوار
+                      </Button>
+                    }
+                  />
+                </div>
 
                 {canEditOps && (
                   <div className="flex flex-wrap gap-2">
