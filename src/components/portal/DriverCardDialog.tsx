@@ -183,8 +183,8 @@ export function buildDriverCardHtml(c: DriverCardData) {
     <div class="head">
       <div class="head-text">
         <p class="event">${esc(eventName)}</p>
-        <h1>بطاقة توجيه السائق إلى المطار</h1>
-        <p class="sub">يرجى تسليم هذه البطاقة للسائق قبل التوجه للمطار</p>
+        <h1>${isTrip ? "بطاقة توجيه سائق — مشوار" : "بطاقة توجيه السائق إلى المطار"}</h1>
+        <p class="sub">${isTrip ? "يرجى تسليم هذه البطاقة للسائق قبل بدء المشوار" : "يرجى تسليم هذه البطاقة للسائق قبل التوجه للمطار"}</p>
         ${c.cardNo ? `<p class="serial">رقم البطاقة التسلسلي: ${esc(String(c.cardNo))}</p>` : ""}
       </div>
       <div class="logo-badge"><img src="${logoUrl()}" alt="شعار الفعالية" /></div>
@@ -194,7 +194,7 @@ export function buildDriverCardHtml(c: DriverCardData) {
       ${c.cardNo ? `<span class="ticket">رقم البطاقة: ${esc(String(c.cardNo))}</span>` : ""}
       ${c.ticketNo ? `<span class="ticket">رقم التذكرة: ${esc(c.ticketNo)}</span>` : ""}
       <table>${rows.map(row).join("")}${extra.map(row).join("")}</table>
-      ${mapsUrl ? `
+      ${!isTrip && mapsUrl ? `
       <a class="maps-link" href="${mapsUrl}" target="_blank" rel="noopener">
         <span class="pin">📍</span> فتح موقع الفندق في خرائط قوقل
       </a>
