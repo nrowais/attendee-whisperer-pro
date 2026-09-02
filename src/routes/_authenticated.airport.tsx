@@ -51,6 +51,10 @@ const statusLabels: Record<
   unknown: { label: "غير معروف", variant: "outline" },
 };
 
+function getStatusLabel(status?: string | null) {
+  return statusLabels[status ?? "unknown"] ?? statusLabels["unknown"];
+}
+
 function fmtDateTime(v?: string | null) {
   if (!v) return "—";
   const d = new Date(v);
