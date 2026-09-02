@@ -507,6 +507,53 @@ export function AttendanceBoard() {
           )}
         </div>
       )}
+
+      {/* سجل دخول/خروج الفنادق — مرتبط بتسجيل الفندق من صفحة المتحدثين */}
+      {(data?.hotelMoves?.length ?? 0) > 0 && (
+        <div className="space-y-2 rounded-xl border bg-card p-4">
+          <div className="flex items-center gap-2">
+            <LogOut className="size-4 text-primary" />
+            <p className="font-display font-bold">سجل دخول وخروج الفنادق (المتحدثون)</p>
+          </div>
+          <div className="divide-y divide-border">
+            {data!.hotelMoves.map((m: any) => (
+              <div key={m.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-2 text-sm">
+                <span className="min-w-40 flex-1 font-semibold">
+                  {m.speakers?.full_name ?? "متحدث"}
+                </span>
+                <span className="text-muted-foreground">
+                  دخل الفندق{" "}
+                  <span dir="ltr" className="text-primary" style={{ unicodeBidi: "embed" }}>
+                    {new Date(m.checked_in_at).toLocaleString("ar-SA-u-ca-gregory", {
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </span>
+                <span className="text-muted-foreground">
+                  {m.checked_out_at ? (
+                    <>
+                      خرج{" "}
+                      <span dir="ltr" style={{ unicodeBidi: "embed" }}>
+                        {new Date(m.checked_out_at).toLocaleString("ar-SA-u-ca-gregory", {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </>
+                  ) : (
+                    "لم يخرج بعد"
+                  )}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
