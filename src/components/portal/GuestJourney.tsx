@@ -58,6 +58,33 @@ const BOOKING_STATUS_LABELS: Record<string, string> = {
   cancelled: "ملغاة",
 };
 
+const OP_STATUS_LABELS: Record<string, string> = {
+  scheduled: "مجدول",
+  arrived: "وصل المطار",
+  in_transport: "في النقل",
+  at_hotel: "في الفندق",
+  at_event: "في الفعالية",
+  departed: "غادر",
+  cancelled: "ملغي",
+};
+
+const OP_TIME_FIELDS: { key: string; label: string }[] = [
+  { key: "arrival_actual_time", label: "وقت الوصول الفعلي للمطار" },
+  { key: "airport_received_at", label: "وقت الاستقبال في المطار" },
+  { key: "transport_departed_at", label: "وقت بدء النقل" },
+  { key: "hotel_arrived_at", label: "وقت الوصول للفندق" },
+  { key: "hotel_checkin_at", label: "وقت دخول الفندق" },
+  { key: "event_arrived_at", label: "وقت الوصول للفعالية" },
+  { key: "departure_actual_time", label: "وقت المغادرة الفعلي" },
+];
+
+const toLocalInput = (v?: string | null) => {
+  if (!v) return "";
+  const d = new Date(v);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
 const STAGES = [
   { key: "flight_in", label: "الطيران", icon: PlaneLanding, link: "/movements" },
   { key: "airport", label: "المطار", icon: Flag, link: "/operations" },
@@ -231,6 +258,7 @@ function useJourneys() {
 
         return {
           ...s,
+          op,
           opStatus: (op?.operational_status as string) ?? "scheduled",
           stages,
           doneCount,
