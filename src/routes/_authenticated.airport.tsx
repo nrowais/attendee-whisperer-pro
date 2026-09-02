@@ -295,14 +295,10 @@ function AirportPage() {
                               size="sm"
                               variant="outline"
                               className="gap-1"
-                              disabled={syncOne.isPending && syncOne.variables === f.id}
+                              disabled={syncOne.isPending}
                               onClick={() => syncOne.mutate(f.id)}
                             >
-                              {syncOne.isPending && syncOne.variables === f.id ? (
-                                <Loader2 className="size-3 animate-spin" />
-                              ) : (
-                                <RefreshCw className="size-3" />
-                              )}
+                              {syncOne.isPending ? <Loader2 className="size-3 animate-spin" /> : <RefreshCw className="size-3" />}
                               تحقق الآن
                             </Button>
                           )}
