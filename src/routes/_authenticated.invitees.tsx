@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { AttendanceBoard } from "@/components/portal/AttendanceBoard";
 import { CrudPage } from "@/components/portal/CrudPage";
 import { Workspace } from "@/components/portal/Workspace";
 import {
@@ -7,6 +8,7 @@ import {
   invitationFields,
   attendanceFields,
 } from "@/lib/tableFields";
+
 
 export const Route = createFileRoute("/_authenticated/invitees")({
   head: () => ({
