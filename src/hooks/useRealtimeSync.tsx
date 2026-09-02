@@ -56,6 +56,7 @@ const GLOBAL_KEYS = [
   "todays-sessions",
   "upcoming-countdown",
   "flight-alerts-log",
+  "airport-board",
   "activity-logs",
   "report",
 ];
