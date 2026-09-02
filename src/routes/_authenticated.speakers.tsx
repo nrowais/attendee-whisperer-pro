@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { CrudPage } from "@/components/portal/CrudPage";
+import { HotelCheckIn } from "@/components/portal/HotelCheckIn";
 import { SpeakersStatusBoard } from "@/components/portal/SpeakersStatusBoard";
 import { Workspace } from "@/components/portal/Workspace";
 import {
@@ -9,6 +10,7 @@ import {
   requestFields,
   guestOperationFields,
   driverCardFields,
+  bookingFields,
 } from "@/lib/tableFields";
 
 export const Route = createFileRoute("/_authenticated/speakers")({
@@ -104,6 +106,29 @@ function GuestsWorkspace() {
                   title="الطلبات الخاصة"
                   subtitle="طلبات المتحدثين ومتابعة تنفيذها"
                   fields={requestFields}
+                />
+              ),
+            },
+          ],
+        },
+        {
+          label: "الإقامة",
+          tabs: [
+            {
+              value: "hotel-checkin",
+              label: "تسجيل دخول الفندق",
+              content: <HotelCheckIn />,
+            },
+            {
+              value: "hotel-bookings",
+              label: "الحجوزات",
+              content: (
+                <CrudPage
+                  compact
+                  table="hotel_bookings"
+                  title="حجوزات الإقامة"
+                  subtitle="الفندق ورقم الغرفة وتواريخ الإقامة"
+                  fields={bookingFields}
                 />
               ),
             },
