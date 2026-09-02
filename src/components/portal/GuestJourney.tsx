@@ -270,10 +270,62 @@ function useJourneys() {
   });
 }
 
+type EditForm = {
+  operational_status: string;
+  notes: string;
+  times: Record<string, string>;
+};
+
 export function GuestJourney() {
   const { data, isLoading } = useJourneys();
+  const { isAdmin } = useRoles();
+  const queryClient = useQueryClient();
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<string>("all");
+  const [editing, setEditing] = useState<any | null>(null);
+  const [form, setForm] = useState<EditForm | null>(null);
+
+  const openEdit = (r: any) => {
+    setEditing(r);
+    setForm({
+      operational_status: r.op?.operational_status ?? "scheduled",
+      notes: r.op?.notes ?? "",
+      times: Object.fromEntries(
+        OP_TIME_FIELDS.map((f) => [f.key, toLocalInput(r.op?.[f.key])]),
+      ),
+    });
+  };
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      if (!editing || !form) return;
+      const payload: Record<string, any> = {
+        speaker_id: editing.id,
+        operational_status: form.operational_status,
+        notes: form.notes || null,
+      };
+      OP_TIME_FIELDS.forEach((f) => {
+        payload[f.key] = form.times[f.key] ? new Date(form.times[f.key]).toISOString() : null;
+      });
+      if (editing.op?.id) {
+        const { error } = await db.from("guest_operations").update(payload).eq("id", editing.op.id);
+        if (error) throw error;
+      } else {
+        const { error } = await db.from("guest_operations").insert(payload);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success(`تم حفظ رحلة الضيف: ${editing?.full_name}`);
+      setEditing(null);
+      setForm(null);
+      queryClient.invalidateQueries({ queryKey: ["guest-journey"] });
+      queryClient.invalidateQueries({ queryKey: ["operations-manage"] });
+      queryClient.invalidateQueries({ queryKey: ["speakers-status-board"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "تعذّر حفظ التعديل"),
+  });
 
   const rows = useMemo(() => {
     return (data ?? []).filter((r: any) => {
@@ -389,6 +441,17 @@ export function GuestJourney() {
                     <p className="truncate text-xs text-muted-foreground">
                       {[r.title, r.organization, r.country].filter(Boolean).join(" · ") || "—"}
                     </p>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => openEdit(r)}
+                        className="mt-1 inline-flex items-center gap-1 rounded-md border border-border px-2 py-0.5 text-[11px] text-primary transition-colors hover:bg-primary/10"
+                        title="تعديل رحلة الضيف"
+                      >
+                        <Pencil className="h-3 w-3" />
+                        تعديل الرحلة
+                      </button>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">{r.doneCount}/{STAGES.length} مراحل</Badge>
