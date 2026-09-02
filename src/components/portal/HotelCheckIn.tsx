@@ -105,6 +105,13 @@ export function HotelCheckIn() {
 
   const update = useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: Record<string, unknown> }) => {
+      if (id.startsWith("new:")) {
+        const { error } = await db
+          .from("hotel_bookings")
+          .insert({ speaker_id: id.slice(4), status: "reserved", ...patch });
+        if (error) throw error;
+        return;
+      }
       const { error } = await db.from("hotel_bookings").update(patch).eq("id", id);
       if (error) throw error;
     },
