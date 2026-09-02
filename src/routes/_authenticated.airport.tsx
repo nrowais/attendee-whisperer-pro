@@ -236,7 +236,7 @@ function AirportPage() {
                   filtered.map((f) => {
                     const persons = personsByFlight[f.id] ?? [];
                     const isDelayed = (f.live_delay_minutes ?? 0) >= 15;
-                    const st = statusLabels[f.live_status ?? "unknown"] || statusLabels["unknown"];
+                    const st = getStatusLabel(f.live_status);
                     return (
                       <TableRow key={f.id} className={isDelayed ? "bg-destructive/5" : ""}>
                         <TableCell className="whitespace-nowrap font-medium">
