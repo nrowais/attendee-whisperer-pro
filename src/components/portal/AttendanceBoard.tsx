@@ -80,11 +80,18 @@ function useBoard() {
     queryKey: ["attendance-board"],
     refetchInterval: 30_000,
     queryFn: async () => {
-      const [{ data: events }, { data: invitees }, { data: attendance }] = await Promise.all([
-        db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
-        db.from("invitees").select("id, full_name, organization, phone, email, invitee_type"),
-        db.from("attendance").select("id, invitee_id, checked_in_at, checked_out_at, event_id"),
-      ]);
+      const [{ data: events }, { data: invitees }, { data: attendance }, { data: hotelMoves }] =
+        await Promise.all([
+          db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
+          db.from("invitees").select("id, full_name, organization, phone, email, invitee_type"),
+          db.from("attendance").select("id, invitee_id, checked_in_at, checked_out_at, event_id"),
+          db
+            .from("attendance")
+            .select("id, checked_in_at, checked_out_at, speakers(full_name)")
+            .eq("method", "hotel")
+            .order("checked_in_at", { ascending: false })
+            .limit(20),
+        ]);
       const eventId: string | null = events?.[0]?.id ?? null;
       const attMap = new Map<string, any>();
       (attendance ?? [])
@@ -101,7 +108,7 @@ function useBoard() {
         };
       });
       rows.sort((a, b) => a.full_name.localeCompare(b.full_name, "ar"));
-      return { rows, eventId, eventName: events?.[0]?.name ?? null };
+      return { rows, eventId, eventName: events?.[0]?.name ?? null, hotelMoves: hotelMoves ?? [] };
     },
   });
 }
