@@ -231,6 +231,26 @@ export function HotelCheckIn() {
                 </p>
               </div>
 
+              <select
+                dir="rtl"
+                disabled={!canEditOps}
+                value={row.hotel_id ?? ""}
+                onChange={(e) =>
+                  update.mutate({
+                    id: row.id,
+                    patch: { hotel_id: e.target.value || null },
+                  })
+                }
+                className="h-9 rounded-md border bg-background px-2 text-sm"
+              >
+                <option value="">اختر الفندق</option>
+                {hotels.map((h) => (
+                  <option key={h.id} value={h.id}>
+                    {h.name}
+                  </option>
+                ))}
+              </select>
+
               <Badge className={cn("border-0", STATUS_STYLES[row.status] ?? "")}>
                 {STATUS_LABELS[row.status] ?? row.status}
               </Badge>
