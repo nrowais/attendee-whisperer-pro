@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
-  BadgeCheck,
   CheckCircle2,
   Clock,
   LogOut,
@@ -236,7 +235,6 @@ export function AttendanceBoard() {
     [rows],
   );
   const absent = counts.total - counts.present;
-  const pct = counts.total ? Math.round((counts.present / counts.total) * 100) : 0;
 
   if (isLoading) {
     return (
@@ -251,7 +249,7 @@ export function AttendanceBoard() {
   return (
     <div className="space-y-4">
       {/* مؤشرات سريعة */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <StatCard icon={<Users className="size-4" />} label="إجمالي المدعوين" value={counts.total} />
         <StatCard
           icon={<CheckCircle2 className="size-4" />}
@@ -260,7 +258,6 @@ export function AttendanceBoard() {
           tone="success"
         />
         <StatCard icon={<Clock className="size-4" />} label="لم يحضروا" value={absent} />
-        <StatCard icon={<BadgeCheck className="size-4" />} label="نسبة الحضور" value={`${pct}%`} />
       </div>
 
       {/* البحث والفلاتر */}
