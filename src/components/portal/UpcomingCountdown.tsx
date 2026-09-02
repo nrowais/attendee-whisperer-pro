@@ -162,9 +162,10 @@ export function UpcomingCountdown() {
                 <Badge
                   variant={urgent ? "destructive" : "secondary"}
                   className="font-mono tabular-nums"
-                  dir="ltr"
                 >
-                  {formatRemaining(diff)}
+                  <span dir="ltr" style={{ unicodeBidi: "embed" }}>
+                    {formatRemaining(diff)}
+                  </span>
                 </Badge>
               </li>
             );
