@@ -1464,6 +1464,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      trigger_flight_sync: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role:
