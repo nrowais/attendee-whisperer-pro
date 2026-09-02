@@ -332,6 +332,66 @@ export type Database = {
           },
         ]
       }
+      flight_status_history: {
+        Row: {
+          created_at: string
+          delay_minutes: number | null
+          flight_id: string | null
+          flight_number: string | null
+          id: string
+          new_estimated_arrival: string | null
+          new_status: string | null
+          old_estimated_arrival: string | null
+          old_status: string | null
+          source: string
+          speaker_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          delay_minutes?: number | null
+          flight_id?: string | null
+          flight_number?: string | null
+          id?: string
+          new_estimated_arrival?: string | null
+          new_status?: string | null
+          old_estimated_arrival?: string | null
+          old_status?: string | null
+          source?: string
+          speaker_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          delay_minutes?: number | null
+          flight_id?: string | null
+          flight_number?: string | null
+          id?: string
+          new_estimated_arrival?: string | null
+          new_status?: string | null
+          old_estimated_arrival?: string | null
+          old_status?: string | null
+          source?: string
+          speaker_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flight_status_history_flight_id_fkey"
+            columns: ["flight_id"]
+            isOneToOne: false
+            referencedRelation: "flights"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_status_history_speaker_id_fkey"
+            columns: ["speaker_id"]
+            isOneToOne: false
+            referencedRelation: "speakers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       flights: {
         Row: {
           airline: string | null
@@ -1028,43 +1088,109 @@ export type Database = {
       }
       speakers: {
         Row: {
+          actual_arrival: string | null
+          actual_departure: string | null
+          airline: string | null
+          arrival_airport: string | null
+          baggage_belt: string | null
           bio: string | null
           country: string | null
           created_at: string
+          delay_minutes: number
+          departure_airport: string | null
+          driver_name: string | null
           email: string | null
+          estimated_arrival: string | null
+          estimated_departure: string | null
+          flight_date: string | null
+          flight_number: string | null
+          flight_status: string
           full_name: string
+          gate: string | null
           id: string
+          last_flight_update: string | null
           organization: string | null
           phone: string | null
           photo_url: string | null
+          reception_stage: string | null
+          receptionist_name: string | null
+          receptionist_phone: string | null
+          scheduled_arrival: string | null
+          scheduled_departure: string | null
+          terminal: string | null
           title: string | null
           updated_at: string
+          vehicle_label: string | null
         }
         Insert: {
+          actual_arrival?: string | null
+          actual_departure?: string | null
+          airline?: string | null
+          arrival_airport?: string | null
+          baggage_belt?: string | null
           bio?: string | null
           country?: string | null
           created_at?: string
+          delay_minutes?: number
+          departure_airport?: string | null
+          driver_name?: string | null
           email?: string | null
+          estimated_arrival?: string | null
+          estimated_departure?: string | null
+          flight_date?: string | null
+          flight_number?: string | null
+          flight_status?: string
           full_name: string
+          gate?: string | null
           id?: string
+          last_flight_update?: string | null
           organization?: string | null
           phone?: string | null
           photo_url?: string | null
+          reception_stage?: string | null
+          receptionist_name?: string | null
+          receptionist_phone?: string | null
+          scheduled_arrival?: string | null
+          scheduled_departure?: string | null
+          terminal?: string | null
           title?: string | null
           updated_at?: string
+          vehicle_label?: string | null
         }
         Update: {
+          actual_arrival?: string | null
+          actual_departure?: string | null
+          airline?: string | null
+          arrival_airport?: string | null
+          baggage_belt?: string | null
           bio?: string | null
           country?: string | null
           created_at?: string
+          delay_minutes?: number
+          departure_airport?: string | null
+          driver_name?: string | null
           email?: string | null
+          estimated_arrival?: string | null
+          estimated_departure?: string | null
+          flight_date?: string | null
+          flight_number?: string | null
+          flight_status?: string
           full_name?: string
+          gate?: string | null
           id?: string
+          last_flight_update?: string | null
           organization?: string | null
           phone?: string | null
           photo_url?: string | null
+          reception_stage?: string | null
+          receptionist_name?: string | null
+          receptionist_phone?: string | null
+          scheduled_arrival?: string | null
+          scheduled_departure?: string | null
+          terminal?: string | null
           title?: string | null
           updated_at?: string
+          vehicle_label?: string | null
         }
         Relationships: []
       }
