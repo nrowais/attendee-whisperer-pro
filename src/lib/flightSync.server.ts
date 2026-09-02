@@ -63,10 +63,19 @@ export async function syncSpeakerFlights(
   db: any,
   opts: { speakerIds?: string[]; date?: string; source?: string } = {},
 ): Promise<{ synced: number; changed: number; results: SyncResult[] }> {
-  const apiKey = process.env["AERODATABOX_API_KEY"];
+  // المفتاح يُقرأ من الخادم فقط: متغير بيئة، أو إعداد محفوظ في قاعدة البيانات.
+  let apiKey = process.env["AERODATABOX_API_KEY"] ?? "";
+  if (!apiKey) {
+    const { data: setting } = await db
+      .from("app_settings")
+      .select("value")
+      .eq("key", "aerodatabox_api_key")
+      .maybeSingle();
+    apiKey = setting?.value ?? "";
+  }
   if (!apiKey) {
     throw new Error(
-      "مفتاح خدمة متابعة الرحلات (AERODATABOX_API_KEY) غير مُعرّف في إعدادات الخادم.",
+      "لم يتم ضبط مفتاح خدمة متابعة الرحلات (AeroDataBox). أضفه من: الإعدادات ← متابعة الرحلات.",
     );
   }
 
