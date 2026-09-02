@@ -515,6 +515,78 @@ export function GuestJourney() {
           </div>
         </>
       )}
+
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent dir="rtl" className="max-h-[90vh] max-w-lg overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>تعديل رحلة الضيف</DialogTitle>
+            <DialogDescription>
+              {editing?.full_name} — عدّل الحالة التشغيلية والأوقات المسجلة لكل مرحلة.
+            </DialogDescription>
+          </DialogHeader>
+
+          {form && (
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">الحالة التشغيلية</label>
+                <select
+                  value={form.operational_status}
+                  onChange={(e) => setForm({ ...form, operational_status: e.target.value })}
+                  className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm"
+                >
+                  {Object.entries(OP_STATUS_LABELS).map(([v, l]) => (
+                    <option key={v} value={v}>
+                      {l}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {OP_TIME_FIELDS.map((f) => (
+                  <div key={f.key} className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">{f.label}</label>
+                    <Input
+                      type="datetime-local"
+                      dir="ltr"
+                      value={form.times[f.key]}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          times: { ...form.times, [f.key]: e.target.value },
+                        })
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">ملاحظات</label>
+                <Input
+                  value={form.notes}
+                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                  placeholder="ملاحظات تشغيلية (اختياري)"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setEditing(null)}>
+              إلغاء
+            </Button>
+            <Button
+              onClick={() => saveMutation.mutate()}
+              disabled={saveMutation.isPending}
+              className="gap-1.5"
+            >
+              {saveMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              حفظ التعديلات
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
