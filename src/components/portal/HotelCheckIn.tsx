@@ -366,7 +366,8 @@ export function HotelCheckIn() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => update.mutate({ id: row.id, patch: { status: "checked_in" } })}
+                      onClick={() => hotelMove.mutate({ row, action: "in" })}
+                      disabled={hotelMove.isPending}
                     >
                       <LogIn className="h-4 w-4" />
                       <span className="ms-1">تسجيل دخول</span>
@@ -376,7 +377,8 @@ export function HotelCheckIn() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => update.mutate({ id: row.id, patch: { status: "checked_out" } })}
+                      onClick={() => hotelMove.mutate({ row, action: "out" })}
+                      disabled={hotelMove.isPending}
                     >
                       <LogOut className="h-4 w-4" />
                       <span className="ms-1">تسجيل خروج</span>
