@@ -305,7 +305,8 @@ export function GuestJourney() {
         notes: form.notes || null,
       };
       OP_TIME_FIELDS.forEach((f) => {
-        payload[f.key] = form.times[f.key] ? new Date(form.times[f.key]).toISOString() : null;
+        const v = form.times[f.key] ?? "";
+        payload[f.key] = v ? new Date(v).toISOString() : null;
       });
       if (editing.op?.id) {
         const { error } = await db.from("guest_operations").update(payload).eq("id", editing.op.id);
