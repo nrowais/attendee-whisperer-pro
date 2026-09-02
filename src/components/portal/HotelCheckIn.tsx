@@ -68,6 +68,25 @@ function useBookings() {
         speakerName: speakerMap.get(b.speaker_id) ?? "—",
         hotelName: hotelMap.get(b.hotel_id) ?? "—",
       }));
+
+      // المتحدثون بلا حجز — تظهر لهم بطاقة فارغة لتسجيل الفندق ورقم الغرفة مباشرة
+      const booked = new Set((bookings ?? []).map((b: any) => b.speaker_id).filter(Boolean));
+      for (const s of speakers ?? []) {
+        if (booked.has(s.id)) continue;
+        rows.push({
+          id: `new:${s.id}`,
+          speaker_id: s.id,
+          hotel_id: null,
+          room_number: null,
+          check_in: null,
+          check_out: null,
+          status: "reserved",
+          notes: null,
+          speakerName: s.full_name,
+          hotelName: "—",
+        });
+      }
+
       rows.sort((a, b) => a.speakerName.localeCompare(b.speakerName, "ar"));
       return { rows, hotels: (hotels ?? []) as { id: string; name: string }[] };
     },
@@ -86,6 +105,13 @@ export function HotelCheckIn() {
 
   const update = useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: Record<string, unknown> }) => {
+      if (id.startsWith("new:")) {
+        const { error } = await db
+          .from("hotel_bookings")
+          .insert({ speaker_id: id.slice(4), status: "reserved", ...patch });
+        if (error) throw error;
+        return;
+      }
       const { error } = await db.from("hotel_bookings").update(patch).eq("id", id);
       if (error) throw error;
     },
@@ -204,6 +230,26 @@ export function HotelCheckIn() {
                   {row.hotelName} · {row.check_in ?? "—"} ← {row.check_out ?? "—"}
                 </p>
               </div>
+
+              <select
+                dir="rtl"
+                disabled={!canEditOps}
+                value={row.hotel_id ?? ""}
+                onChange={(e) =>
+                  update.mutate({
+                    id: row.id,
+                    patch: { hotel_id: e.target.value || null },
+                  })
+                }
+                className="h-9 rounded-md border bg-background px-2 text-sm"
+              >
+                <option value="">اختر الفندق</option>
+                {hotels.map((h) => (
+                  <option key={h.id} value={h.id}>
+                    {h.name}
+                  </option>
+                ))}
+              </select>
 
               <Badge className={cn("border-0", STATUS_STYLES[row.status] ?? "")}>
                 {STATUS_LABELS[row.status] ?? row.status}
