@@ -163,7 +163,7 @@ export function UpcomingCountdown() {
                   variant={urgent ? "destructive" : "secondary"}
                   className="font-mono tabular-nums"
                 >
-                  <span dir="ltr" style={{ unicodeBidi: "embed" }}>
+                  <span dir={diff >= 86_400_000 ? "rtl" : "ltr"} className="inline-block whitespace-nowrap">
                     {formatRemaining(diff)}
                   </span>
                 </Badge>
