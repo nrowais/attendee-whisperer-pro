@@ -25,6 +25,7 @@ const logoUrl = () =>
 const db = supabase as any;
 
 export type DriverCardData = {
+  cardType: "airport" | "trip";
   guestName: string;
   terminal: string;
   receiverName: string;
@@ -85,17 +86,28 @@ function arabicTime(value: string) {
 }
 
 export function buildDriverCardHtml(c: DriverCardData) {
-  const rows: Array<[string, string]> = [
-    ["اسم الضيف", c.guestName],
-    ["رقم صالة المطار", c.terminal],
-    ["رقم الرحلة", c.flightNo],
-    ["اسم مستقبل الضيف", c.receiverName],
-    ["رقم جوال مستقبل الضيف", c.receiverPhone],
-    ["وقت الرحلة", arabicTime(c.flightTime)],
-    ["تاريخ الرحلة", arabicDate(c.flightDate)],
-    ["اسم الفندق", c.hotelName ?? ""],
-    ["موقع الفندق", c.hotelLocation ?? ""],
-  ].filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
+  const isTrip = c.cardType === "trip";
+  const rows: Array<[string, string]> = (
+    isTrip
+      ? [
+          ["اسم الضيف", c.guestName],
+          ["التاريخ", arabicDate(c.flightDate)],
+          ["الوقت", arabicTime(c.flightTime)],
+          ["اسم مستقبل الضيف", c.receiverName],
+          ["رقم جوال مستقبل الضيف", c.receiverPhone],
+        ]
+      : [
+          ["اسم الضيف", c.guestName],
+          ["رقم صالة المطار", c.terminal],
+          ["رقم الرحلة", c.flightNo],
+          ["اسم مستقبل الضيف", c.receiverName],
+          ["رقم جوال مستقبل الضيف", c.receiverPhone],
+          ["وقت الرحلة", arabicTime(c.flightTime)],
+          ["تاريخ الرحلة", arabicDate(c.flightDate)],
+          ["اسم الفندق", c.hotelName ?? ""],
+          ["موقع الفندق", c.hotelLocation ?? ""],
+        ]
+  ).filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
   const extra: Array<[string, string]> = [
     ["السائق", c.driverName],
     ["جوال السائق", c.driverPhone],
@@ -171,8 +183,8 @@ export function buildDriverCardHtml(c: DriverCardData) {
     <div class="head">
       <div class="head-text">
         <p class="event">${esc(eventName)}</p>
-        <h1>بطاقة توجيه السائق إلى المطار</h1>
-        <p class="sub">يرجى تسليم هذه البطاقة للسائق قبل التوجه للمطار</p>
+        <h1>${isTrip ? "بطاقة توجيه سائق — مشوار" : "بطاقة توجيه السائق إلى المطار"}</h1>
+        <p class="sub">${isTrip ? "يرجى تسليم هذه البطاقة للسائق قبل بدء المشوار" : "يرجى تسليم هذه البطاقة للسائق قبل التوجه للمطار"}</p>
         ${c.cardNo ? `<p class="serial">رقم البطاقة التسلسلي: ${esc(String(c.cardNo))}</p>` : ""}
       </div>
       <div class="logo-badge"><img src="${logoUrl()}" alt="شعار الفعالية" /></div>
@@ -182,7 +194,7 @@ export function buildDriverCardHtml(c: DriverCardData) {
       ${c.cardNo ? `<span class="ticket">رقم البطاقة: ${esc(String(c.cardNo))}</span>` : ""}
       ${c.ticketNo ? `<span class="ticket">رقم التذكرة: ${esc(c.ticketNo)}</span>` : ""}
       <table>${rows.map(row).join("")}${extra.map(row).join("")}</table>
-      ${mapsUrl ? `
+      ${!isTrip && mapsUrl ? `
       <a class="maps-link" href="${mapsUrl}" target="_blank" rel="noopener">
         <span class="pin">📍</span> فتح موقع الفندق في خرائط قوقل
       </a>
@@ -215,6 +227,7 @@ type Props = {
   trip?: any;
   canEdit?: boolean;
   trigger?: React.ReactNode;
+  defaultType?: "airport" | "trip";
 };
 
 function splitDateTime(iso: string | null) {
@@ -228,10 +241,11 @@ function splitDateTime(iso: string | null) {
   };
 }
 
-export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
+export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType = "airport" }: Props) {
   const [open, setOpen] = useState(false);
   const qc = useQueryClient();
   const [form, setForm] = useState<DriverCardData>({
+    cardType: defaultType,
     guestName: "",
     terminal: "",
     receiverName: "",
@@ -260,6 +274,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
     // استكمال بيانات الفندق تلقائياً من القائمة المعتمدة عند تطابق الاسم
     const hotelMatch = HOTELS.find((h) => h.name === (trip?.hotel_name ?? ""));
     setForm({
+      cardType: defaultType,
       guestName: trip?.guest_name ?? trip?.speaker?.full_name ?? "",
       terminal: trip?.terminal ?? "",
       receiverName: trip?.receiver_name ?? "",
@@ -279,9 +294,14 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       hotelMapUrl: trip?.hotel_map_url ?? hotelMatch?.mapUrl ?? "",
     });
 
-    // استرجاع بطاقة محفوظة سابقاً لهذا الضيف/التذكرة
+    // استرجاع بطاقة محفوظة سابقاً لهذا الضيف/التذكرة (من نفس النوع)
     (async () => {
-      let q = db.from("driver_cards").select("*").order("created_at", { ascending: false }).limit(1);
+      let q = db
+        .from("driver_cards")
+        .select("*")
+        .eq("card_type", defaultType)
+        .order("created_at", { ascending: false })
+        .limit(1);
       if (trip?.id) q = q.eq("trip_id", trip.id);
       else if (trip?.speaker_id) q = q.eq("speaker_id", trip.speaker_id);
       else if (trip?.speaker?.full_name) q = q.eq("guest_name", trip.speaker.full_name);
@@ -293,6 +313,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       setCardId(row.id);
       setForm((f) => ({
         ...f,
+        cardType: row.card_type === "trip" ? "trip" : "airport",
         cardNo: String(row.card_no),
         guestName: row.guest_name ?? f.guestName,
         terminal: row.terminal ?? f.terminal,
@@ -308,7 +329,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
         hotelMapUrl: row.hotel_map_url ?? f.hotelMapUrl,
       }));
     })();
-  }, [open, trip]);
+  }, [open, trip, defaultType]);
 
   const flightIso = () =>
     form.flightDate && form.flightTime
@@ -330,6 +351,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       speakerId = match?.[0]?.id ?? null;
     }
     const payload = {
+      card_type: form.cardType,
       speaker_id: speakerId,
       trip_id: trip?.id ?? null,
       guest_name: form.guestName || null,
@@ -434,11 +456,35 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
       </DialogTrigger>
       <DialogContent dir="rtl" className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader className="text-right">
-          <DialogTitle>بطاقة توجيه السائق إلى المطار</DialogTitle>
+          <DialogTitle>
+            {form.cardType === "trip" ? "بطاقة توجيه سائق — مشوار" : "بطاقة توجيه السائق إلى المطار"}
+          </DialogTitle>
           <DialogDescription>
-            تُعبأ البطاقة تلقائياً من بيانات الضيف المسجلة (الوصول، الرحلة، الفندق)، ويمكنك تعديل أي حقل يدوياً قبل الحفظ.
+            {form.cardType === "trip"
+              ? "بطاقة مشوار عادي: تُعبأ من بيانات الرحلة ويمكنك تعديل أي حقل يدوياً قبل الحفظ."
+              : "تُعبأ البطاقة تلقائياً من بيانات الضيف المسجلة (الوصول، الرحلة، الفندق)، ويمكنك تعديل أي حقل يدوياً قبل الحفظ."}
           </DialogDescription>
         </DialogHeader>
+
+        {/* اختيار نوع البطاقة */}
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant={form.cardType === "airport" ? "default" : "outline"}
+            onClick={() => setForm((f) => ({ ...f, cardType: "airport" }))}
+          >
+            بطاقة مطار
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={form.cardType === "trip" ? "default" : "outline"}
+            onClick={() => setForm((f) => ({ ...f, cardType: "trip" }))}
+          >
+            بطاقة مشوار عادي
+          </Button>
+        </div>
 
         {form.cardNo && (
           <div className="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-xs font-bold text-accent-foreground">
@@ -448,51 +494,67 @@ export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
 
         <div className="grid gap-3 sm:grid-cols-2">
           {field("guestName", "اسم الضيف")}
-          {field("terminal", "رقم صالة المطار", "text", "مثال: صالة 1")}
-          {field("receiverName", "اسم مستقبل الضيف")}
-          {field("receiverPhone", "رقم جوال مستقبل الضيف", "tel", "05xxxxxxxx")}
-          {field("flightTime", "وقت الرحلة", "time")}
-          {field("flightDate", "تاريخ الرحلة", "date")}
-          {field("flightNo", "رقم الرحلة (اختياري)")}
-          {field("driverName", "اسم السائق (اختياري)")}
-          {field("driverPhone", "رقم جوال السائق", "tel", "05xxxxxxxx")}
-          <div className="space-y-1">
-            <Label className="text-xs text-muted-foreground">اسم الفندق</Label>
-            <select
-              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              value={form.hotelName ?? ""}
-              onChange={(e) => {
-                const name = e.target.value;
-                const hotel = HOTELS.find((h) => h.name === name);
-                setForm((f) => ({
-                  ...f,
-                  hotelName: name,
-                  hotelLocation: hotel ? hotel.location : (f.hotelLocation ?? ""),
-                  hotelMapUrl: hotel?.mapUrl ?? (f.hotelMapUrl ?? ""),
-                }));
-              }}
-            >
-              <option value="">اختر الفندق…</option>
-              {HOTELS.map((h) => (
-                <option key={h.name} value={h.name}>
-                  {h.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          {field("hotelLocation", "موقع الفندق", "text", "مثال: حي السفارات، الرياض")}
-          {field("hotelMapUrl", "رابط موقع الفندق (اختياري)", "url", "https://maps.app.goo.gl/...")}
-          {form.hotelMapUrl && (
-            <div className="space-y-1 sm:col-span-2">
-              <a
-                href={form.hotelMapUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm text-primary underline hover:bg-muted"
-              >
-                📍 فتح موقع {form.hotelName || "الفندق"} في خرائط قوقل
-              </a>
-            </div>
+          {form.cardType === "trip" ? (
+            <>
+              {field("flightDate", "التاريخ", "date")}
+              {field("flightTime", "الوقت", "time")}
+              {field("pickup", "نقطة الانطلاق")}
+              {field("dropoff", "الوجهة")}
+              {field("receiverName", "اسم مستقبل الضيف (اختياري)")}
+              {field("receiverPhone", "رقم جوال مستقبل الضيف", "tel", "05xxxxxxxx")}
+              {field("driverName", "اسم السائق (اختياري)")}
+              {field("driverPhone", "رقم جوال السائق", "tel", "05xxxxxxxx")}
+              {field("vehicle", "المركبة (اختياري)")}
+            </>
+          ) : (
+            <>
+              {field("terminal", "رقم صالة المطار", "text", "مثال: صالة 1")}
+              {field("receiverName", "اسم مستقبل الضيف")}
+              {field("receiverPhone", "رقم جوال مستقبل الضيف", "tel", "05xxxxxxxx")}
+              {field("flightTime", "وقت الرحلة", "time")}
+              {field("flightDate", "تاريخ الرحلة", "date")}
+              {field("flightNo", "رقم الرحلة (اختياري)")}
+              {field("driverName", "اسم السائق (اختياري)")}
+              {field("driverPhone", "رقم جوال السائق", "tel", "05xxxxxxxx")}
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">اسم الفندق</Label>
+                <select
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  value={form.hotelName ?? ""}
+                  onChange={(e) => {
+                    const name = e.target.value;
+                    const hotel = HOTELS.find((h) => h.name === name);
+                    setForm((f) => ({
+                      ...f,
+                      hotelName: name,
+                      hotelLocation: hotel ? hotel.location : (f.hotelLocation ?? ""),
+                      hotelMapUrl: hotel?.mapUrl ?? (f.hotelMapUrl ?? ""),
+                    }));
+                  }}
+                >
+                  <option value="">اختر الفندق…</option>
+                  {HOTELS.map((h) => (
+                    <option key={h.name} value={h.name}>
+                      {h.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {field("hotelLocation", "موقع الفندق", "text", "مثال: حي السفارات، الرياض")}
+              {field("hotelMapUrl", "رابط موقع الفندق (اختياري)", "url", "https://maps.app.goo.gl/...")}
+              {form.hotelMapUrl && (
+                <div className="space-y-1 sm:col-span-2">
+                  <a
+                    href={form.hotelMapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm text-primary underline hover:bg-muted"
+                  >
+                    📍 فتح موقع {form.hotelName || "الفندق"} في خرائط قوقل
+                  </a>
+                </div>
+              )}
+            </>
           )}
         </div>
 

@@ -142,6 +142,7 @@ export type Database = {
       driver_cards: {
         Row: {
           card_no: number
+          card_type: string
           created_at: string
           created_by: string | null
           driver_name: string | null
@@ -166,6 +167,7 @@ export type Database = {
         }
         Insert: {
           card_no?: number
+          card_type?: string
           created_at?: string
           created_by?: string | null
           driver_name?: string | null
@@ -190,6 +192,7 @@ export type Database = {
         }
         Update: {
           card_no?: number
+          card_type?: string
           created_at?: string
           created_by?: string | null
           driver_name?: string | null
