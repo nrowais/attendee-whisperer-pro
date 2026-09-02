@@ -309,11 +309,18 @@ function OperationsPage() {
   });
 
   const rows = useMemo(() => {
+    const norm = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/[ً-ْٰـ]/g, "")
+        .replace(/[أإآ]/g, "ا")
+        .trim();
+    const q = norm(query);
     return (data ?? []).filter((r: any) => {
       if (statusFilter !== "all" && r.opStatus !== statusFilter) return false;
-      if (query.trim()) {
-        const hay = `${r.full_name} ${r.organization ?? ""} ${r.country ?? ""}`;
-        if (!hay.includes(query.trim())) return false;
+      if (q) {
+        const hay = norm(`${r.full_name} ${r.organization ?? ""} ${r.country ?? ""}`);
+        if (!hay.includes(q)) return false;
       }
       return true;
     });
