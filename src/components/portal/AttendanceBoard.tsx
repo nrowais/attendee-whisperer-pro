@@ -5,6 +5,7 @@ import {
   BadgeCheck,
   CheckCircle2,
   Clock,
+  LogOut,
   RotateCcw,
   Search,
   UserPlus,
@@ -422,9 +423,20 @@ export function AttendanceBoard() {
                     {[r.organization, r.phone].filter(Boolean).join(" · ") || "—"}
                     {present && r.checkedInAt && (
                       <span className="text-primary">
-                        {" · حضر "}
+                        {" · دخل "}
                         <span dir="ltr" style={{ unicodeBidi: "embed" }}>
                           {new Date(r.checkedInAt).toLocaleTimeString("ar-SA", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </span>
+                    )}
+                    {r.checkedOutAt && (
+                      <span className="text-muted-foreground">
+                        {" · خرج "}
+                        <span dir="ltr" style={{ unicodeBidi: "embed" }}>
+                          {new Date(r.checkedOutAt).toLocaleTimeString("ar-SA", {
                             hour: "2-digit",
                             minute: "2-digit",
                           })}
@@ -435,20 +447,39 @@ export function AttendanceBoard() {
                 </div>
 
                 {present ? (
-                  canDelete ? (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="gap-1"
-                      disabled={undo.isPending}
-                      onClick={() => undo.mutate(r)}
-                    >
-                      <RotateCcw className="size-4" />
-                      تراجع
-                    </Button>
-                  ) : (
-                    <Badge className="bg-primary/15 text-primary">تم الحضور</Badge>
-                  )
+                  <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+                    {r.checkedOutAt ? (
+                      <Badge variant="secondary" className="gap-1">
+                        <LogOut className="size-3" />
+                        تم تسجيل الخروج
+                      </Badge>
+                    ) : (
+                      canRegister && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="gap-1"
+                          disabled={checkOut.isPending}
+                          onClick={() => checkOut.mutate(r)}
+                        >
+                          <LogOut className="size-4" />
+                          تسجيل الخروج
+                        </Button>
+                      )
+                    )}
+                    {canDelete && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="gap-1"
+                        disabled={undo.isPending}
+                        onClick={() => undo.mutate(r)}
+                      >
+                        <RotateCcw className="size-4" />
+                        تراجع
+                      </Button>
+                    )}
+                  </div>
                 ) : (
                   canRegister && (
                     <Button
