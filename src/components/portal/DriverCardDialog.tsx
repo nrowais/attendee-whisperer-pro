@@ -25,6 +25,7 @@ const logoUrl = () =>
 const db = supabase as any;
 
 export type DriverCardData = {
+  cardType: "airport" | "trip";
   guestName: string;
   terminal: string;
   receiverName: string;
@@ -85,17 +86,28 @@ function arabicTime(value: string) {
 }
 
 export function buildDriverCardHtml(c: DriverCardData) {
-  const rows: Array<[string, string]> = [
-    ["اسم الضيف", c.guestName],
-    ["رقم صالة المطار", c.terminal],
-    ["رقم الرحلة", c.flightNo],
-    ["اسم مستقبل الضيف", c.receiverName],
-    ["رقم جوال مستقبل الضيف", c.receiverPhone],
-    ["وقت الرحلة", arabicTime(c.flightTime)],
-    ["تاريخ الرحلة", arabicDate(c.flightDate)],
-    ["اسم الفندق", c.hotelName ?? ""],
-    ["موقع الفندق", c.hotelLocation ?? ""],
-  ].filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
+  const isTrip = c.cardType === "trip";
+  const rows: Array<[string, string]> = (
+    isTrip
+      ? [
+          ["اسم الضيف", c.guestName],
+          ["التاريخ", arabicDate(c.flightDate)],
+          ["الوقت", arabicTime(c.flightTime)],
+          ["اسم مستقبل الضيف", c.receiverName],
+          ["رقم جوال مستقبل الضيف", c.receiverPhone],
+        ]
+      : [
+          ["اسم الضيف", c.guestName],
+          ["رقم صالة المطار", c.terminal],
+          ["رقم الرحلة", c.flightNo],
+          ["اسم مستقبل الضيف", c.receiverName],
+          ["رقم جوال مستقبل الضيف", c.receiverPhone],
+          ["وقت الرحلة", arabicTime(c.flightTime)],
+          ["تاريخ الرحلة", arabicDate(c.flightDate)],
+          ["اسم الفندق", c.hotelName ?? ""],
+          ["موقع الفندق", c.hotelLocation ?? ""],
+        ]
+  ).filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
   const extra: Array<[string, string]> = [
     ["السائق", c.driverName],
     ["جوال السائق", c.driverPhone],
