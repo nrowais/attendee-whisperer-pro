@@ -48,6 +48,7 @@ export type Database = {
         Row: {
           checked_in_at: string
           checked_in_by: string | null
+          checked_out_at: string | null
           created_at: string
           event_id: string
           id: string
@@ -58,6 +59,7 @@ export type Database = {
         Insert: {
           checked_in_at?: string
           checked_in_by?: string | null
+          checked_out_at?: string | null
           created_at?: string
           event_id: string
           id?: string
@@ -68,6 +70,7 @@ export type Database = {
         Update: {
           checked_in_at?: string
           checked_in_by?: string | null
+          checked_out_at?: string | null
           created_at?: string
           event_id?: string
           id?: string
