@@ -285,7 +285,7 @@ function AirportPage() {
                           )}
                         </TableCell>
                         <TableCell className="whitespace-nowrap">
-                          <Badge variant={st.variant}>{st.label}</Badge>
+                          <Badge variant={st!.variant}>{st!.label}</Badge>
                         </TableCell>
                         <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
                           {[f.live_gate, f.live_terminal].filter(Boolean).join(" / ") || "—"}
