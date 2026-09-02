@@ -25,6 +25,7 @@ import { Route as AuthenticatedInviteesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedMovementsRouteImport } from './routes/_authenticated.movements'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated.notifications'
 import { Route as AuthenticatedOperationsRouteImport } from './routes/_authenticated.operations'
+import { Route as AuthenticatedReceptionRouteImport } from './routes/_authenticated.reception'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated.reports'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedSheetsRouteImport } from './routes/_authenticated.sheets'
@@ -116,6 +117,11 @@ const AuthenticatedOperationsRoute = AuthenticatedOperationsRouteImport.update({
   path: '/operations',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedReceptionRoute = AuthenticatedReceptionRouteImport.update({
+  id: '/reception',
+  path: '/reception',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -178,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/operations': typeof AuthenticatedOperationsRoute
+  '/reception': typeof AuthenticatedReceptionRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/sheets': typeof AuthenticatedSheetsRoute
@@ -204,6 +211,7 @@ export interface FileRoutesByTo {
   '/movements': typeof AuthenticatedMovementsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/operations': typeof AuthenticatedOperationsRoute
+  '/reception': typeof AuthenticatedReceptionRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/sheets': typeof AuthenticatedSheetsRoute
@@ -232,6 +240,7 @@ export interface FileRoutesById {
   '/_authenticated/movements': typeof AuthenticatedMovementsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/operations': typeof AuthenticatedOperationsRoute
+  '/_authenticated/reception': typeof AuthenticatedReceptionRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/sheets': typeof AuthenticatedSheetsRoute
@@ -260,6 +269,7 @@ export interface FileRouteTypes {
     | '/movements'
     | '/notifications'
     | '/operations'
+    | '/reception'
     | '/reports'
     | '/settings'
     | '/sheets'
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
     | '/movements'
     | '/notifications'
     | '/operations'
+    | '/reception'
     | '/reports'
     | '/settings'
     | '/sheets'
@@ -313,6 +324,7 @@ export interface FileRouteTypes {
     | '/_authenticated/movements'
     | '/_authenticated/notifications'
     | '/_authenticated/operations'
+    | '/_authenticated/reception'
     | '/_authenticated/reports'
     | '/_authenticated/settings'
     | '/_authenticated/sheets'
@@ -448,6 +460,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOperationsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/reception': {
+      id: '/_authenticated/reception'
+      path: '/reception'
+      fullPath: '/reception'
+      preLoaderRoute: typeof AuthenticatedReceptionRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/reports': {
       id: '/_authenticated/reports'
       path: '/reports'
@@ -527,6 +546,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMovementsRoute: typeof AuthenticatedMovementsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOperationsRoute: typeof AuthenticatedOperationsRoute
+  AuthenticatedReceptionRoute: typeof AuthenticatedReceptionRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSheetsRoute: typeof AuthenticatedSheetsRoute
@@ -548,6 +568,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMovementsRoute: AuthenticatedMovementsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOperationsRoute: AuthenticatedOperationsRoute,
+  AuthenticatedReceptionRoute: AuthenticatedReceptionRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSheetsRoute: AuthenticatedSheetsRoute,

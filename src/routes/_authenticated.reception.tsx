@@ -47,7 +47,7 @@ import {
   RECEPTION_STAGES,
   RECEPTION_STAGE_LABELS,
   type FlightStatus,
-} from "@/lib/flightSync.server";
+} from "@/lib/flightStatus";
 import {
   getReceptionBoard,
   syncAllSpeakerFlights,
