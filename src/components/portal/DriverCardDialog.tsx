@@ -227,6 +227,7 @@ type Props = {
   trip?: any;
   canEdit?: boolean;
   trigger?: React.ReactNode;
+  defaultType?: "airport" | "trip";
 };
 
 function splitDateTime(iso: string | null) {
@@ -240,10 +241,11 @@ function splitDateTime(iso: string | null) {
   };
 }
 
-export function DriverCardDialog({ trip, canEdit = false, trigger }: Props) {
+export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType = "airport" }: Props) {
   const [open, setOpen] = useState(false);
   const qc = useQueryClient();
   const [form, setForm] = useState<DriverCardData>({
+    cardType: defaultType,
     guestName: "",
     terminal: "",
     receiverName: "",
