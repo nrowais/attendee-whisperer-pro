@@ -82,6 +82,7 @@ export type Database = {
           invitation_id: string | null
           invitee_id: string | null
           method: string
+          speaker_id: string | null
         }
         Insert: {
           checked_in_at?: string
@@ -93,6 +94,7 @@ export type Database = {
           invitation_id?: string | null
           invitee_id?: string | null
           method?: string
+          speaker_id?: string | null
         }
         Update: {
           checked_in_at?: string
@@ -104,6 +106,7 @@ export type Database = {
           invitation_id?: string | null
           invitee_id?: string | null
           method?: string
+          speaker_id?: string | null
         }
         Relationships: [
           {
@@ -125,6 +128,13 @@ export type Database = {
             columns: ["invitee_id"]
             isOneToOne: false
             referencedRelation: "invitees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_speaker_id_fkey"
+            columns: ["speaker_id"]
+            isOneToOne: false
+            referencedRelation: "speakers"
             referencedColumns: ["id"]
           },
         ]

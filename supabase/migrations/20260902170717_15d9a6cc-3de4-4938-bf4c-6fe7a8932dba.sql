@@ -1,0 +1,1 @@
+ALTER TABLE public.attendance ADD COLUMN IF NOT EXISTS speaker_id uuid REFERENCES public.speakers(id) ON DELETE CASCADE;

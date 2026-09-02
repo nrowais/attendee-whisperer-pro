@@ -123,6 +123,87 @@ export function HotelCheckIn() {
     onError: (e: any) => toast.error(e?.message ?? "تعذّر الحفظ"),
   });
 
+  // تسجيل دخول/خروج الفندق + ربطه بسجل الحضور (attendance) ليظهر في المتابعة اللحظية وصفحة الضيوف
+  const hotelMove = useMutation({
+    mutationFn: async ({ row, action }: { row: Booking; action: "in" | "out" }) => {
+      const speakerId = row.speaker_id ?? (row.id.startsWith("new:") ? row.id.slice(4) : null);
+      if (!speakerId) throw new Error("لا يوجد متحدث مرتبط");
+      const nowIso = new Date().toISOString();
+
+      // 1) تحديث حالة الحجز (مع إنشائه إن لم يكن موجودًا)
+      if (row.id.startsWith("new:")) {
+        const { error } = await db.from("hotel_bookings").insert({
+          speaker_id: speakerId,
+          status: action === "in" ? "checked_in" : "checked_out",
+        });
+        if (error) throw error;
+      } else {
+        const { error } = await db
+          .from("hotel_bookings")
+          .update({ status: action === "in" ? "checked_in" : "checked_out" })
+          .eq("id", row.id);
+        if (error) throw error;
+      }
+
+      // 2) تسجيل الحركة في سجل الحضور
+      const { data: events } = await db
+        .from("events")
+        .select("id")
+        .order("start_date", { ascending: false })
+        .limit(1);
+      const eventId: string | null = events?.[0]?.id ?? null;
+
+      const { data: existing } = await db
+        .from("attendance")
+        .select("id")
+        .eq("speaker_id", speakerId)
+        .eq("method", "hotel")
+        .order("checked_in_at", { ascending: false })
+        .limit(1);
+      const att = existing?.[0];
+
+      if (action === "in") {
+        const { error } = await db.from("attendance").insert({
+          event_id: eventId,
+          speaker_id: speakerId,
+          method: "hotel",
+          checked_in_at: nowIso,
+        });
+        if (error) throw error;
+      } else {
+        if (att?.id) {
+          const { error } = await db
+            .from("attendance")
+            .update({ checked_out_at: nowIso })
+            .eq("id", att.id);
+          if (error) throw error;
+        } else {
+          const { error } = await db.from("attendance").insert({
+            event_id: eventId,
+            speaker_id: speakerId,
+            method: "hotel",
+            checked_in_at: nowIso,
+            checked_out_at: nowIso,
+          });
+          if (error) throw error;
+        }
+      }
+    },
+    onSuccess: (_v, { row, action }) => {
+      queryClient.invalidateQueries({ queryKey: ["hotel-checkin-board"] });
+      queryClient.invalidateQueries({ queryKey: ["speakers-status-board"] });
+      queryClient.invalidateQueries({ queryKey: ["attendance-board"] });
+      queryClient.invalidateQueries({ queryKey: ["live-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["hotel-move-log"] });
+      toast.success(
+        action === "in"
+          ? `تم تسجيل دخول الفندق: ${row.speakerName}`
+          : `تم تسجيل خروج الفندق: ${row.speakerName}`,
+      );
+    },
+    onError: (e: any) => toast.error(e?.message ?? "تعذّر تسجيل الحركة"),
+  });
+
   const rows = data?.rows ?? [];
   const hotels = data?.hotels ?? [];
 
@@ -285,7 +366,8 @@ export function HotelCheckIn() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => update.mutate({ id: row.id, patch: { status: "checked_in" } })}
+                      onClick={() => hotelMove.mutate({ row, action: "in" })}
+                      disabled={hotelMove.isPending}
                     >
                       <LogIn className="h-4 w-4" />
                       <span className="ms-1">تسجيل دخول</span>
@@ -295,7 +377,8 @@ export function HotelCheckIn() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => update.mutate({ id: row.id, patch: { status: "checked_out" } })}
+                      onClick={() => hotelMove.mutate({ row, action: "out" })}
+                      disabled={hotelMove.isPending}
                     >
                       <LogOut className="h-4 w-4" />
                       <span className="ms-1">تسجيل خروج</span>

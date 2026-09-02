@@ -163,6 +163,14 @@ function useLiveStats() {
         .order("due_at", { ascending: true })
         .limit(5);
 
+      // سجل دخول/خروج الفنادق المرتبط بسجل الحضور
+      const { data: hotelMoves } = await db
+        .from("attendance")
+        .select("id, checked_in_at, checked_out_at, speakers(full_name)")
+        .eq("method", "hotel")
+        .order("checked_in_at", { ascending: false })
+        .limit(8);
+
       return {
         speakers,
         invitees,
@@ -187,6 +195,7 @@ function useLiveStats() {
         upcomingDepartures: upcomingDepartures ?? [],
         nextTrips: nextTrips ?? [],
         alerts: alerts ?? [],
+        hotelMoves: hotelMoves ?? [],
       };
     },
   });
@@ -401,6 +410,47 @@ function DashboardPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="surface-card p-6">
+        <div className="mb-4 flex items-center gap-3">
+          <span className="rounded-xl bg-primary/10 p-2.5 text-primary">
+            <BedDouble className="size-5" />
+          </span>
+          <div>
+            <p className="font-display text-lg font-bold text-foreground">سجل دخول وخروج الفنادق</p>
+            <span className="text-xs text-muted-foreground">
+              مرتبط بسجل الحضور — يُحدَّث فور تسجيل الدخول أو الخروج من صفحة المتحدثين
+            </span>
+          </div>
+        </div>
+        {data.hotelMoves.length === 0 ? (
+          <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+            لا توجد حركات دخول أو خروج فنادق مسجّلة بعد
+          </p>
+        ) : (
+          <div className="divide-y divide-border">
+            {data.hotelMoves.map((m: any) => (
+              <div key={m.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-2.5 text-sm">
+                <span className="min-w-40 flex-1 font-semibold text-foreground">
+                  {m.speakers?.full_name ?? "متحدث"}
+                </span>
+                <span className="text-muted-foreground">
+                  دخول الفندق:{" "}
+                  <span dir="ltr" className="font-semibold text-primary" style={{ unicodeBidi: "embed" }}>
+                    {fmtTime(m.checked_in_at)}
+                  </span>
+                </span>
+                <span className="text-muted-foreground">
+                  خروج الفندق:{" "}
+                  <span dir="ltr" className="font-semibold text-foreground" style={{ unicodeBidi: "embed" }}>
+                    {m.checked_out_at ? fmtTime(m.checked_out_at) : "لم يخرج بعد"}
+                  </span>
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

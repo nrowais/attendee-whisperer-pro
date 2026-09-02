@@ -80,11 +80,18 @@ function useBoard() {
     queryKey: ["attendance-board"],
     refetchInterval: 30_000,
     queryFn: async () => {
-      const [{ data: events }, { data: invitees }, { data: attendance }] = await Promise.all([
-        db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
-        db.from("invitees").select("id, full_name, organization, phone, email, invitee_type"),
-        db.from("attendance").select("id, invitee_id, checked_in_at, checked_out_at, event_id"),
-      ]);
+      const [{ data: events }, { data: invitees }, { data: attendance }, { data: hotelMoves }] =
+        await Promise.all([
+          db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
+          db.from("invitees").select("id, full_name, organization, phone, email, invitee_type"),
+          db.from("attendance").select("id, invitee_id, checked_in_at, checked_out_at, event_id"),
+          db
+            .from("attendance")
+            .select("id, checked_in_at, checked_out_at, speakers(full_name)")
+            .eq("method", "hotel")
+            .order("checked_in_at", { ascending: false })
+            .limit(20),
+        ]);
       const eventId: string | null = events?.[0]?.id ?? null;
       const attMap = new Map<string, any>();
       (attendance ?? [])
@@ -101,7 +108,7 @@ function useBoard() {
         };
       });
       rows.sort((a, b) => a.full_name.localeCompare(b.full_name, "ar"));
-      return { rows, eventId, eventName: events?.[0]?.name ?? null };
+      return { rows, eventId, eventName: events?.[0]?.name ?? null, hotelMoves: hotelMoves ?? [] };
     },
   });
 }
@@ -498,6 +505,53 @@ export function AttendanceBoard() {
               يعرض أول 200 نتيجة — استخدم البحث لتضييق النطاق ({filtered.length} إجمالاً)
             </p>
           )}
+        </div>
+      )}
+
+      {/* سجل دخول/خروج الفنادق — مرتبط بتسجيل الفندق من صفحة المتحدثين */}
+      {(data?.hotelMoves?.length ?? 0) > 0 && (
+        <div className="space-y-2 rounded-xl border bg-card p-4">
+          <div className="flex items-center gap-2">
+            <LogOut className="size-4 text-primary" />
+            <p className="font-display font-bold">سجل دخول وخروج الفنادق (المتحدثون)</p>
+          </div>
+          <div className="divide-y divide-border">
+            {data!.hotelMoves.map((m: any) => (
+              <div key={m.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-2 text-sm">
+                <span className="min-w-40 flex-1 font-semibold">
+                  {m.speakers?.full_name ?? "متحدث"}
+                </span>
+                <span className="text-muted-foreground">
+                  دخل الفندق{" "}
+                  <span dir="ltr" className="text-primary" style={{ unicodeBidi: "embed" }}>
+                    {new Date(m.checked_in_at).toLocaleString("ar-SA-u-ca-gregory", {
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </span>
+                <span className="text-muted-foreground">
+                  {m.checked_out_at ? (
+                    <>
+                      خرج{" "}
+                      <span dir="ltr" style={{ unicodeBidi: "embed" }}>
+                        {new Date(m.checked_out_at).toLocaleString("ar-SA-u-ca-gregory", {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </>
+                  ) : (
+                    "لم يخرج بعد"
+                  )}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
