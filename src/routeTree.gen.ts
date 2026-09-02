@@ -31,6 +31,7 @@ import { Route as AuthenticatedSheetsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSpeakersRouteImport } from './routes/_authenticated.speakers'
 import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated.tickets'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
+import { Route as ApiPublicFlightsSyncRouteImport } from './routes/api/public/flights-sync'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicSheetsTableRouteImport } from './routes/api/public/sheets.$table'
 
@@ -145,6 +146,11 @@ const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiPublicFlightsSyncRoute = ApiPublicFlightsSyncRouteImport.update({
+  id: '/api/public/flights-sync',
+  path: '/api/public/flights-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   id: '/api/public/health',
   path: '/api/public/health',
@@ -178,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
+  '/api/public/flights-sync': typeof ApiPublicFlightsSyncRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
@@ -203,6 +210,7 @@ export interface FileRoutesByTo {
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
+  '/api/public/flights-sync': typeof ApiPublicFlightsSyncRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
@@ -230,6 +238,7 @@ export interface FileRoutesById {
   '/_authenticated/speakers': typeof AuthenticatedSpeakersRoute
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
+  '/api/public/flights-sync': typeof ApiPublicFlightsSyncRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
@@ -257,6 +266,7 @@ export interface FileRouteTypes {
     | '/speakers'
     | '/tickets'
     | '/users'
+    | '/api/public/flights-sync'
     | '/api/public/health'
     | '/api/public/sheets/$table'
   fileRoutesByTo: FileRoutesByTo
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/speakers'
     | '/tickets'
     | '/users'
+    | '/api/public/flights-sync'
     | '/api/public/health'
     | '/api/public/sheets/$table'
   id:
@@ -308,6 +319,7 @@ export interface FileRouteTypes {
     | '/_authenticated/speakers'
     | '/_authenticated/tickets'
     | '/_authenticated/users'
+    | '/api/public/flights-sync'
     | '/api/public/health'
     | '/api/public/sheets/$table'
   fileRoutesById: FileRoutesById
@@ -317,6 +329,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   SpeakerRoute: typeof SpeakerRoute
+  ApiPublicFlightsSyncRoute: typeof ApiPublicFlightsSyncRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicSheetsTableRoute: typeof ApiPublicSheetsTableRoute
 }
@@ -477,6 +490,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsersRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/public/flights-sync': {
+      id: '/api/public/flights-sync'
+      path: '/api/public/flights-sync'
+      fullPath: '/api/public/flights-sync'
+      preLoaderRoute: typeof ApiPublicFlightsSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/health': {
       id: '/api/public/health'
       path: '/api/public/health'
@@ -545,6 +565,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   SpeakerRoute: SpeakerRoute,
+  ApiPublicFlightsSyncRoute: ApiPublicFlightsSyncRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicSheetsTableRoute: ApiPublicSheetsTableRoute,
 }
