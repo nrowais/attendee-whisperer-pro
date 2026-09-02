@@ -228,7 +228,6 @@ export async function syncSpeakerFlights(
               : effectiveStatus === "diverted"
                 ? `⚠️ تحويل مسار رحلة ${flightNumber} الخاصة بـ ${sp.full_name}`
                 : `تأخّر رحلة ${flightNumber} الخاصة بـ ${sp.full_name} بمقدار ${delayMinutes} دقيقة`;
-          await db.rpc("noop_placeholder").catch(() => undefined);
           const { data: roles } = await db.from("user_roles").select("user_id");
           if (roles?.length) {
             await db.from("notifications").insert(
