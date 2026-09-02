@@ -163,6 +163,14 @@ function useLiveStats() {
         .order("due_at", { ascending: true })
         .limit(5);
 
+      // سجل دخول/خروج الفنادق المرتبط بسجل الحضور
+      const { data: hotelMoves } = await db
+        .from("attendance")
+        .select("id, checked_in_at, checked_out_at, speakers(full_name)")
+        .eq("method", "hotel")
+        .order("checked_in_at", { ascending: false })
+        .limit(8);
+
       return {
         speakers,
         invitees,
@@ -187,6 +195,7 @@ function useLiveStats() {
         upcomingDepartures: upcomingDepartures ?? [],
         nextTrips: nextTrips ?? [],
         alerts: alerts ?? [],
+        hotelMoves: hotelMoves ?? [],
       };
     },
   });
