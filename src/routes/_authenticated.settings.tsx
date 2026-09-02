@@ -31,7 +31,38 @@ export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsWorkspace,
 });
 
+const FLIGHT_KEYS = [
+  {
+    key: "aerodatabox_api_key",
+    title: "AeroDataBox (RapidAPI)",
+    hint: "المفتاح المستخدم في مركز الرحلات والاستقبال لتحديث حالات رحلات المتحدثين تلقائيًا.",
+  },
+  {
+    key: "aviationstack_api_key",
+    title: "AviationStack",
+    hint: "المفتاح المستخدم في شاشة المطار للتحقق من حالة الرحلات المسجلة.",
+  },
+] as const;
+
 function FlightTrackingSettings() {
+  return (
+    <div className="space-y-4">
+      {FLIGHT_KEYS.map((k) => (
+        <FlightKeyCard key={k.key} settingKey={k.key} title={k.title} hint={k.hint} />
+      ))}
+    </div>
+  );
+}
+
+function FlightKeyCard({
+  settingKey,
+  title,
+  hint,
+}: {
+  settingKey: string;
+  title: string;
+  hint: string;
+}) {
   const { isAdmin } = useRoles();
   const [key, setKey] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,12 +73,12 @@ function FlightTrackingSettings() {
     supabase
       .from("app_settings")
       .select("value")
-      .eq("key", "aviationstack_api_key")
+      .eq("key", settingKey)
       .maybeSingle()
       .then(({ data }) => {
         if (data?.value) setKey(data.value);
       });
-  }, [isAdmin]);
+  }, [isAdmin, settingKey]);
 
   const save = async () => {
     if (!isAdmin) return;
@@ -57,7 +88,7 @@ function FlightTrackingSettings() {
     } = await supabase.auth.getUser();
     const { error } = await supabase.from("app_settings").upsert(
       {
-        key: "aviationstack_api_key",
+        key: settingKey,
         value: key.trim() || null,
         updated_by: user?.id ?? null,
       },
@@ -69,7 +100,7 @@ function FlightTrackingSettings() {
     } else {
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-      toast.success("تم حفظ مفتاح AviationStack");
+      toast.success("تم حفظ المفتاح");
     }
   };
 
@@ -85,18 +116,16 @@ function FlightTrackingSettings() {
     <Card>
       <CardContent className="space-y-4 p-5">
         <div className="space-y-1">
-          <h3 className="font-display text-lg font-semibold">متابعة الرحلات الجوية</h3>
-          <p className="text-sm text-muted-foreground">
-            أدخل مفتاح AviationStack لتمكين التحقق المباشر من حالة الرحلات والتأخيرات.
-          </p>
+          <h3 className="font-display text-lg font-semibold">{title}</h3>
+          <p className="text-sm text-muted-foreground">{hint}</p>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="aviation-key">مفتاح API (Access Key)</Label>
+          <Label htmlFor={`key-${settingKey}`}>مفتاح API (Access Key)</Label>
           <Input
-            id="aviation-key"
+            id={`key-${settingKey}`}
             value={key}
             onChange={(e) => setKey(e.target.value)}
-            placeholder="ألصق مفتاح AviationStack هنا"
+            placeholder="ألصق المفتاح هنا"
             dir="ltr"
           />
         </div>
