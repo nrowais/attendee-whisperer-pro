@@ -72,6 +72,7 @@ type Row = {
   invitee_type: string;
   attendanceId: string | null;
   checkedInAt: string | null;
+  checkedOutAt: string | null;
 };
 
 function useBoard() {
@@ -82,7 +83,7 @@ function useBoard() {
       const [{ data: events }, { data: invitees }, { data: attendance }] = await Promise.all([
         db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
         db.from("invitees").select("id, full_name, organization, phone, email, invitee_type"),
-        db.from("attendance").select("id, invitee_id, checked_in_at, event_id"),
+        db.from("attendance").select("id, invitee_id, checked_in_at, checked_out_at, event_id"),
       ]);
       const eventId: string | null = events?.[0]?.id ?? null;
       const attMap = new Map<string, any>();
@@ -96,6 +97,7 @@ function useBoard() {
           ...i,
           attendanceId: att?.id ?? null,
           checkedInAt: att?.checked_in_at ?? null,
+          checkedOutAt: att?.checked_out_at ?? null,
         };
       });
       rows.sort((a, b) => a.full_name.localeCompare(b.full_name, "ar"));
