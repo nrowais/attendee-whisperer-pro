@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Plane,
   PlaneLanding,
@@ -12,13 +12,26 @@ import {
   CheckCircle2,
   Circle,
   Clock,
+  Pencil,
+  Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { useRoles } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const db = supabase as any;
 
@@ -43,6 +56,33 @@ const BOOKING_STATUS_LABELS: Record<string, string> = {
   checked_in: "سجّل دخول",
   checked_out: "سجّل خروج",
   cancelled: "ملغاة",
+};
+
+const OP_STATUS_LABELS: Record<string, string> = {
+  scheduled: "مجدول",
+  arrived: "وصل المطار",
+  in_transport: "في النقل",
+  at_hotel: "في الفندق",
+  at_event: "في الفعالية",
+  departed: "غادر",
+  cancelled: "ملغي",
+};
+
+const OP_TIME_FIELDS: { key: string; label: string }[] = [
+  { key: "arrival_actual_time", label: "وقت الوصول الفعلي للمطار" },
+  { key: "airport_received_at", label: "وقت الاستقبال في المطار" },
+  { key: "transport_departed_at", label: "وقت بدء النقل" },
+  { key: "hotel_arrived_at", label: "وقت الوصول للفندق" },
+  { key: "hotel_checkin_at", label: "وقت دخول الفندق" },
+  { key: "event_arrived_at", label: "وقت الوصول للفعالية" },
+  { key: "departure_actual_time", label: "وقت المغادرة الفعلي" },
+];
+
+const toLocalInput = (v?: string | null) => {
+  if (!v) return "";
+  const d = new Date(v);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
 const STAGES = [
@@ -218,6 +258,7 @@ function useJourneys() {
 
         return {
           ...s,
+          op,
           opStatus: (op?.operational_status as string) ?? "scheduled",
           stages,
           doneCount,
@@ -229,10 +270,63 @@ function useJourneys() {
   });
 }
 
+type EditForm = {
+  operational_status: string;
+  notes: string;
+  times: Record<string, string>;
+};
+
 export function GuestJourney() {
   const { data, isLoading } = useJourneys();
+  const { isAdmin } = useRoles();
+  const queryClient = useQueryClient();
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<string>("all");
+  const [editing, setEditing] = useState<any | null>(null);
+  const [form, setForm] = useState<EditForm | null>(null);
+
+  const openEdit = (r: any) => {
+    setEditing(r);
+    setForm({
+      operational_status: r.op?.operational_status ?? "scheduled",
+      notes: r.op?.notes ?? "",
+      times: Object.fromEntries(
+        OP_TIME_FIELDS.map((f) => [f.key, toLocalInput(r.op?.[f.key])]),
+      ),
+    });
+  };
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      if (!editing || !form) return;
+      const payload: Record<string, any> = {
+        speaker_id: editing.id,
+        operational_status: form.operational_status,
+        notes: form.notes || null,
+      };
+      OP_TIME_FIELDS.forEach((f) => {
+        const v = form.times[f.key] ?? "";
+        payload[f.key] = v ? new Date(v).toISOString() : null;
+      });
+      if (editing.op?.id) {
+        const { error } = await db.from("guest_operations").update(payload).eq("id", editing.op.id);
+        if (error) throw error;
+      } else {
+        const { error } = await db.from("guest_operations").insert(payload);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success(`تم حفظ رحلة الضيف: ${editing?.full_name}`);
+      setEditing(null);
+      setForm(null);
+      queryClient.invalidateQueries({ queryKey: ["guest-journey"] });
+      queryClient.invalidateQueries({ queryKey: ["operations-manage"] });
+      queryClient.invalidateQueries({ queryKey: ["speakers-status-board"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "تعذّر حفظ التعديل"),
+  });
 
   const rows = useMemo(() => {
     return (data ?? []).filter((r: any) => {
@@ -348,6 +442,17 @@ export function GuestJourney() {
                     <p className="truncate text-xs text-muted-foreground">
                       {[r.title, r.organization, r.country].filter(Boolean).join(" · ") || "—"}
                     </p>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => openEdit(r)}
+                        className="mt-1 inline-flex items-center gap-1 rounded-md border border-border px-2 py-0.5 text-[11px] text-primary transition-colors hover:bg-primary/10"
+                        title="تعديل رحلة الضيف"
+                      >
+                        <Pencil className="h-3 w-3" />
+                        تعديل الرحلة
+                      </button>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">{r.doneCount}/{STAGES.length} مراحل</Badge>
@@ -411,6 +516,78 @@ export function GuestJourney() {
           </div>
         </>
       )}
+
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent dir="rtl" className="max-h-[90vh] max-w-lg overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>تعديل رحلة الضيف</DialogTitle>
+            <DialogDescription>
+              {editing?.full_name} — عدّل الحالة التشغيلية والأوقات المسجلة لكل مرحلة.
+            </DialogDescription>
+          </DialogHeader>
+
+          {form && (
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">الحالة التشغيلية</label>
+                <select
+                  value={form.operational_status}
+                  onChange={(e) => setForm({ ...form, operational_status: e.target.value })}
+                  className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm"
+                >
+                  {Object.entries(OP_STATUS_LABELS).map(([v, l]) => (
+                    <option key={v} value={v}>
+                      {l}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {OP_TIME_FIELDS.map((f) => (
+                  <div key={f.key} className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">{f.label}</label>
+                    <Input
+                      type="datetime-local"
+                      dir="ltr"
+                      value={form.times[f.key]}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          times: { ...form.times, [f.key]: e.target.value },
+                        })
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">ملاحظات</label>
+                <Input
+                  value={form.notes}
+                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                  placeholder="ملاحظات تشغيلية (اختياري)"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setEditing(null)}>
+              إلغاء
+            </Button>
+            <Button
+              onClick={() => saveMutation.mutate()}
+              disabled={saveMutation.isPending}
+              className="gap-1.5"
+            >
+              {saveMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              حفظ التعديلات
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
