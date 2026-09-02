@@ -58,8 +58,8 @@ function FlightTrackingSettings() {
     const { error } = await supabase.from("app_settings").upsert(
       {
         key: "aviationstack_api_key",
-        value: key.trim(),
-        updated_by: user?.id,
+        value: key.trim() || null,
+        updated_by: user?.id ?? null,
       },
       { onConflict: "key" },
     );
