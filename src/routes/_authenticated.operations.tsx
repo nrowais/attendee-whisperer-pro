@@ -220,6 +220,7 @@ function OperationsPage() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [pending, setPending] = useState<string | null>(null);
+  const [highlighted, setHighlighted] = useState<string | null>(null);
   const [confirmUndo, setConfirmUndo] = useState<{ row: any; action: (typeof ACTIONS)[number] } | null>(null);
 
   const mutation = useMutation({
@@ -285,6 +286,21 @@ function OperationsPage() {
     onSettled: () => setPending(null),
     onSuccess: (_d, { row, action, undo }) => {
       toast.success(`${row.full_name}: ${undo ? "تم التراجع عن" : "تم تسجيل"} ${action.label}`);
+      // أبقِ المتحدث ظاهراً: أعد فلتر الحالة إلى "الكل" إن لم تعد حالته الجديدة ضمن الفلتر
+      const nextStatus = undo
+        ? (REVERT_STATUS[action.key] ?? row.opStatus)
+        : (action.status ?? row.opStatus);
+      if (statusFilter !== "all" && nextStatus !== statusFilter) {
+        setStatusFilter("all");
+      }
+      // ظلّل بطاقة المتحدث وانتقل إليها بعد التحديث لتسهيل متابعة التعديل
+      setHighlighted(row.id);
+      setTimeout(() => {
+        document
+          .getElementById(`op-row-${row.id}`)
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 150);
+      setTimeout(() => setHighlighted(null), 4000);
       queryClient.invalidateQueries({ queryKey: ["operations-manage"] });
       queryClient.invalidateQueries({ queryKey: ["speakers-status-board"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
@@ -293,11 +309,18 @@ function OperationsPage() {
   });
 
   const rows = useMemo(() => {
+    const norm = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/[ً-ْٰـ]/g, "")
+        .replace(/[أإآ]/g, "ا")
+        .trim();
+    const q = norm(query);
     return (data ?? []).filter((r: any) => {
       if (statusFilter !== "all" && r.opStatus !== statusFilter) return false;
-      if (query.trim()) {
-        const hay = `${r.full_name} ${r.organization ?? ""} ${r.country ?? ""}`;
-        if (!hay.includes(query.trim())) return false;
+      if (q) {
+        const hay = norm(`${r.full_name} ${r.organization ?? ""} ${r.country ?? ""}`);
+        if (!hay.includes(q)) return false;
       }
       return true;
     });
@@ -357,7 +380,14 @@ function OperationsPage() {
       ) : (
         <div className="space-y-3">
           {rows.map((r: any) => (
-            <div key={r.id} className="space-y-3 rounded-xl border border-border bg-card p-4">
+            <div
+              key={r.id}
+              id={`op-row-${r.id}`}
+              className={cn(
+                "space-y-3 rounded-xl border bg-card p-4 transition-colors duration-500",
+                highlighted === r.id ? "border-primary ring-2 ring-primary/30" : "border-border"
+              )}
+            >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="truncate font-semibold text-foreground">{r.full_name}</p>
