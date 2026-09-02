@@ -1271,6 +1271,7 @@ export type Database = {
     }
     Functions: {
       can_edit: { Args: { _user_id: string }; Returns: boolean }
+      can_register: { Args: { _user_id: string }; Returns: boolean }
       can_update_ops: { Args: { _user_id: string }; Returns: boolean }
       check_flight_alerts: {
         Args: { window_minutes?: number }
@@ -1285,7 +1286,13 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "coordinator" | "viewer" | "operator"
+      app_role:
+        | "admin"
+        | "coordinator"
+        | "viewer"
+        | "operator"
+        | "field_staff"
+        | "registration"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1413,7 +1420,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "coordinator", "viewer", "operator"],
+      app_role: [
+        "admin",
+        "coordinator",
+        "viewer",
+        "operator",
+        "field_staff",
+        "registration",
+      ],
     },
   },
 } as const
