@@ -380,6 +380,8 @@ export function UpcomingCountdown() {
       qc.invalidateQueries({ queryKey: ["transport-tickets"] });
       qc.invalidateQueries({ queryKey: ["fleet-trips"] });
       qc.invalidateQueries({ queryKey: ["upcoming-countdown"] });
+      qc.invalidateQueries({ queryKey: ["speakers-status-board"] });
+      qc.invalidateQueries({ queryKey: ["driver-card"] });
       toast.success(`تم إصدار تذكرة نقل رقم ${inserted?.ticket_no ?? ""} لـ ${draft?.guestName ?? ""}`);
       setDraft(null);
     },
