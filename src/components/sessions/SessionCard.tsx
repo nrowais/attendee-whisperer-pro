@@ -14,6 +14,7 @@ import {
   sessionTypeLabels,
   timeAlertLabel,
   timePhase,
+  timePrecisionLabels,
   type ParticipantRole,
   type SessionStatus,
   type SessionType,
