@@ -25,6 +25,8 @@ import { Route as AuthenticatedMovementsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated.notifications'
 import { Route as AuthenticatedOperationsRouteImport } from './routes/_authenticated.operations'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated.reports'
+import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated.sessions'
+import { Route as AuthenticatedSessionsLiveRouteImport } from './routes/_authenticated.sessions-live'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedSheetsRouteImport } from './routes/_authenticated.sheets'
 import { Route as AuthenticatedSpeakersRouteImport } from './routes/_authenticated.speakers'
@@ -114,6 +116,17 @@ const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
+  id: '/sessions',
+  path: '/sessions',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSessionsLiveRoute =
+  AuthenticatedSessionsLiveRouteImport.update({
+    id: '/sessions-live',
+    path: '/sessions-live',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -166,6 +179,8 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/operations': typeof AuthenticatedOperationsRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/sessions': typeof AuthenticatedSessionsRoute
+  '/sessions-live': typeof AuthenticatedSessionsLiveRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/sheets': typeof AuthenticatedSheetsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
@@ -190,6 +205,8 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/operations': typeof AuthenticatedOperationsRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/sessions': typeof AuthenticatedSessionsRoute
+  '/sessions-live': typeof AuthenticatedSessionsLiveRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/sheets': typeof AuthenticatedSheetsRoute
   '/speakers': typeof AuthenticatedSpeakersRoute
@@ -216,6 +233,8 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/operations': typeof AuthenticatedOperationsRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/sessions': typeof AuthenticatedSessionsRoute
+  '/_authenticated/sessions-live': typeof AuthenticatedSessionsLiveRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/sheets': typeof AuthenticatedSheetsRoute
   '/_authenticated/speakers': typeof AuthenticatedSpeakersRoute
@@ -242,6 +261,8 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/operations'
     | '/reports'
+    | '/sessions'
+    | '/sessions-live'
     | '/settings'
     | '/sheets'
     | '/speakers'
@@ -266,6 +287,8 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/operations'
     | '/reports'
+    | '/sessions'
+    | '/sessions-live'
     | '/settings'
     | '/sheets'
     | '/speakers'
@@ -291,6 +314,8 @@ export interface FileRouteTypes {
     | '/_authenticated/notifications'
     | '/_authenticated/operations'
     | '/_authenticated/reports'
+    | '/_authenticated/sessions'
+    | '/_authenticated/sessions-live'
     | '/_authenticated/settings'
     | '/_authenticated/sheets'
     | '/_authenticated/speakers'
@@ -423,6 +448,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/sessions': {
+      id: '/_authenticated/sessions'
+      path: '/sessions'
+      fullPath: '/sessions'
+      preLoaderRoute: typeof AuthenticatedSessionsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/sessions-live': {
+      id: '/_authenticated/sessions-live'
+      path: '/sessions-live'
+      fullPath: '/sessions-live'
+      preLoaderRoute: typeof AuthenticatedSessionsLiveRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -488,6 +527,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOperationsRoute: typeof AuthenticatedOperationsRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRoute
+  AuthenticatedSessionsLiveRoute: typeof AuthenticatedSessionsLiveRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSheetsRoute: typeof AuthenticatedSheetsRoute
   AuthenticatedSpeakersRoute: typeof AuthenticatedSpeakersRoute
@@ -508,6 +549,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOperationsRoute: AuthenticatedOperationsRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedSessionsRoute: AuthenticatedSessionsRoute,
+  AuthenticatedSessionsLiveRoute: AuthenticatedSessionsLiveRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSheetsRoute: AuthenticatedSheetsRoute,
   AuthenticatedSpeakersRoute: AuthenticatedSpeakersRoute,
