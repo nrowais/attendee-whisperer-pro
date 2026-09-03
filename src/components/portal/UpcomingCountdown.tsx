@@ -37,7 +37,7 @@ function openCardPdf(card: DriverCardData, ticketNo: number | string) {
   }
   const html = buildDriverCardHtml(card).replace(
     "<title>بطاقة توجيه السائق</title>",
-    `<title>تذكرة-نقل-${String(ticketNo)}</title>`,
+    `<title>بطاقة-سائق-${String(ticketNo)}</title>`,
   );
   win.document.open();
   win.document.write(html);
@@ -218,6 +218,8 @@ export function UpcomingCountdown() {
     dropoff: string;
     receiverName: string;
     receiverPhone: string;
+    flightDate: string;
+    flightTime: string;
     hotelName: string;
     hotelLocation: string;
     hotelMapUrl: string;
