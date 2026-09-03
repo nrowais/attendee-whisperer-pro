@@ -234,3 +234,20 @@ export function normalizeName(value?: string | null) {
 }
 
 export const TBD = "لم يتأكد بعد";
+
+/** حالة مطابقة المشارك مع سجلات المتحدثين */
+export type MatchStatus = "matched" | "needs_matching" | "unconfirmed";
+
+export const matchStatusLabels: Record<MatchStatus, string> = {
+  matched: "مطابق مؤكد",
+  needs_matching: "بحاجة لمطابقة",
+  unconfirmed: "غير مؤكد",
+};
+
+/** دقة توقيت النشاط داخل الفترة الزمنية */
+export type TimePrecision = "exact" | "within_slot";
+
+export const timePrecisionLabels: Record<TimePrecision, string> = {
+  exact: "وقت محدد",
+  within_slot: "ضمن الفترة الزمنية",
+};
