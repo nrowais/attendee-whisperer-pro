@@ -353,7 +353,7 @@ export function UpcomingCountdown() {
             const diff = new Date(item.at).getTime() - tick;
             const Icon = kindMeta[item.kind].icon;
             const urgent = diff <= ALERT_MINUTES * 60 * 1000;
-            const busy = createTicket.isPending && createTicket.variables?.id === item.id;
+            const busy = issueTicket.isPending && draft?.item.id === item.id;
             const hasTicket = item.ticketNos.length > 0;
             const inCooldown =
               !!item.lastTicketAt && Date.now() - new Date(item.lastTicketAt).getTime() < TICKET_COOLDOWN_MS;
