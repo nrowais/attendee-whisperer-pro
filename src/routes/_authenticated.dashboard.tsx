@@ -351,6 +351,8 @@ function DashboardPage() {
 
       <UpcomingCountdown />
 
+      <UpcomingSessionsOps />
+
       <TodaysSessions />
 
       <section className="surface-card overflow-hidden">
