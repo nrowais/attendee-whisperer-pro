@@ -19,13 +19,29 @@ export const listAccountStates = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
     if (error) throw new Error(error.message);
+    const { data: logs } = await supabaseAdmin
+      .from("activity_logs")
+      .select("user_id, created_at")
+      .order("created_at", { ascending: false })
+      .limit(5000);
+    const lastActivity = new Map<string, string>();
+    const activityCount = new Map<string, number>();
+    for (const row of (logs ?? []) as any[]) {
+      if (!row.user_id) continue;
+      if (!lastActivity.has(row.user_id)) lastActivity.set(row.user_id, row.created_at);
+      activityCount.set(row.user_id, (activityCount.get(row.user_id) ?? 0) + 1);
+    }
     return data.users.map((u) => ({
       id: u.id,
       email: u.email ?? null,
       disabled: Boolean((u as any).banned_until && new Date((u as any).banned_until) > new Date()),
       lastSignInAt: u.last_sign_in_at ?? null,
+      createdAt: u.created_at ?? null,
+      lastActivityAt: lastActivity.get(u.id) ?? null,
+      activityCount: activityCount.get(u.id) ?? 0,
     }));
   });
+
 
 export const setUserPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
