@@ -67,3 +67,35 @@ export const setUserDisabled = createServerFn({ method: "POST" })
     if (profileError) throw new Error(profileError.message);
     return { ok: true };
   });
+
+/** Activity trail for one user: latest actions recorded in the portal. */
+export const getUserActivity = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { userId: string; limit?: number }) => {
+    if (!input?.userId) throw new Error("المستخدم غير محدد");
+    return { userId: input.userId, limit: Math.min(input.limit ?? 100, 300) };
+  })
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as any);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [logsRes, userRes] = await Promise.all([
+      supabaseAdmin
+        .from("activity_logs")
+        .select("id, entity_type, entity_id, action, details, created_at")
+        .eq("user_id", data.userId)
+        .order("created_at", { ascending: false })
+        .limit(data.limit),
+      supabaseAdmin.auth.admin.getUserById(data.userId),
+    ]);
+    if (logsRes.error) throw new Error(logsRes.error.message);
+    const u = userRes.data?.user as any;
+    return {
+      logs: (logsRes.data ?? []) as any[],
+      account: {
+        createdAt: u?.created_at ?? null,
+        lastSignInAt: u?.last_sign_in_at ?? null,
+        emailConfirmedAt: u?.email_confirmed_at ?? null,
+        provider: u?.app_metadata?.provider ?? null,
+      },
+    };
+  });
