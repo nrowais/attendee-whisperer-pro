@@ -176,6 +176,20 @@ export function UpcomingCountdown() {
   const createTicket = useMutation({
     mutationFn: async (item: Item) => {
       const isArrival = item.kind === "arrival";
+
+      // بطاقة واحدة فقط لكل اسم خلال الساعة الواحدة
+      const cooldownStart = new Date(Date.now() - TICKET_COOLDOWN_MS).toISOString();
+      const linkCol = isArrival ? "arrival_id" : "departure_id";
+      const recent = await db
+        .from("transport_trips")
+        .select("id, created_at")
+        .eq(linkCol, item.sourceId)
+        .gte("created_at", cooldownStart)
+        .limit(1);
+      if ((recent.data ?? []).length > 0) {
+        throw new Error(`تم إصدار بطاقة لـ ${item.name} خلال آخر ساعة — لا يمكن إصدار بطاقة أخرى الآن`);
+      }
+
       const { error } = await db.from("transport_trips").insert({
         event_id: item.eventId,
         speaker_id: item.speakerId,
