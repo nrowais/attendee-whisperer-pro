@@ -235,6 +235,7 @@ export function UpcomingCountdown() {
     dropoff: string;
     receiverName: string;
     receiverPhone: string;
+    receiverModeSel: string;
     flightDate: string;
     flightTime: string;
     hotelName: string;
@@ -295,6 +296,7 @@ export function UpcomingCountdown() {
       dropoff: isArrival ? hotelName || "الفندق" : (item.point ?? "المطار"),
       receiverName: "",
       receiverPhone: "",
+      receiverModeSel: "",
       flightDate: splitDateTime(item.at).date,
       flightTime: splitDateTime(item.at).time,
       hotelName,
