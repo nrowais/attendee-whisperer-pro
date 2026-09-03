@@ -65,6 +65,10 @@ export const HOTELS: Array<{ name: string; location: string; mapUrl?: string }> 
   },
 ];
 
+export const RECEIVERS: Array<{ name: string; phone: string }> = [
+  { name: "نواف", phone: "0551180896" },
+];
+
 function esc(v: string) {
   return (v || "—")
     .replace(/&/g, "&amp;")
