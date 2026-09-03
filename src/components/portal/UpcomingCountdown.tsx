@@ -27,7 +27,22 @@ import {
 } from "@/components/ui/select";
 import { useRoles } from "@/hooks/useAuth";
 import { buildDriverCardHtml, type DriverCardData } from "@/components/portal/DriverCardDialog";
-import { toast as toastPdf } from "sonner";
+
+/** فتح نافذة طباعة بطاقة السائق — نفس قالب شاشة التذاكر */
+function openCardPdf(card: DriverCardData, ticketNo: number | string) {
+  const win = window.open("", "_blank", "width=900,height=700");
+  if (!win) {
+    toast.error("يرجى السماح بالنوافذ المنبثقة لتحميل البطاقة");
+    return;
+  }
+  const html = buildDriverCardHtml(card).replace(
+    "<title>بطاقة توجيه السائق</title>",
+    `<title>تذكرة-نقل-${String(ticketNo)}</title>`,
+  );
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+}
 
 const db = supabase as any;
 
