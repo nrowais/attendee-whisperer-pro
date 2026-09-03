@@ -1403,7 +1403,9 @@ export type Database = {
         Row: {
           actual_dropoff_at: string | null
           actual_pickup_at: string | null
+          arrival_id: string | null
           created_at: string
+          departure_id: string | null
           driver_id: string | null
           dropoff_location: string | null
           event_id: string | null
@@ -1429,7 +1431,9 @@ export type Database = {
         Insert: {
           actual_dropoff_at?: string | null
           actual_pickup_at?: string | null
+          arrival_id?: string | null
           created_at?: string
+          departure_id?: string | null
           driver_id?: string | null
           dropoff_location?: string | null
           event_id?: string | null
@@ -1455,7 +1459,9 @@ export type Database = {
         Update: {
           actual_dropoff_at?: string | null
           actual_pickup_at?: string | null
+          arrival_id?: string | null
           created_at?: string
+          departure_id?: string | null
           driver_id?: string | null
           dropoff_location?: string | null
           event_id?: string | null
@@ -1479,6 +1485,20 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "transport_trips_arrival_id_fkey"
+            columns: ["arrival_id"]
+            isOneToOne: false
+            referencedRelation: "speaker_arrivals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transport_trips_departure_id_fkey"
+            columns: ["departure_id"]
+            isOneToOne: false
+            referencedRelation: "speaker_departures"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "transport_trips_driver_id_fkey"
             columns: ["driver_id"]

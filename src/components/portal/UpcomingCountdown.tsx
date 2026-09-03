@@ -24,7 +24,12 @@ type Item = {
   terminal: string | null;
   sourceId: string;
   ticketNos: number[];
+  /** تاريخ آخر تذكرة مصدرة لهذا الموعد */
+  lastTicketAt: string | null;
 };
+
+/** حد الإصدار: بطاقة واحدة فقط لكل اسم خلال الساعة */
+const TICKET_COOLDOWN_MS = 60 * 60 * 1000;
 
 /** عدد العناصر الظاهرة قبل توسيع القائمة */
 const COLLAPSED_COUNT = 5;
@@ -89,28 +94,36 @@ export function UpcomingCountdown() {
         arrivalIds.length
           ? db
               .from("transport_trips")
-              .select("id, arrival_id, ticket_no")
+              .select("id, arrival_id, ticket_no, created_at")
               .in("arrival_id", arrivalIds)
           : { data: [] },
         departureIds.length
           ? db
               .from("transport_trips")
-              .select("id, departure_id, ticket_no")
+              .select("id, departure_id, ticket_no, created_at")
               .in("departure_id", departureIds)
           : { data: [] },
       ]);
 
       const arrivalTicketMap = new Map<string, number[]>();
+      const arrivalLastAt = new Map<string, string>();
       for (const t of arrivalTickets.data ?? []) {
         const list = arrivalTicketMap.get(t.arrival_id) ?? [];
         list.push(t.ticket_no);
         arrivalTicketMap.set(t.arrival_id, list);
+        if (!arrivalLastAt.get(t.arrival_id) || t.created_at > arrivalLastAt.get(t.arrival_id)!) {
+          arrivalLastAt.set(t.arrival_id, t.created_at);
+        }
       }
       const departureTicketMap = new Map<string, number[]>();
+      const departureLastAt = new Map<string, string>();
       for (const t of departureTickets.data ?? []) {
         const list = departureTicketMap.get(t.departure_id) ?? [];
         list.push(t.ticket_no);
         departureTicketMap.set(t.departure_id, list);
+        if (!departureLastAt.get(t.departure_id) || t.created_at > departureLastAt.get(t.departure_id)!) {
+          departureLastAt.set(t.departure_id, t.created_at);
+        }
       }
 
       const items: Item[] = [];
@@ -127,6 +140,7 @@ export function UpcomingCountdown() {
           terminal: a.terminal ?? null,
           sourceId: a.id,
           ticketNos: arrivalTicketMap.get(a.id) ?? [],
+          lastTicketAt: arrivalLastAt.get(a.id) ?? null,
         });
       }
       for (const d of departures.data ?? []) {
@@ -142,6 +156,7 @@ export function UpcomingCountdown() {
           terminal: d.terminal ?? null,
           sourceId: d.id,
           ticketNos: departureTicketMap.get(d.id) ?? [],
+          lastTicketAt: departureLastAt.get(d.id) ?? null,
         });
       }
 
@@ -161,6 +176,20 @@ export function UpcomingCountdown() {
   const createTicket = useMutation({
     mutationFn: async (item: Item) => {
       const isArrival = item.kind === "arrival";
+
+      // بطاقة واحدة فقط لكل اسم خلال الساعة الواحدة
+      const cooldownStart = new Date(Date.now() - TICKET_COOLDOWN_MS).toISOString();
+      const linkCol = isArrival ? "arrival_id" : "departure_id";
+      const recent = await db
+        .from("transport_trips")
+        .select("id, created_at")
+        .eq(linkCol, item.sourceId)
+        .gte("created_at", cooldownStart)
+        .limit(1);
+      if ((recent.data ?? []).length > 0) {
+        throw new Error(`تم إصدار بطاقة لـ ${item.name} خلال آخر ساعة — لا يمكن إصدار بطاقة أخرى الآن`);
+      }
+
       const { error } = await db.from("transport_trips").insert({
         event_id: item.eventId,
         speaker_id: item.speakerId,
@@ -231,6 +260,8 @@ export function UpcomingCountdown() {
             const urgent = diff <= ALERT_MINUTES * 60 * 1000;
             const busy = createTicket.isPending && createTicket.variables?.id === item.id;
             const hasTicket = item.ticketNos.length > 0;
+            const inCooldown =
+              !!item.lastTicketAt && Date.now() - new Date(item.lastTicketAt).getTime() < TICKET_COOLDOWN_MS;
             return (
               <li key={item.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                 <div className="flex min-w-0 items-center gap-3">
@@ -238,7 +269,7 @@ export function UpcomingCountdown() {
                     <Icon className="size-4" />
                   </span>
                   <div className="min-w-0">
-                    {canEditOps && item.speakerId && !hasTicket ? (
+                    {canEditOps && item.speakerId && !inCooldown ? (
                       <button
                         type="button"
                         disabled={busy}
