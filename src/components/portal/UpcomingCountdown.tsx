@@ -106,16 +106,24 @@ export function UpcomingCountdown() {
       ]);
 
       const arrivalTicketMap = new Map<string, number[]>();
+      const arrivalLastAt = new Map<string, string>();
       for (const t of arrivalTickets.data ?? []) {
         const list = arrivalTicketMap.get(t.arrival_id) ?? [];
         list.push(t.ticket_no);
         arrivalTicketMap.set(t.arrival_id, list);
+        if (!arrivalLastAt.get(t.arrival_id) || t.created_at > arrivalLastAt.get(t.arrival_id)!) {
+          arrivalLastAt.set(t.arrival_id, t.created_at);
+        }
       }
       const departureTicketMap = new Map<string, number[]>();
+      const departureLastAt = new Map<string, string>();
       for (const t of departureTickets.data ?? []) {
         const list = departureTicketMap.get(t.departure_id) ?? [];
         list.push(t.ticket_no);
         departureTicketMap.set(t.departure_id, list);
+        if (!departureLastAt.get(t.departure_id) || t.created_at > departureLastAt.get(t.departure_id)!) {
+          departureLastAt.set(t.departure_id, t.created_at);
+        }
       }
 
       const items: Item[] = [];
