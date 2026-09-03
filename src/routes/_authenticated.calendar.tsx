@@ -139,25 +139,6 @@ function useMonthItems(from: Date, to: Date) {
             subtitle: [tr.pickup_location, tr.dropoff_location].filter(Boolean).join(" ← "),
           });
       }
-      for (const b of bookings.data ?? []) {
-        if (b.check_in && b.check_in >= fromDate && b.check_in <= toDate)
-          items.push({
-            id: `ci-${b.id}`,
-            kind: "checkin",
-            date: b.check_in,
-            title: b.speakers?.full_name ?? "حجز فندقي",
-            subtitle: b.hotels?.name ?? undefined,
-          });
-        if (b.check_out && b.check_out >= fromDate && b.check_out <= toDate)
-          items.push({
-            id: `co-${b.id}`,
-            kind: "checkout",
-            date: b.check_out,
-            title: b.speakers?.full_name ?? "حجز فندقي",
-            subtitle: b.hotels?.name ?? undefined,
-          });
-      }
-
       return items.sort((x, y) => (x.time ?? "").localeCompare(y.time ?? ""));
     },
   });
