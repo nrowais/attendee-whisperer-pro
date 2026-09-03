@@ -636,7 +636,7 @@ export function UpcomingCountdown() {
                   <option value="">بدون مستقبل</option>
                   {RECEIVERS.map((r) => (
                     <option key={r.name} value={r.name}>
-                      {r.name} · {r.phone}
+                      {r.name}
                     </option>
                   ))}
                   <option value="__custom__">أخرى (إدخال يدوي)</option>
