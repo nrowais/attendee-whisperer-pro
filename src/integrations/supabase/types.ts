@@ -793,6 +793,162 @@ export type Database = {
         }
         Relationships: []
       }
+      session_participants: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          match_status: string
+          role: string
+          session_id: string
+          sort_order: number
+          speaker_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          match_status?: string
+          role?: string
+          session_id: string
+          sort_order?: number
+          speaker_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          match_status?: string
+          role?: string
+          session_id?: string
+          sort_order?: number
+          speaker_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_participants_speaker_id_fkey"
+            columns: ["speaker_id"]
+            isOneToOne: false
+            referencedRelation: "speakers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_tracks: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          name_ar: string
+          name_en: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          name_ar: string
+          name_en?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          name_ar?: string
+          name_en?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sessions: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          end_time: string | null
+          event_id: string | null
+          id: string
+          notes: string | null
+          partner_text: string | null
+          session_date: string
+          session_type: string
+          start_time: string | null
+          status: string
+          title_ar: string | null
+          title_en: string | null
+          topic: string | null
+          track_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          end_time?: string | null
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          partner_text?: string | null
+          session_date: string
+          session_type?: string
+          start_time?: string | null
+          status?: string
+          title_ar?: string | null
+          title_en?: string | null
+          topic?: string | null
+          track_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          end_time?: string | null
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          partner_text?: string | null
+          session_date?: string
+          session_type?: string
+          start_time?: string | null
+          status?: string
+          title_ar?: string | null
+          title_en?: string | null
+          topic?: string | null
+          track_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "session_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       speaker_arrivals: {
         Row: {
           arrival_point: string | null
