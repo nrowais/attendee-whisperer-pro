@@ -224,6 +224,7 @@ export function UpcomingCountdown() {
             const Icon = kindMeta[item.kind].icon;
             const urgent = diff <= ALERT_MINUTES * 60 * 1000;
             const busy = createTicket.isPending && createTicket.variables?.id === item.id;
+            const hasTicket = item.ticketNo != null;
             return (
               <li key={item.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                 <div className="flex min-w-0 items-center gap-3">
@@ -231,7 +232,7 @@ export function UpcomingCountdown() {
                     <Icon className="size-4" />
                   </span>
                   <div className="min-w-0">
-                    {canEditOps && item.speakerId ? (
+                    {canEditOps && item.speakerId && !hasTicket ? (
                       <button
                         type="button"
                         disabled={busy}
@@ -253,6 +254,16 @@ export function UpcomingCountdown() {
                       {item.detail} • {new Date(item.at).toLocaleString("ar-SA-u-ca-gregory")}
                     </p>
                   </div>
+                  {hasTicket && (
+                    <Badge
+                      variant="default"
+                      className="shrink-0 gap-1 bg-primary text-primary-foreground"
+                      title="تذكرة نقل مصدرة"
+                    >
+                      <Ticket className="size-3" />
+                      #{item.ticketNo}
+                    </Badge>
+                  )}
                 </div>
                 <Badge
                   variant={urgent ? "destructive" : "secondary"}
