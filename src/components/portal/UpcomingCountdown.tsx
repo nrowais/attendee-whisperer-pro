@@ -269,7 +269,7 @@ export function UpcomingCountdown() {
                     <Icon className="size-4" />
                   </span>
                   <div className="min-w-0">
-                    {canEditOps && item.speakerId && !hasTicket ? (
+                    {canEditOps && item.speakerId && !inCooldown ? (
                       <button
                         type="button"
                         disabled={busy}
