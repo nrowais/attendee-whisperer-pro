@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS drivers_national_id_key ON public.drivers (national_id);
