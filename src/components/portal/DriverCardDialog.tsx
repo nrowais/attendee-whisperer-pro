@@ -606,9 +606,10 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
               {field("dropoff", "الوجهة")}
               {field("receiverName", "اسم مستقبل الضيف (اختياري)")}
               {field("receiverPhone", "رقم جوال مستقبل الضيف", "tel", "05xxxxxxxx")}
-              {field("driverName", "اسم السائق (اختياري)")}
+              {driverPicker}
               {field("driverPhone", "رقم جوال السائق", "tel", "05xxxxxxxx")}
-              {field("vehicle", "المركبة (اختياري)")}
+              {vehiclePicker}
+              {field("vehicle", "المركبة (تعديل يدوي اختياري)")}
             </>
           ) : (
             <>
@@ -618,7 +619,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
               {field("flightTime", "وقت الرحلة", "time")}
               {field("flightDate", "تاريخ الرحلة", "date")}
               {field("flightNo", "رقم الرحلة (اختياري)")}
-              {field("driverName", "اسم السائق (اختياري)")}
+              {driverPicker}
               {field("driverPhone", "رقم جوال السائق", "tel", "05xxxxxxxx")}
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">اسم الفندق</Label>
