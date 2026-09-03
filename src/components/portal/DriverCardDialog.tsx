@@ -285,6 +285,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
   const [cardId, setCardId] = useState<string | null>(null);
   const [driverId, setDriverId] = useState<string | null>(null);
   const [vehicleId, setVehicleId] = useState<string | null>(null);
+  const [receiverModeSel, setReceiverModeSel] = useState("");
 
   // قائمة السائقين والمركبات المسجلة في النظام لربطها بالبطاقة
   const { data: drivers = [] } = useQuery({
@@ -343,6 +344,10 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
     setCardId(null);
     setDriverId(trip?.driver_id ?? null);
     setVehicleId(trip?.vehicle_id ?? null);
+    const initReceiver = trip?.receiver_name ?? "";
+    setReceiverModeSel(
+      !initReceiver ? "" : RECEIVERS.some((r) => r.name === initReceiver) ? initReceiver : "__custom__",
+    );
     // استكمال بيانات الفندق تلقائياً من القائمة المعتمدة عند تطابق الاسم
     const hotelMatch = HOTELS.find((h) => h.name === (trip?.hotel_name ?? ""));
     setForm({
