@@ -545,6 +545,35 @@ export function UpcomingCountdown() {
                 />
               </div>
               <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">اسم مستقبل الضيف (اختياري)</Label>
+                <Input
+                  value={draft.receiverName}
+                  onChange={(e) => setDraft({ ...draft, receiverName: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">جوال مستقبل الضيف (اختياري)</Label>
+                <Input
+                  dir="ltr"
+                  value={draft.receiverPhone}
+                  onChange={(e) => setDraft({ ...draft, receiverPhone: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">اسم الفندق (اختياري)</Label>
+                <Input
+                  value={draft.hotelName}
+                  onChange={(e) => setDraft({ ...draft, hotelName: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">موقع الفندق (اختياري)</Label>
+                <Input
+                  value={draft.hotelLocation}
+                  onChange={(e) => setDraft({ ...draft, hotelLocation: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">نقطة الانطلاق</Label>
                 <Input
                   value={draft.pickup}
