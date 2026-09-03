@@ -8,10 +8,13 @@ import {
 } from "@/components/ui/dialog";
 import { useRoles } from "@/hooks/useAuth";
 import {
+  completionGaps,
   fmtDuration,
   fmtTime,
   moderatorRoles,
   opStatusLabels,
+  opsBreakdown,
+  opsGroups,
   participantRoleLabels,
   readinessClasses,
   sessionReadiness,
@@ -23,6 +26,7 @@ import {
   type SessionStatus,
   type SessionType,
 } from "@/lib/sessions";
+
 import { cn } from "@/lib/utils";
 import type { SessionRow, SpeakerOps, TrackRow } from "./data";
 
