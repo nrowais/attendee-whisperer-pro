@@ -12,6 +12,7 @@ import {
   setUserPassword,
 } from "@/lib/adminUsers.functions";
 import { useRoles, roleLabels, type AppRole } from "@/hooks/useAuth";
+import { UserActivityDialog, formatDateTime } from "@/components/portal/UserActivityDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -423,6 +424,8 @@ function UsersPage() {
           </Table>
         )}
       </div>
+
+      <UserActivityDialog user={activityTarget} onOpenChange={(o) => !o && setActivityTarget(null)} />
 
       <Dialog
         open={passwordTarget !== null}
