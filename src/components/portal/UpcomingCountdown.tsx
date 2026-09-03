@@ -23,7 +23,7 @@ type Item = {
   point: string | null;
   terminal: string | null;
   sourceId: string;
-  ticketNo: number | null;
+  ticketNos: number[];
 };
 
 /** عدد العناصر الظاهرة قبل توسيع القائمة */
