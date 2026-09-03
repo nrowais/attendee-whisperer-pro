@@ -216,6 +216,10 @@ export function UpcomingCountdown() {
     flightNo: string;
     pickup: string;
     dropoff: string;
+    receiverName: string;
+    receiverPhone: string;
+    hotelName: string;
+    hotelLocation: string;
     driverId: string | null;
     vehicleId: string | null;
     notes: string;
