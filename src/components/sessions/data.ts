@@ -19,6 +19,7 @@ export type ParticipantRow = {
   display_name: string | null;
   role: string;
   match_status: string;
+  notes?: string | null;
   sort_order: number;
   speakers?: { id: string; full_name: string; phone: string | null; photo_url: string | null } | null;
 };
