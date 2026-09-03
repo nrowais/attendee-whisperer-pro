@@ -25,7 +25,7 @@ export function SessionsTimeline({
   sessions: SessionRow[];
   tracks: TrackRow[];
   now: number;
-  opsMap?: Map<string, SpeakerOps>;
+  opsMap?: Map<string, SpeakerOps> | undefined;
   onOpen: (session: SessionRow) => void;
 }) {
   const slots = useMemo(() => {

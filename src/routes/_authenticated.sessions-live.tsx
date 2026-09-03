@@ -46,7 +46,7 @@ function SessionBlock({
   title: string;
   session: SessionRow | null;
   now: number;
-  opsMap?: Map<string, any>;
+  opsMap?: Map<string, any> | undefined;
 }) {
   if (!session) {
     return (

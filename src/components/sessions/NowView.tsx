@@ -21,7 +21,7 @@ export function NowView({
   sessions: SessionRow[];
   tracks: TrackRow[];
   now: number;
-  opsMap?: Map<string, SpeakerOps>;
+  opsMap?: Map<string, SpeakerOps> | undefined;
   onOpen: (s: SessionRow) => void;
 }) {
   return (

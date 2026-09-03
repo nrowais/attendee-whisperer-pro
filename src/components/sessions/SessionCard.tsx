@@ -30,12 +30,12 @@ export function SessionCard({
   compact,
 }: {
   session: SessionRow;
-  trackName?: string;
+  trackName?: string | undefined;
   now: number;
-  opsMap?: Map<string, SpeakerOps>;
+  opsMap?: Map<string, SpeakerOps> | undefined;
   onOpen?: () => void;
-  conflict?: boolean;
-  compact?: boolean;
+  conflict?: boolean | undefined;
+  compact?: boolean | undefined;
 }) {
   const phase = timePhase(session, now);
   const participants = session.session_participants ?? [];

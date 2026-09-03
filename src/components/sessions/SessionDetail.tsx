@@ -45,7 +45,7 @@ export function SessionDetail({
 }: {
   session: SessionRow | null;
   tracks: TrackRow[];
-  opsMap?: Map<string, SpeakerOps>;
+  opsMap?: Map<string, SpeakerOps> | undefined;
   now: number;
   onClose: () => void;
   onEdit: (session: SessionRow) => void;
