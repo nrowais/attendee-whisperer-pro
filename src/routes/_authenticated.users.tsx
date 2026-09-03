@@ -12,6 +12,7 @@ import {
   setUserPassword,
 } from "@/lib/adminUsers.functions";
 import { useRoles, roleLabels, type AppRole } from "@/hooks/useAuth";
+import { UserActivityDialog, formatDateTime } from "@/components/portal/UserActivityDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -146,11 +147,32 @@ function UsersPage() {
     enabled: isAdmin,
     queryFn: async () => {
       const rows = await fetchStates();
-      const map: Record<string, { disabled: boolean; lastSignInAt: string | null }> = {};
-      for (const r of rows) map[r.id] = { disabled: r.disabled, lastSignInAt: r.lastSignInAt };
+      const map: Record<
+        string,
+        {
+          disabled: boolean;
+          lastSignInAt: string | null;
+          lastActivityAt: string | null;
+          activityCount: number;
+        }
+      > = {};
+      for (const r of rows)
+        map[r.id] = {
+          disabled: r.disabled,
+          lastSignInAt: r.lastSignInAt,
+          lastActivityAt: r.lastActivityAt,
+          activityCount: r.activityCount,
+        };
       return map;
     },
   });
+
+  const [activityTarget, setActivityTarget] = useState<{
+    id: string;
+    name: string;
+    email: string | null;
+  } | null>(null);
+
 
   const [passwordTarget, setPasswordTarget] = useState<{ id: string; email: string } | null>(null);
   const [newPassword, setNewPassword] = useState("");
@@ -266,7 +288,9 @@ function UsersPage() {
                 <TableHead className="text-start">البريد الإلكتروني</TableHead>
                 <TableHead className="text-start">الصلاحية</TableHead>
                 <TableHead className="text-start">حالة الحساب</TableHead>
+                {isAdmin ? <TableHead className="text-start">النشاط وأوقات الاتصال</TableHead> : null}
                 {isAdmin ? <TableHead className="text-start">إدارة الحساب</TableHead> : null}
+
               </TableRow>
 
             </TableHeader>
@@ -332,6 +356,37 @@ function UsersPage() {
                   {isAdmin ? (
                     <TableCell className="text-start">
                       {(() => {
+                        const st = statesQuery.data?.[u.id];
+                        return (
+                          <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">
+                              آخر اتصال: {formatDateTime(st?.lastSignInAt)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              آخر عملية: {formatDateTime(st?.lastActivityAt)}
+                            </p>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                setActivityTarget({
+                                  id: u.id,
+                                  name: u.full_name ?? u.email ?? "مستخدم",
+                                  email: u.email ?? null,
+                                })
+                              }
+                            >
+                              سجل النشاط ({st?.activityCount ?? 0})
+                            </Button>
+                          </div>
+                        );
+                      })()}
+                    </TableCell>
+                  ) : null}
+                  {isAdmin ? (
+
+                    <TableCell className="text-start">
+                      {(() => {
                         const disabled = statesQuery.data?.[u.id]?.disabled ?? false;
                         return (
                           <div className="flex flex-wrap items-center gap-2">
@@ -369,6 +424,8 @@ function UsersPage() {
           </Table>
         )}
       </div>
+
+      <UserActivityDialog user={activityTarget} onOpenChange={(o) => !o && setActivityTarget(null)} />
 
       <Dialog
         open={passwordTarget !== null}
