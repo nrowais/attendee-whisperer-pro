@@ -65,7 +65,7 @@ export function UpcomingCountdown() {
       const nowIso = now.toISOString();
       const horizon = new Date(now.getTime() + 72 * 60 * 60 * 1000).toISOString();
 
-      const [arrivals, departures, arrivalTickets, departureTickets] = await Promise.all([
+      const [arrivals, departures] = await Promise.all([
         db
           .from("speaker_arrivals")
           .select("id, event_id, speaker_id, arrival_time, arrival_point, terminal, speakers(full_name)")
@@ -80,22 +80,24 @@ export function UpcomingCountdown() {
           .lte("departure_time", horizon)
           .order("departure_time", { ascending: true })
           .limit(50),
-        db
-          .from("transport_trips")
-          .select("id, arrival_id, ticket_no")
-          .not("arrival_id", "is", null)
-          .in(
-            "arrival_id",
-            (arrivals.data ?? []).map((a: any) => a.id),
-          ),
-        db
-          .from("transport_trips")
-          .select("id, departure_id, ticket_no")
-          .not("departure_id", "is", null)
-          .in(
-            "departure_id",
-            (departures.data ?? []).map((d: any) => d.id),
-          ),
+      ]);
+
+      const arrivalIds = (arrivals.data ?? []).map((a: any) => a.id);
+      const departureIds = (departures.data ?? []).map((d: any) => d.id);
+
+      const [arrivalTickets, departureTickets] = await Promise.all([
+        arrivalIds.length
+          ? db
+              .from("transport_trips")
+              .select("id, arrival_id, ticket_no")
+              .in("arrival_id", arrivalIds)
+          : { data: [] },
+        departureIds.length
+          ? db
+              .from("transport_trips")
+              .select("id, departure_id, ticket_no")
+              .in("departure_id", departureIds)
+          : { data: [] },
       ]);
 
       const arrivalTicketMap = new Map(
