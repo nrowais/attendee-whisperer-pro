@@ -135,7 +135,7 @@ export function UpcomingCountdown() {
           point: d.departure_point ?? null,
           terminal: d.terminal ?? null,
           sourceId: d.id,
-          ticketNo: departureTicketMap.get(d.id) ?? null,
+          ticketNo: (departureTicketMap.get(d.id) as number | undefined) ?? null,
         });
       }
 
