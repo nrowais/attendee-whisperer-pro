@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Ticket, Car, User, Search, PlayCircle, CheckCircle2, Clock, IdCard } from "lucide-react";
+import { Ticket, Car, User, Search, PlayCircle, CheckCircle2, Clock, IdCard, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { CrudPage } from "@/components/portal/CrudPage";
@@ -19,6 +19,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { DriverCardDialog } from "@/components/portal/DriverCardDialog";
 
@@ -112,11 +122,27 @@ function useTickets() {
 }
 
 function TicketsPage() {
-  const { canEditOps, canEdit } = useRoles();
+  const { canEditOps, canEdit, isAdmin } = useRoles();
   const { data, isLoading } = useTickets();
   const qc = useQueryClient();
   const [direction, setDirection] = useState<string>("all");
   const [query, setQuery] = useState("");
+  const [toDelete, setToDelete] = useState<any | null>(null);
+
+  const remove = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await db.from("transport_trips").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["transport-tickets"] });
+      qc.invalidateQueries({ queryKey: ["fleet-trips"] });
+      qc.invalidateQueries({ queryKey: ["upcoming-countdown"] });
+      toast.success("تم حذف التذكرة");
+      setToDelete(null);
+    },
+    onError: (e: any) => toast.error(e.message ?? "تعذر حذف التذكرة"),
+  });
 
   const update = useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: Record<string, any> }) => {
@@ -405,6 +431,18 @@ function TicketsPage() {
                     )}
                   </div>
                 )}
+
+                {isAdmin && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => setToDelete(t)}
+                  >
+                    <Trash2 className="ml-1 h-4 w-4" />
+                    حذف التذكرة
+                  </Button>
+                )}
               </article>
             ))}
           </div>
@@ -419,6 +457,28 @@ function TicketsPage() {
           fields={ticketFields}
         />
       )}
+
+      <AlertDialog open={!!toDelete} onOpenChange={(v) => !v && setToDelete(null)}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader className="text-right">
+            <AlertDialogTitle>حذف التذكرة رقم {toDelete?.ticket_no ?? "—"}؟</AlertDialogTitle>
+            <AlertDialogDescription>
+              سيتم حذف التذكرة الخاصة بـ {toDelete?.speaker?.full_name ?? toDelete?.guest_name ?? "—"} نهائياً
+              ولا يمكن التراجع عن هذا الإجراء.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={remove.isPending}
+              onClick={() => toDelete && remove.mutate(toDelete.id)}
+            >
+              {remove.isPending ? "جارٍ الحذف..." : "حذف نهائي"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
