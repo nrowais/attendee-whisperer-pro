@@ -277,6 +277,8 @@ export function UpcomingCountdown() {
       dropoff: isArrival ? hotelName || "الفندق" : (item.point ?? "المطار"),
       receiverName: "",
       receiverPhone: "",
+      flightDate: splitDateTime(item.at).date,
+      flightTime: splitDateTime(item.at).time,
       hotelName,
       hotelLocation,
       hotelMapUrl,
