@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { IdCard, Download, Save } from "lucide-react";
 import { toast } from "sonner";
 
@@ -7,6 +7,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -265,12 +272,66 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
   });
 
   const [cardId, setCardId] = useState<string | null>(null);
+  const [driverId, setDriverId] = useState<string | null>(null);
+  const [vehicleId, setVehicleId] = useState<string | null>(null);
+
+  // قائمة السائقين والمركبات المسجلة في النظام لربطها بالبطاقة
+  const { data: drivers = [] } = useQuery({
+    queryKey: ["driver-card", "drivers"],
+    enabled: open,
+    queryFn: async () => {
+      const { data } = await db.from("drivers").select("id, full_name, phone").order("full_name");
+      return data ?? [];
+    },
+  });
+  const { data: vehicles = [] } = useQuery({
+    queryKey: ["driver-card", "vehicles"],
+    enabled: open,
+    queryFn: async () => {
+      const { data } = await db
+        .from("vehicles")
+        .select("id, plate_number, make")
+        .order("plate_number");
+      return data ?? [];
+    },
+  });
+
+  const pickDriver = (v: string) => {
+    if (v === "none") {
+      setDriverId(null);
+      setForm((f) => ({ ...f, driverName: "", driverPhone: "" }));
+      return;
+    }
+    const d = drivers.find((x: any) => x.id === v);
+    setDriverId(v);
+    setForm((f) => ({
+      ...f,
+      driverName: d?.full_name ?? f.driverName,
+      driverPhone: d?.phone ?? f.driverPhone,
+    }));
+  };
+
+  const pickVehicle = (v: string) => {
+    if (v === "none") {
+      setVehicleId(null);
+      setForm((f) => ({ ...f, vehicle: "" }));
+      return;
+    }
+    const veh = vehicles.find((x: any) => x.id === v);
+    setVehicleId(v);
+    setForm((f) => ({
+      ...f,
+      vehicle: veh ? `${veh.plate_number}${veh.make ? ` · ${veh.make}` : ""}` : f.vehicle,
+    }));
+  };
 
   useEffect(() => {
     if (!open) return;
     const base = trip?.flight_at ?? trip?.scheduled_at ?? null;
     const { date, time } = splitDateTime(base);
     setCardId(null);
+    setDriverId(trip?.driver_id ?? null);
+    setVehicleId(trip?.vehicle_id ?? null);
     // استكمال بيانات الفندق تلقائياً من القائمة المعتمدة عند تطابق الاسم
     const hotelMatch = HOTELS.find((h) => h.name === (trip?.hotel_name ?? ""));
     setForm({
