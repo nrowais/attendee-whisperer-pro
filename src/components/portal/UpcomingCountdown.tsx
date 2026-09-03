@@ -37,7 +37,7 @@ function openCardPdf(card: DriverCardData, ticketNo: number | string) {
   }
   const html = buildDriverCardHtml(card).replace(
     "<title>بطاقة توجيه السائق</title>",
-    `<title>تذكرة-نقل-${String(ticketNo)}</title>`,
+    `<title>بطاقة-سائق-${String(ticketNo)}</title>`,
   );
   win.document.open();
   win.document.write(html);
@@ -87,6 +87,17 @@ function formatRemaining(ms: number) {
   const s = total % 60;
   if (d > 0) return `${d} يوم ${h} ساعة`;
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function splitDateTime(iso: string | null) {
+  if (!iso) return { date: "", time: "" };
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return { date: "", time: "" };
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return {
+    date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+    time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+  };
 }
 
 export function UpcomingCountdown() {
@@ -218,6 +229,8 @@ export function UpcomingCountdown() {
     dropoff: string;
     receiverName: string;
     receiverPhone: string;
+    flightDate: string;
+    flightTime: string;
     hotelName: string;
     hotelLocation: string;
     hotelMapUrl: string;
@@ -275,6 +288,8 @@ export function UpcomingCountdown() {
       dropoff: isArrival ? hotelName || "الفندق" : (item.point ?? "المطار"),
       receiverName: "",
       receiverPhone: "",
+      flightDate: splitDateTime(item.at).date,
+      flightTime: splitDateTime(item.at).time,
       hotelName,
       hotelLocation,
       hotelMapUrl,
@@ -289,6 +304,12 @@ export function UpcomingCountdown() {
       if (!draft) throw new Error("لا توجد تذكرة قيد الإصدار");
       const item = draft.item;
       const isArrival = item.kind === "arrival";
+
+      // وقت/تاريخ الرحلة القابلان للتعديل قبل الإصدار
+      const customAt = draft.flightDate
+        ? new Date(`${draft.flightDate}T${draft.flightTime || "00:00"}:00`)
+        : new Date(item.at);
+      const flightAt = Number.isNaN(customAt.getTime()) ? item.at : customAt.toISOString();
 
       // بطاقة واحدة فقط لكل اسم خلال الساعة الواحدة
       const cooldownStart = new Date(Date.now() - TICKET_COOLDOWN_MS).toISOString();
@@ -318,7 +339,7 @@ export function UpcomingCountdown() {
           guest_name: draft.guestName || null,
           terminal: draft.terminal || null,
           flight_no: draft.flightNo || null,
-          flight_at: item.at,
+          flight_at: flightAt,
           notes: draft.notes || null,
           arrival_id: isArrival ? item.sourceId : null,
           departure_id: isArrival ? null : item.sourceId,
@@ -333,8 +354,6 @@ export function UpcomingCountdown() {
       const vehicleText = vehicle
         ? `${vehicle.plate_number}${vehicle.make ? ` · ${vehicle.make}` : ""}`
         : "";
-      const atDate = new Date(item.at);
-      const pad = (n: number) => String(n).padStart(2, "0");
       const { data: card } = await db
         .from("driver_cards")
         .insert({
@@ -345,7 +364,7 @@ export function UpcomingCountdown() {
           terminal: draft.terminal || null,
           receiver_name: draft.receiverName || null,
           receiver_phone: draft.receiverPhone || null,
-          flight_at: item.at,
+          flight_at: flightAt,
           flight_no: draft.flightNo || null,
           driver_name: driver?.full_name ?? null,
           driver_phone: driver?.phone ?? null,
@@ -368,21 +387,21 @@ export function UpcomingCountdown() {
             terminal: draft.terminal,
             receiverName: draft.receiverName,
             receiverPhone: draft.receiverPhone,
-            flightDate: `${atDate.getFullYear()}-${pad(atDate.getMonth() + 1)}-${pad(atDate.getDate())}`,
-            flightTime: `${pad(atDate.getHours())}:${pad(atDate.getMinutes())}`,
+            flightDate: draft.flightDate || splitDateTime(item.at).date,
+            flightTime: draft.flightTime || splitDateTime(item.at).time,
             flightNo: draft.flightNo,
             driverName: driver?.full_name ?? "",
             driverPhone: driver?.phone ?? "",
             vehicle: vehicleText,
             pickup: draft.pickup,
             dropoff: draft.dropoff,
-            ticketNo: String(inserted.ticket_no),
+            ticketNo: "",
             cardNo: card?.card_no ? String(card.card_no) : "",
             hotelName: draft.hotelName,
             hotelLocation: draft.hotelLocation,
             hotelMapUrl: draft.hotelMapUrl,
           },
-          inserted.ticket_no,
+          card?.card_no ?? inserted.ticket_no,
         );
       }
       return inserted;
@@ -554,6 +573,24 @@ export function UpcomingCountdown() {
                 <Input
                   value={draft.flightNo}
                   onChange={(e) => setDraft({ ...draft, flightNo: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">تاريخ الرحلة</Label>
+                <Input
+                  type="date"
+                  dir="ltr"
+                  value={draft.flightDate}
+                  onChange={(e) => setDraft({ ...draft, flightDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">وقت الرحلة</Label>
+                <Input
+                  type="time"
+                  dir="ltr"
+                  value={draft.flightTime}
+                  onChange={(e) => setDraft({ ...draft, flightTime: e.target.value })}
                 />
               </div>
               <div className="space-y-1">
