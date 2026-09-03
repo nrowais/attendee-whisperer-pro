@@ -679,8 +679,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
           ) : (
             <>
               {field("terminal", "رقم صالة المطار", "text", "مثال: صالة 1")}
-              {field("receiverName", "اسم مستقبل الضيف")}
-              {field("receiverPhone", "رقم جوال مستقبل الضيف", "tel", "05xxxxxxxx")}
+              {receiverFields}
               {field("flightTime", "وقت الرحلة", "time")}
               {field("flightDate", "تاريخ الرحلة", "date")}
               {field("flightNo", "رقم الرحلة (اختياري)")}
