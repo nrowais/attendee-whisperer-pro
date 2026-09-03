@@ -24,7 +24,12 @@ type Item = {
   terminal: string | null;
   sourceId: string;
   ticketNos: number[];
+  /** تاريخ آخر تذكرة مصدرة لهذا الموعد */
+  lastTicketAt: string | null;
 };
+
+/** حد الإصدار: بطاقة واحدة فقط لكل اسم خلال الساعة */
+const TICKET_COOLDOWN_MS = 60 * 60 * 1000;
 
 /** عدد العناصر الظاهرة قبل توسيع القائمة */
 const COLLAPSED_COUNT = 5;
