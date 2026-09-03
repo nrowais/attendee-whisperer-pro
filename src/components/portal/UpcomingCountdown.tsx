@@ -305,6 +305,12 @@ export function UpcomingCountdown() {
       const item = draft.item;
       const isArrival = item.kind === "arrival";
 
+      // وقت/تاريخ الرحلة القابلان للتعديل قبل الإصدار
+      const customAt = draft.flightDate
+        ? new Date(`${draft.flightDate}T${draft.flightTime || "00:00"}:00`)
+        : new Date(item.at);
+      const flightAt = Number.isNaN(customAt.getTime()) ? item.at : customAt.toISOString();
+
       // بطاقة واحدة فقط لكل اسم خلال الساعة الواحدة
       const cooldownStart = new Date(Date.now() - TICKET_COOLDOWN_MS).toISOString();
       const linkCol = isArrival ? "arrival_id" : "departure_id";
