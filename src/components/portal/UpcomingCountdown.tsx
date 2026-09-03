@@ -140,6 +140,7 @@ export function UpcomingCountdown() {
           terminal: a.terminal ?? null,
           sourceId: a.id,
           ticketNos: arrivalTicketMap.get(a.id) ?? [],
+          lastTicketAt: arrivalLastAt.get(a.id) ?? null,
         });
       }
       for (const d of departures.data ?? []) {
@@ -155,6 +156,7 @@ export function UpcomingCountdown() {
           terminal: d.terminal ?? null,
           sourceId: d.id,
           ticketNos: departureTicketMap.get(d.id) ?? [],
+          lastTicketAt: departureLastAt.get(d.id) ?? null,
         });
       }
 
