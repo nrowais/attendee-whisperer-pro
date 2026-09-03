@@ -586,6 +586,15 @@ export function UpcomingCountdown() {
                 />
               </div>
               <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">رابط موقع الفندق (Google Maps)</Label>
+                <Input
+                  dir="ltr"
+                  value={draft.hotelMapUrl}
+                  onChange={(e) => setDraft({ ...draft, hotelMapUrl: e.target.value })}
+                  placeholder="https://maps.app.goo.gl/…"
+                />
+              </div>
+              <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">نقطة الانطلاق</Label>
                 <Input
                   value={draft.pickup}
