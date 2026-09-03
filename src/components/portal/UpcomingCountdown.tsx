@@ -610,10 +610,30 @@ export function UpcomingCountdown() {
               </div>
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">اسم الفندق (اختياري)</Label>
-                <Input
+                <select
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   value={draft.hotelName}
-                  onChange={(e) => setDraft({ ...draft, hotelName: e.target.value })}
-                />
+                  onChange={(e) => {
+                    const name = e.target.value;
+                    const hotel = HOTELS.find((h) => h.name === name);
+                    setDraft({
+                      ...draft,
+                      hotelName: name,
+                      hotelLocation: hotel ? hotel.location : draft.hotelLocation,
+                      hotelMapUrl: hotel?.mapUrl ?? draft.hotelMapUrl,
+                    });
+                  }}
+                >
+                  <option value="">اختر الفندق…</option>
+                  {HOTELS.map((h) => (
+                    <option key={h.name} value={h.name}>
+                      {h.name}
+                    </option>
+                  ))}
+                  {draft.hotelName && !HOTELS.some((h) => h.name === draft.hotelName) && (
+                    <option value={draft.hotelName}>{draft.hotelName}</option>
+                  )}
+                </select>
               </div>
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">موقع الفندق (اختياري)</Label>
