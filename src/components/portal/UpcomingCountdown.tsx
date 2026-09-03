@@ -120,7 +120,7 @@ export function UpcomingCountdown() {
           point: a.arrival_point ?? null,
           terminal: a.terminal ?? null,
           sourceId: a.id,
-          ticketNo: arrivalTicketMap.get(a.id) ?? null,
+          ticketNo: (arrivalTicketMap.get(a.id) as number | undefined) ?? null,
         });
       }
       for (const d of departures.data ?? []) {
