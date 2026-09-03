@@ -457,6 +457,28 @@ function TicketsPage() {
           fields={ticketFields}
         />
       )}
+
+      <AlertDialog open={!!toDelete} onOpenChange={(v) => !v && setToDelete(null)}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader className="text-right">
+            <AlertDialogTitle>حذف التذكرة رقم {toDelete?.ticket_no ?? "—"}؟</AlertDialogTitle>
+            <AlertDialogDescription>
+              سيتم حذف التذكرة الخاصة بـ {toDelete?.speaker?.full_name ?? toDelete?.guest_name ?? "—"} نهائياً
+              ولا يمكن التراجع عن هذا الإجراء.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={remove.isPending}
+              onClick={() => toDelete && remove.mutate(toDelete.id)}
+            >
+              {remove.isPending ? "جارٍ الحذف..." : "حذف نهائي"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
