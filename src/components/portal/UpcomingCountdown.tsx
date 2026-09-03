@@ -222,6 +222,7 @@ export function UpcomingCountdown() {
   // حوار مراجعة التذكرة قبل إصدارها
   const [draft, setDraft] = useState<{
     item: Item;
+    cardType: "airport" | "trip";
     guestName: string;
     terminal: string;
     flightNo: string;
@@ -281,6 +282,7 @@ export function UpcomingCountdown() {
     }
     setDraft({
       item,
+      cardType: "airport",
       guestName: item.name !== "—" ? item.name : "",
       terminal: item.terminal ?? "",
       flightNo: "",
@@ -331,7 +333,7 @@ export function UpcomingCountdown() {
           speaker_id: item.speakerId,
           driver_id: draft.driverId,
           vehicle_id: draft.vehicleId,
-          trip_type: isArrival ? "airport_pickup" : "airport_dropoff",
+          trip_type: draft.cardType === "trip" ? "custom" : isArrival ? "airport_pickup" : "airport_dropoff",
           pickup_location: draft.pickup || null,
           dropoff_location: draft.dropoff || null,
           scheduled_at: item.at,
@@ -357,7 +359,7 @@ export function UpcomingCountdown() {
       const { data: card } = await db
         .from("driver_cards")
         .insert({
-          card_type: "airport",
+          card_type: draft.cardType,
           speaker_id: item.speakerId,
           trip_id: inserted.id,
           guest_name: draft.guestName || null,
@@ -382,7 +384,7 @@ export function UpcomingCountdown() {
       if (withPdf && inserted?.ticket_no) {
         openCardPdf(
           {
-            cardType: "airport",
+            cardType: draft.cardType,
             guestName: draft.guestName,
             terminal: draft.terminal,
             receiverName: draft.receiverName,
@@ -553,6 +555,22 @@ export function UpcomingCountdown() {
 
           {draft && (
             <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-2 gap-2 sm:col-span-2">
+                <Button
+                  type="button"
+                  variant={draft.cardType === "airport" ? "default" : "outline"}
+                  onClick={() => setDraft({ ...draft, cardType: "airport" })}
+                >
+                  بطاقة مطار
+                </Button>
+                <Button
+                  type="button"
+                  variant={draft.cardType === "trip" ? "default" : "outline"}
+                  onClick={() => setDraft({ ...draft, cardType: "trip" })}
+                >
+                  بطاقة مشوار عادي
+                </Button>
+              </div>
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">اسم الضيف</Label>
                 <Input
