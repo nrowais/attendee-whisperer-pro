@@ -401,7 +401,7 @@ export function UpcomingCountdown() {
             hotelLocation: draft.hotelLocation,
             hotelMapUrl: draft.hotelMapUrl,
           },
-          inserted.ticket_no,
+          card?.card_no ?? inserted.ticket_no,
         );
       }
       return inserted;
@@ -573,6 +573,24 @@ export function UpcomingCountdown() {
                 <Input
                   value={draft.flightNo}
                   onChange={(e) => setDraft({ ...draft, flightNo: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">تاريخ الرحلة</Label>
+                <Input
+                  type="date"
+                  dir="ltr"
+                  value={draft.flightDate}
+                  onChange={(e) => setDraft({ ...draft, flightDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">وقت الرحلة</Label>
+                <Input
+                  type="time"
+                  dir="ltr"
+                  value={draft.flightTime}
+                  onChange={(e) => setDraft({ ...draft, flightTime: e.target.value })}
                 />
               </div>
               <div className="space-y-1">
