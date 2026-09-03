@@ -230,7 +230,7 @@ export function UpcomingCountdown() {
             const Icon = kindMeta[item.kind].icon;
             const urgent = diff <= ALERT_MINUTES * 60 * 1000;
             const busy = createTicket.isPending && createTicket.variables?.id === item.id;
-            const hasTicket = item.ticketNo != null;
+            const hasTicket = item.ticketNos.length > 0;
             return (
               <li key={item.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                 <div className="flex min-w-0 items-center gap-3">
@@ -261,14 +261,19 @@ export function UpcomingCountdown() {
                     </p>
                   </div>
                   {hasTicket && (
-                    <Badge
-                      variant="default"
-                      className="shrink-0 gap-1 bg-primary text-primary-foreground"
-                      title="تذكرة نقل مصدرة"
-                    >
-                      <Ticket className="size-3" />
-                      #{item.ticketNo}
-                    </Badge>
+                    <div className="flex shrink-0 flex-wrap items-center gap-1">
+                      {item.ticketNos.map((no) => (
+                        <Badge
+                          key={no}
+                          variant="default"
+                          className="gap-1 bg-primary text-primary-foreground"
+                          title="تذكرة نقل مصدرة"
+                        >
+                          <Ticket className="size-3" />
+                          #{no}
+                        </Badge>
+                      ))}
+                    </div>
                   )}
                 </div>
                 <Badge
