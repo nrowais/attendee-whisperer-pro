@@ -52,7 +52,7 @@ export type DriverCardData = {
   hotelMapUrl?: string;
 };
 
-const HOTELS: Array<{ name: string; location: string; mapUrl?: string }> = [
+export const HOTELS: Array<{ name: string; location: string; mapUrl?: string }> = [
   {
     name: "فندق ماريوت حي السفارات",
     location: "حي السفارات، الرياض",
