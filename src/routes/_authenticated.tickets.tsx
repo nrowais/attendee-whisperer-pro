@@ -431,6 +431,18 @@ function TicketsPage() {
                     )}
                   </div>
                 )}
+
+                {isAdmin && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => setToDelete(t)}
+                  >
+                    <Trash2 className="ml-1 h-4 w-4" />
+                    حذف التذكرة
+                  </Button>
+                )}
               </article>
             ))}
           </div>
