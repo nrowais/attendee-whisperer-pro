@@ -654,7 +654,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
               </div>
               {field("hotelLocation", "موقع الفندق", "text", "مثال: حي السفارات، الرياض")}
               {field("hotelMapUrl", "رابط موقع الفندق (اختياري)", "url", "https://maps.app.goo.gl/...")}
-              {form.hotelMapUrl && (
+              {form.hotelName && form.hotelMapUrl && (
                 <div className="space-y-1 sm:col-span-2">
                   <a
                     href={form.hotelMapUrl}
@@ -662,7 +662,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
                     rel="noopener noreferrer"
                     className="flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm text-primary underline hover:bg-muted"
                   >
-                    📍 فتح موقع {form.hotelName || "الفندق"} في خرائط قوقل
+                    📍 فتح موقع {form.hotelName} في خرائط قوقل
                   </a>
                 </div>
               )}
