@@ -260,6 +260,8 @@ export function UpcomingCountdown() {
             const urgent = diff <= ALERT_MINUTES * 60 * 1000;
             const busy = createTicket.isPending && createTicket.variables?.id === item.id;
             const hasTicket = item.ticketNos.length > 0;
+            const inCooldown =
+              !!item.lastTicketAt && Date.now() - new Date(item.lastTicketAt).getTime() < TICKET_COOLDOWN_MS;
             return (
               <li key={item.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                 <div className="flex min-w-0 items-center gap-3">
