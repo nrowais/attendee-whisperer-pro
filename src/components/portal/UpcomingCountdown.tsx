@@ -192,9 +192,55 @@ export function UpcomingCountdown() {
   const qc = useQueryClient();
   const { canEditOps } = useRoles();
 
-  // إنشاء تذكرة نقل مباشرة من موعد الوصول/المغادرة (للمشرفين فقط)
-  const createTicket = useMutation({
-    mutationFn: async (item: Item) => {
+  // حوار مراجعة التذكرة قبل إصدارها
+  const [draft, setDraft] = useState<{
+    item: Item;
+    guestName: string;
+    terminal: string;
+    flightNo: string;
+    pickup: string;
+    dropoff: string;
+    driverId: string | null;
+    vehicleId: string | null;
+    notes: string;
+  } | null>(null);
+
+  const { data: drivers = [] } = useQuery({
+    queryKey: ["countdown-ticket", "drivers"],
+    enabled: !!draft,
+    queryFn: async () => {
+      const { data } = await db.from("drivers").select("id, full_name, phone").order("full_name");
+      return data ?? [];
+    },
+  });
+  const { data: vehicles = [] } = useQuery({
+    queryKey: ["countdown-ticket", "vehicles"],
+    enabled: !!draft,
+    queryFn: async () => {
+      const { data } = await db.from("vehicles").select("id, plate_number, make").order("plate_number");
+      return data ?? [];
+    },
+  });
+
+  const openDraft = (item: Item) => {
+    const isArrival = item.kind === "arrival";
+    setDraft({
+      item,
+      guestName: item.name !== "—" ? item.name : "",
+      terminal: item.terminal ?? "",
+      flightNo: "",
+      pickup: isArrival ? (item.point ?? "المطار") : "الفندق",
+      dropoff: isArrival ? "الفندق" : (item.point ?? "المطار"),
+      driverId: null,
+      vehicleId: null,
+      notes: "",
+    });
+  };
+
+  const issueTicket = useMutation({
+    mutationFn: async ({ withPdf }: { withPdf: boolean }) => {
+      if (!draft) throw new Error("لا توجد تذكرة قيد الإصدار");
+      const item = draft.item;
       const isArrival = item.kind === "arrival";
 
       // بطاقة واحدة فقط لكل اسم خلال الساعة الواحدة
@@ -210,27 +256,56 @@ export function UpcomingCountdown() {
         throw new Error(`تم إصدار بطاقة لـ ${item.name} خلال آخر ساعة — لا يمكن إصدار بطاقة أخرى الآن`);
       }
 
-      const { error } = await db.from("transport_trips").insert({
-        event_id: item.eventId,
-        speaker_id: item.speakerId,
-        trip_type: isArrival ? "airport_pickup" : "airport_dropoff",
-        pickup_location: isArrival ? (item.point ?? "المطار") : "الفندق",
-        dropoff_location: isArrival ? "الفندق" : (item.point ?? "المطار"),
-        scheduled_at: item.at,
-        status: "scheduled",
-        guest_name: item.name !== "—" ? item.name : null,
-        terminal: item.terminal,
-        flight_at: item.at,
-        arrival_id: isArrival ? item.sourceId : null,
-        departure_id: isArrival ? null : item.sourceId,
-      });
+      const { data: inserted, error } = await db
+        .from("transport_trips")
+        .insert({
+          event_id: item.eventId,
+          speaker_id: item.speakerId,
+          driver_id: draft.driverId,
+          vehicle_id: draft.vehicleId,
+          trip_type: isArrival ? "airport_pickup" : "airport_dropoff",
+          pickup_location: draft.pickup || null,
+          dropoff_location: draft.dropoff || null,
+          scheduled_at: item.at,
+          status: "scheduled",
+          guest_name: draft.guestName || null,
+          terminal: draft.terminal || null,
+          flight_no: draft.flightNo || null,
+          flight_at: item.at,
+          notes: draft.notes || null,
+          arrival_id: isArrival ? item.sourceId : null,
+          departure_id: isArrival ? null : item.sourceId,
+        })
+        .select("id, ticket_no")
+        .single();
       if (error) throw error;
+
+      if (withPdf && inserted?.ticket_no) {
+        const driver = drivers.find((d: any) => d.id === draft.driverId);
+        const vehicle = vehicles.find((v: any) => v.id === draft.vehicleId);
+        openTicketPdf({
+          ticketNo: inserted.ticket_no,
+          guestName: draft.guestName,
+          direction: item.kind,
+          pickup: draft.pickup,
+          dropoff: draft.dropoff,
+          scheduledAt: item.at,
+          terminal: draft.terminal,
+          flightNo: draft.flightNo,
+          driverName: driver?.full_name ?? "",
+          driverPhone: driver?.phone ?? "",
+          vehicle: vehicle ? `${vehicle.plate_number}${vehicle.make ? ` · ${vehicle.make}` : ""}` : "",
+          notes: draft.notes,
+        });
+      }
+      return inserted;
     },
-    onSuccess: (_d, item) => {
+    onSuccess: (inserted) => {
       qc.invalidateQueries({ queryKey: ["transport-tickets"] });
       qc.invalidateQueries({ queryKey: ["fleet-trips"] });
       qc.invalidateQueries({ queryKey: ["upcoming-countdown"] });
-      toast.success(`تم إنشاء تذكرة نقل لـ ${item.name}`);
+      toast.success(`تم إصدار تذكرة نقل رقم ${inserted?.ticket_no ?? ""} لـ ${draft?.guestName ?? ""}`);
+      setDraft(null);
     },
     onError: (e: any) => toast.error(e.message ?? "تعذر إنشاء التذكرة"),
   });
