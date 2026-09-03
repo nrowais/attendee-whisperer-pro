@@ -78,6 +78,11 @@ const kindMeta: Record<Kind, { label: string; icon: typeof PlaneLanding }> = {
 /** فترة التنبيه المسبق بالدقائق */
 const ALERT_MINUTES = 120;
 
+function receiverMode(name: string) {
+  if (!name) return "";
+  return RECEIVERS.some((r) => r.name === name) ? name : "__custom__";
+}
+
 function formatRemaining(ms: number) {
   if (ms <= 0) return "حان الموعد";
   const total = Math.floor(ms / 1000);
