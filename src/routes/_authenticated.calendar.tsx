@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/calendar")({
 
 const db = supabase as any;
 
-type Kind = "session" | "arrival" | "departure" | "trip" | "checkin" | "checkout";
+type Kind = "session" | "arrival" | "departure" | "trip";
 
 type CalItem = {
   id: string;
@@ -41,8 +41,6 @@ const kindMeta: Record<Kind, { label: string; className: string }> = {
   arrival: { label: "وصول", className: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30" },
   departure: { label: "مغادرة", className: "bg-amber-500/15 text-amber-600 border-amber-500/30" },
   trip: { label: "نقل", className: "bg-sky-500/15 text-sky-600 border-sky-500/30" },
-  checkin: { label: "دخول فندق", className: "bg-violet-500/15 text-violet-600 border-violet-500/30" },
-  checkout: { label: "خروج فندق", className: "bg-rose-500/15 text-rose-600 border-rose-500/30" },
 };
 
 const weekDays = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
@@ -68,7 +66,7 @@ function useMonthItems(from: Date, to: Date) {
     queryKey: ["calendar", fromIso, toIso],
     refetchInterval: 60_000,
     queryFn: async (): Promise<CalItem[]> => {
-      const [sessions, arrivals, departures, trips, bookings] = await Promise.all([
+      const [sessions, arrivals, departures, trips] = await Promise.all([
         db
           .from("speaker_sessions")
           .select("id, session_title, hall, starts_at, speakers(full_name)")
@@ -89,10 +87,6 @@ function useMonthItems(from: Date, to: Date) {
           .select("id, scheduled_at, pickup_location, dropoff_location, speakers(full_name)")
           .gte("scheduled_at", fromIso)
           .lte("scheduled_at", toIso),
-        db
-          .from("hotel_bookings")
-          .select("id, check_in, check_out, hotels(name), speakers(full_name)")
-          .or(`and(check_in.gte.${fromDate},check_in.lte.${toDate}),and(check_out.gte.${fromDate},check_out.lte.${toDate})`),
       ]);
 
       const items: CalItem[] = [];
@@ -145,25 +139,6 @@ function useMonthItems(from: Date, to: Date) {
             subtitle: [tr.pickup_location, tr.dropoff_location].filter(Boolean).join(" ← "),
           });
       }
-      for (const b of bookings.data ?? []) {
-        if (b.check_in && b.check_in >= fromDate && b.check_in <= toDate)
-          items.push({
-            id: `ci-${b.id}`,
-            kind: "checkin",
-            date: b.check_in,
-            title: b.speakers?.full_name ?? "حجز فندقي",
-            subtitle: b.hotels?.name ?? undefined,
-          });
-        if (b.check_out && b.check_out >= fromDate && b.check_out <= toDate)
-          items.push({
-            id: `co-${b.id}`,
-            kind: "checkout",
-            date: b.check_out,
-            title: b.speakers?.full_name ?? "حجز فندقي",
-            subtitle: b.hotels?.name ?? undefined,
-          });
-      }
-
       return items.sort((x, y) => (x.time ?? "").localeCompare(y.time ?? ""));
     },
   });
