@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRoles } from "@/hooks/useAuth";
-import { buildDriverCardHtml, type DriverCardData } from "@/components/portal/DriverCardDialog";
+import { buildDriverCardHtml, HOTELS, type DriverCardData } from "@/components/portal/DriverCardDialog";
 
 /** فتح نافذة طباعة بطاقة السائق — نفس قالب شاشة التذاكر */
 function openCardPdf(card: DriverCardData, ticketNo: number | string) {
@@ -220,6 +220,7 @@ export function UpcomingCountdown() {
     receiverPhone: string;
     hotelName: string;
     hotelLocation: string;
+    hotelMapUrl: string;
     driverId: string | null;
     vehicleId: string | null;
     notes: string;
@@ -247,16 +248,23 @@ export function UpcomingCountdown() {
     // تعبئة بيانات الفندق تلقائياً من حجز المتحدث إن وجد
     let hotelName = "";
     let hotelLocation = "";
+    let hotelMapUrl = "";
     if (item.speakerId) {
       const { data: booking } = await db
         .from("hotel_bookings")
-        .select("hotels(name, location)")
+        .select("hotels(name, address)")
         .eq("speaker_id", item.speakerId)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
       hotelName = booking?.hotels?.name ?? "";
-      hotelLocation = booking?.hotels?.location ?? "";
+      hotelLocation = booking?.hotels?.address ?? "";
+    }
+    // استكمال الموقع ورابط خرائط قوقل من قائمة الفنادق المعتمدة
+    const known = HOTELS.find((h) => h.name === hotelName);
+    if (known) {
+      hotelLocation = hotelLocation || known.location;
+      hotelMapUrl = known.mapUrl ?? "";
     }
     setDraft({
       item,
@@ -269,6 +277,7 @@ export function UpcomingCountdown() {
       receiverPhone: "",
       hotelName,
       hotelLocation,
+      hotelMapUrl,
       driverId: null,
       vehicleId: null,
       notes: "",
@@ -346,6 +355,7 @@ export function UpcomingCountdown() {
           ticket_no: inserted.ticket_no ? String(inserted.ticket_no) : null,
           hotel_name: draft.hotelName || null,
           hotel_location: draft.hotelLocation || null,
+          hotel_map_url: draft.hotelMapUrl || null,
         })
         .select("id, card_no")
         .maybeSingle();
@@ -370,6 +380,7 @@ export function UpcomingCountdown() {
             cardNo: card?.card_no ? String(card.card_no) : "",
             hotelName: draft.hotelName,
             hotelLocation: draft.hotelLocation,
+            hotelMapUrl: draft.hotelMapUrl,
           },
           inserted.ticket_no,
         );
@@ -572,6 +583,15 @@ export function UpcomingCountdown() {
                 <Input
                   value={draft.hotelLocation}
                   onChange={(e) => setDraft({ ...draft, hotelLocation: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">رابط موقع الفندق (Google Maps)</Label>
+                <Input
+                  dir="ltr"
+                  value={draft.hotelMapUrl}
+                  onChange={(e) => setDraft({ ...draft, hotelMapUrl: e.target.value })}
+                  placeholder="https://maps.app.goo.gl/…"
                 />
               </div>
               <div className="space-y-1">
