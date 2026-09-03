@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/calendar")({
 
 const db = supabase as any;
 
-type Kind = "session" | "arrival" | "departure" | "trip" | "checkin" | "checkout";
+type Kind = "session" | "arrival" | "departure" | "trip";
 
 type CalItem = {
   id: string;
@@ -41,8 +41,6 @@ const kindMeta: Record<Kind, { label: string; className: string }> = {
   arrival: { label: "وصول", className: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30" },
   departure: { label: "مغادرة", className: "bg-amber-500/15 text-amber-600 border-amber-500/30" },
   trip: { label: "نقل", className: "bg-sky-500/15 text-sky-600 border-sky-500/30" },
-  checkin: { label: "دخول فندق", className: "bg-violet-500/15 text-violet-600 border-violet-500/30" },
-  checkout: { label: "خروج فندق", className: "bg-rose-500/15 text-rose-600 border-rose-500/30" },
 };
 
 const weekDays = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
