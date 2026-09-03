@@ -65,8 +65,7 @@ export function UpcomingCountdown() {
       const nowIso = now.toISOString();
       const horizon = new Date(now.getTime() + 72 * 60 * 60 * 1000).toISOString();
 
-
-      const [arrivals, departures] = await Promise.all([
+      const [arrivals, departures, arrivalTickets, departureTickets] = await Promise.all([
         db
           .from("speaker_arrivals")
           .select("id, event_id, speaker_id, arrival_time, arrival_point, terminal, speakers(full_name)")
@@ -81,7 +80,30 @@ export function UpcomingCountdown() {
           .lte("departure_time", horizon)
           .order("departure_time", { ascending: true })
           .limit(50),
+        db
+          .from("transport_trips")
+          .select("id, arrival_id, ticket_no")
+          .not("arrival_id", "is", null)
+          .in(
+            "arrival_id",
+            (arrivals.data ?? []).map((a: any) => a.id),
+          ),
+        db
+          .from("transport_trips")
+          .select("id, departure_id, ticket_no")
+          .not("departure_id", "is", null)
+          .in(
+            "departure_id",
+            (departures.data ?? []).map((d: any) => d.id),
+          ),
       ]);
+
+      const arrivalTicketMap = new Map(
+        (arrivalTickets.data ?? []).map((t: any) => [t.arrival_id, t.ticket_no]),
+      );
+      const departureTicketMap = new Map(
+        (departureTickets.data ?? []).map((t: any) => [t.departure_id, t.ticket_no]),
+      );
 
       const items: Item[] = [];
       for (const a of arrivals.data ?? []) {
@@ -95,6 +117,8 @@ export function UpcomingCountdown() {
           eventId: a.event_id ?? null,
           point: a.arrival_point ?? null,
           terminal: a.terminal ?? null,
+          sourceId: a.id,
+          ticketNo: arrivalTicketMap.get(a.id) ?? null,
         });
       }
       for (const d of departures.data ?? []) {
@@ -108,6 +132,8 @@ export function UpcomingCountdown() {
           eventId: d.event_id ?? null,
           point: d.departure_point ?? null,
           terminal: d.terminal ?? null,
+          sourceId: d.id,
+          ticketNo: departureTicketMap.get(d.id) ?? null,
         });
       }
 
