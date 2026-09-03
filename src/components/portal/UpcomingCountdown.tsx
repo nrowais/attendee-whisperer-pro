@@ -242,15 +242,33 @@ export function UpcomingCountdown() {
     },
   });
 
-  const openDraft = (item: Item) => {
+  const openDraft = async (item: Item) => {
     const isArrival = item.kind === "arrival";
+    // تعبئة بيانات الفندق تلقائياً من حجز المتحدث إن وجد
+    let hotelName = "";
+    let hotelLocation = "";
+    if (item.speakerId) {
+      const { data: booking } = await db
+        .from("hotel_bookings")
+        .select("hotels(name, location)")
+        .eq("speaker_id", item.speakerId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      hotelName = booking?.hotels?.name ?? "";
+      hotelLocation = booking?.hotels?.location ?? "";
+    }
     setDraft({
       item,
       guestName: item.name !== "—" ? item.name : "",
       terminal: item.terminal ?? "",
       flightNo: "",
-      pickup: isArrival ? (item.point ?? "المطار") : "الفندق",
-      dropoff: isArrival ? "الفندق" : (item.point ?? "المطار"),
+      pickup: isArrival ? (item.point ?? "المطار") : hotelName || "الفندق",
+      dropoff: isArrival ? hotelName || "الفندق" : (item.point ?? "المطار"),
+      receiverName: "",
+      receiverPhone: "",
+      hotelName,
+      hotelLocation,
       driverId: null,
       vehicleId: null,
       notes: "",
