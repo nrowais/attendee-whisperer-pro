@@ -87,10 +87,6 @@ function useMonthItems(from: Date, to: Date) {
           .select("id, scheduled_at, pickup_location, dropoff_location, speakers(full_name)")
           .gte("scheduled_at", fromIso)
           .lte("scheduled_at", toIso),
-        db
-          .from("hotel_bookings")
-          .select("id, check_in, check_out, hotels(name), speakers(full_name)")
-          .or(`and(check_in.gte.${fromDate},check_in.lte.${toDate}),and(check_out.gte.${fromDate},check_out.lte.${toDate})`),
       ]);
 
       const items: CalItem[] = [];
