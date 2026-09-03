@@ -166,12 +166,15 @@ export function UpcomingCountdown() {
         guest_name: item.name !== "—" ? item.name : null,
         terminal: item.terminal,
         flight_at: item.at,
+        arrival_id: isArrival ? item.sourceId : null,
+        departure_id: isArrival ? null : item.sourceId,
       });
       if (error) throw error;
     },
     onSuccess: (_d, item) => {
       qc.invalidateQueries({ queryKey: ["transport-tickets"] });
       qc.invalidateQueries({ queryKey: ["fleet-trips"] });
+      qc.invalidateQueries({ queryKey: ["upcoming-countdown"] });
       toast.success(`تم إنشاء تذكرة نقل لـ ${item.name}`);
     },
     onError: (e: any) => toast.error(e.message ?? "تعذر إنشاء التذكرة"),
