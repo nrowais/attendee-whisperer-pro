@@ -26,7 +26,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRoles } from "@/hooks/useAuth";
-import { openTicketPdf } from "@/lib/ticketPdf";
+import { buildDriverCardHtml, type DriverCardData } from "@/components/portal/DriverCardDialog";
+import { toast as toastPdf } from "sonner";
 
 const db = supabase as any;
 
