@@ -368,8 +368,8 @@ export function UpcomingCountdown() {
                       <button
                         type="button"
                         disabled={busy}
-                        onClick={() => createTicket.mutate(item)}
-                        title="إنشاء تذكرة نقل لهذا الموعد"
+                        onClick={() => openDraft(item)}
+                        title="إصدار تذكرة نقل لهذا الموعد"
                         className="group flex items-center gap-1.5 truncate text-sm font-medium text-foreground transition-colors hover:text-primary disabled:opacity-50"
                       >
                         <span className="truncate">
