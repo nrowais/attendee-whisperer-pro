@@ -146,11 +146,32 @@ function UsersPage() {
     enabled: isAdmin,
     queryFn: async () => {
       const rows = await fetchStates();
-      const map: Record<string, { disabled: boolean; lastSignInAt: string | null }> = {};
-      for (const r of rows) map[r.id] = { disabled: r.disabled, lastSignInAt: r.lastSignInAt };
+      const map: Record<
+        string,
+        {
+          disabled: boolean;
+          lastSignInAt: string | null;
+          lastActivityAt: string | null;
+          activityCount: number;
+        }
+      > = {};
+      for (const r of rows)
+        map[r.id] = {
+          disabled: r.disabled,
+          lastSignInAt: r.lastSignInAt,
+          lastActivityAt: r.lastActivityAt,
+          activityCount: r.activityCount,
+        };
       return map;
     },
   });
+
+  const [activityTarget, setActivityTarget] = useState<{
+    id: string;
+    name: string;
+    email: string | null;
+  } | null>(null);
+
 
   const [passwordTarget, setPasswordTarget] = useState<{ id: string; email: string } | null>(null);
   const [newPassword, setNewPassword] = useState("");
