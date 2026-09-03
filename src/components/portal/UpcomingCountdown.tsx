@@ -100,12 +100,18 @@ export function UpcomingCountdown() {
           : { data: [] },
       ]);
 
-      const arrivalTicketMap = new Map(
-        (arrivalTickets.data ?? []).map((t: any) => [t.arrival_id, t.ticket_no]),
-      );
-      const departureTicketMap = new Map(
-        (departureTickets.data ?? []).map((t: any) => [t.departure_id, t.ticket_no]),
-      );
+      const arrivalTicketMap = new Map<string, number[]>();
+      for (const t of arrivalTickets.data ?? []) {
+        const list = arrivalTicketMap.get(t.arrival_id) ?? [];
+        list.push(t.ticket_no);
+        arrivalTicketMap.set(t.arrival_id, list);
+      }
+      const departureTicketMap = new Map<string, number[]>();
+      for (const t of departureTickets.data ?? []) {
+        const list = departureTicketMap.get(t.departure_id) ?? [];
+        list.push(t.ticket_no);
+        departureTicketMap.set(t.departure_id, list);
+      }
 
       const items: Item[] = [];
       for (const a of arrivals.data ?? []) {
@@ -120,7 +126,7 @@ export function UpcomingCountdown() {
           point: a.arrival_point ?? null,
           terminal: a.terminal ?? null,
           sourceId: a.id,
-          ticketNo: (arrivalTicketMap.get(a.id) as number | undefined) ?? null,
+          ticketNos: arrivalTicketMap.get(a.id) ?? [],
         });
       }
       for (const d of departures.data ?? []) {
@@ -135,7 +141,7 @@ export function UpcomingCountdown() {
           point: d.departure_point ?? null,
           terminal: d.terminal ?? null,
           sourceId: d.id,
-          ticketNo: (departureTicketMap.get(d.id) as number | undefined) ?? null,
+          ticketNos: departureTicketMap.get(d.id) ?? [],
         });
       }
 
