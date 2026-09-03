@@ -222,6 +222,7 @@ export function UpcomingCountdown() {
   // حوار مراجعة التذكرة قبل إصدارها
   const [draft, setDraft] = useState<{
     item: Item;
+    cardType: "airport" | "trip";
     guestName: string;
     terminal: string;
     flightNo: string;
