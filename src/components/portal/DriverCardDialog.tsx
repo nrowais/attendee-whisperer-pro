@@ -670,8 +670,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
               {field("flightTime", "الوقت", "time")}
               {field("pickup", "نقطة الانطلاق")}
               {field("dropoff", "الوجهة")}
-              {field("receiverName", "اسم مستقبل الضيف (اختياري)")}
-              {field("receiverPhone", "رقم جوال مستقبل الضيف", "tel", "05xxxxxxxx")}
+              {receiverFields}
               {driverPicker}
               {field("driverPhone", "رقم جوال السائق", "tel", "05xxxxxxxx")}
               {vehiclePicker}
