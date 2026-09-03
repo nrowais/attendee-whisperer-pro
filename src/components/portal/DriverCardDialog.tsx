@@ -285,6 +285,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
   const [cardId, setCardId] = useState<string | null>(null);
   const [driverId, setDriverId] = useState<string | null>(null);
   const [vehicleId, setVehicleId] = useState<string | null>(null);
+  const [receiverModeSel, setReceiverModeSel] = useState("");
 
   // قائمة السائقين والمركبات المسجلة في النظام لربطها بالبطاقة
   const { data: drivers = [] } = useQuery({
@@ -343,6 +344,10 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
     setCardId(null);
     setDriverId(trip?.driver_id ?? null);
     setVehicleId(trip?.vehicle_id ?? null);
+    const initReceiver = trip?.receiver_name ?? "";
+    setReceiverModeSel(
+      !initReceiver ? "" : RECEIVERS.some((r) => r.name === initReceiver) ? initReceiver : "__custom__",
+    );
     // استكمال بيانات الفندق تلقائياً من القائمة المعتمدة عند تطابق الاسم
     const hotelMatch = HOTELS.find((h) => h.name === (trip?.hotel_name ?? ""));
     setForm({
@@ -518,24 +523,23 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
     </div>
   );
 
-  const receiverSelectValue = (() => {
-    if (!form.receiverName) return "";
-    return RECEIVERS.some((r) => r.name === form.receiverName) ? form.receiverName : "__custom__";
-  })();
-
   const receiverFields = (
     <>
       <div className="space-y-1">
         <Label className="text-xs text-muted-foreground">اسم مستقبل الضيف</Label>
         <select
           className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          value={receiverSelectValue}
+          value={receiverModeSel}
           onChange={(e) => {
             const val = e.target.value;
+            setReceiverModeSel(val);
             if (val === "") {
               setForm((f) => ({ ...f, receiverName: "", receiverPhone: "" }));
             } else if (val === "__custom__") {
-              setForm((f) => ({ ...f, receiverName: f.receiverName || "", receiverPhone: f.receiverPhone || "" }));
+              setForm((f) => ({
+                ...f,
+                receiverName: RECEIVERS.some((r) => r.name === f.receiverName) ? "" : f.receiverName,
+              }));
             } else {
               const r = RECEIVERS.find((x) => x.name === val)!;
               setForm((f) => ({ ...f, receiverName: r.name, receiverPhone: r.phone }));
@@ -551,7 +555,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
           <option value="__custom__">أخرى (إدخال يدوي)</option>
         </select>
       </div>
-      {receiverSelectValue === "__custom__" && (
+      {receiverModeSel === "__custom__" && (
         <div className="space-y-1">
           <Label className="text-xs text-muted-foreground">اسم مستقبل الضيف (يدوي)</Label>
           <Input
@@ -566,7 +570,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
           type="tel"
           dir="ltr"
           value={form.receiverPhone}
-          disabled={receiverSelectValue !== "__custom__" && receiverSelectValue !== ""}
+          disabled={receiverModeSel !== "__custom__" && receiverModeSel !== ""}
           onChange={(e) => setForm((f) => ({ ...f, receiverPhone: e.target.value }))}
         />
       </div>

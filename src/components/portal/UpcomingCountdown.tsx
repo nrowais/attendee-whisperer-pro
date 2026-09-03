@@ -78,11 +78,6 @@ const kindMeta: Record<Kind, { label: string; icon: typeof PlaneLanding }> = {
 /** فترة التنبيه المسبق بالدقائق */
 const ALERT_MINUTES = 120;
 
-function receiverMode(name: string) {
-  if (!name) return "";
-  return RECEIVERS.some((r) => r.name === name) ? name : "__custom__";
-}
-
 function formatRemaining(ms: number) {
   if (ms <= 0) return "حان الموعد";
   const total = Math.floor(ms / 1000);
@@ -235,6 +230,7 @@ export function UpcomingCountdown() {
     dropoff: string;
     receiverName: string;
     receiverPhone: string;
+    receiverModeSel: string;
     flightDate: string;
     flightTime: string;
     hotelName: string;
@@ -295,6 +291,7 @@ export function UpcomingCountdown() {
       dropoff: isArrival ? hotelName || "الفندق" : (item.point ?? "المطار"),
       receiverName: "",
       receiverPhone: "",
+      receiverModeSel: "",
       flightDate: splitDateTime(item.at).date,
       flightTime: splitDateTime(item.at).time,
       hotelName,
@@ -620,16 +617,16 @@ export function UpcomingCountdown() {
                 <Label className="text-xs text-muted-foreground">اسم مستقبل الضيف</Label>
                 <select
                   className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  value={receiverMode(draft.receiverName)}
+                  value={draft.receiverModeSel}
                   onChange={(e) => {
                     const val = e.target.value;
                     if (val === "") {
-                      setDraft({ ...draft, receiverName: "", receiverPhone: "" });
+                      setDraft({ ...draft, receiverModeSel: "", receiverName: "", receiverPhone: "" });
                     } else if (val === "__custom__") {
-                      setDraft({ ...draft, receiverName: draft.receiverName || "", receiverPhone: draft.receiverPhone || "" });
+                      setDraft({ ...draft, receiverModeSel: "__custom__", receiverName: RECEIVERS.some((r) => r.name === draft.receiverName) ? "" : draft.receiverName });
                     } else {
                       const r = RECEIVERS.find((x) => x.name === val)!;
-                      setDraft({ ...draft, receiverName: r.name, receiverPhone: r.phone });
+                      setDraft({ ...draft, receiverModeSel: val, receiverName: r.name, receiverPhone: r.phone });
                     }
                   }}
                 >
@@ -642,7 +639,7 @@ export function UpcomingCountdown() {
                   <option value="__custom__">أخرى (إدخال يدوي)</option>
                 </select>
               </div>
-              {receiverMode(draft.receiverName) === "__custom__" && (
+              {draft.receiverModeSel === "__custom__" && (
                 <div className="space-y-1">
                   <Label className="text-xs text-muted-foreground">اسم مستقبل الضيف (يدوي)</Label>
                   <Input
@@ -657,7 +654,7 @@ export function UpcomingCountdown() {
                   type="tel"
                   dir="ltr"
                   value={draft.receiverPhone}
-                  disabled={receiverMode(draft.receiverName) !== "__custom__" && receiverMode(draft.receiverName) !== ""}
+                  disabled={draft.receiverModeSel !== "__custom__" && draft.receiverModeSel !== ""}
                   onChange={(e) => setDraft({ ...draft, receiverPhone: e.target.value })}
                 />
               </div>
