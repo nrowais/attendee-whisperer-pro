@@ -66,7 +66,7 @@ function useMonthItems(from: Date, to: Date) {
     queryKey: ["calendar", fromIso, toIso],
     refetchInterval: 60_000,
     queryFn: async (): Promise<CalItem[]> => {
-      const [sessions, arrivals, departures, trips, bookings] = await Promise.all([
+      const [sessions, arrivals, departures, trips] = await Promise.all([
         db
           .from("speaker_sessions")
           .select("id, session_title, hall, starts_at, speakers(full_name)")
