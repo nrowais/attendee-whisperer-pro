@@ -94,6 +94,7 @@ function arabicTime(value: string) {
 
 export function buildDriverCardHtml(c: DriverCardData) {
   const isTrip = c.cardType === "trip";
+  const hasHotel = !!(c.hotelName && c.hotelName.trim() !== "");
   const rows: Array<[string, string]> = (
     isTrip
       ? [
@@ -111,8 +112,12 @@ export function buildDriverCardHtml(c: DriverCardData) {
           ["رقم جوال مستقبل الضيف", c.receiverPhone],
           ["وقت الرحلة", arabicTime(c.flightTime)],
           ["تاريخ الرحلة", arabicDate(c.flightDate)],
-          ["اسم الفندق", c.hotelName ?? ""],
-          ["موقع الفندق", c.hotelLocation ?? ""],
+          ...(hasHotel
+            ? [
+                ["اسم الفندق", c.hotelName ?? ""],
+                ["موقع الفندق", c.hotelLocation ?? ""],
+              ]
+            : []),
         ]
   ).filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
   const extra: Array<[string, string]> = [
@@ -123,11 +128,13 @@ export function buildDriverCardHtml(c: DriverCardData) {
     ["الوجهة", c.dropoff],
   ].filter(([, v]) => v && v.trim() !== "") as Array<[string, string]>;
 
-  const mapQuery = [c.hotelName, c.hotelLocation].filter((v) => v && v.trim() !== "").join("، ");
+  const mapQuery = hasHotel
+    ? [c.hotelName, c.hotelLocation].filter((v) => v && v.trim() !== "").join("، ")
+    : "";
   const fallbackUrl = mapQuery
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
     : "";
-  const mapsUrl = c.hotelMapUrl && c.hotelMapUrl.trim() !== "" ? c.hotelMapUrl : fallbackUrl;
+  const mapsUrl = hasHotel && c.hotelMapUrl && c.hotelMapUrl.trim() !== "" ? c.hotelMapUrl : fallbackUrl;
 
   const row = ([label, value]: [string, string]) => {
     const cell =
@@ -632,12 +639,12 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
                     setForm((f) => ({
                       ...f,
                       hotelName: name,
-                      hotelLocation: hotel ? hotel.location : (f.hotelLocation ?? ""),
-                      hotelMapUrl: hotel?.mapUrl ?? (f.hotelMapUrl ?? ""),
+                      hotelLocation: name ? (hotel ? hotel.location : (f.hotelLocation ?? "")) : "",
+                      hotelMapUrl: name ? (hotel?.mapUrl ?? (f.hotelMapUrl ?? "")) : "",
                     }));
                   }}
                 >
-                  <option value="">اختر الفندق…</option>
+                  <option value="">لا يوجد</option>
                   {HOTELS.map((h) => (
                     <option key={h.name} value={h.name}>
                       {h.name}
