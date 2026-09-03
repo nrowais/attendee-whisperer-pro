@@ -22,6 +22,8 @@ type Item = {
   eventId: string | null;
   point: string | null;
   terminal: string | null;
+  sourceId: string;
+  ticketNo: number | null;
 };
 
 /** عدد العناصر الظاهرة قبل توسيع القائمة */
