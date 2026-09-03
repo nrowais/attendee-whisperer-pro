@@ -346,7 +346,6 @@ export function UpcomingCountdown() {
           ticket_no: inserted.ticket_no ? String(inserted.ticket_no) : null,
           hotel_name: draft.hotelName || null,
           hotel_location: draft.hotelLocation || null,
-          notes: draft.notes || null,
         })
         .select("id, card_no")
         .maybeSingle();
