@@ -339,7 +339,7 @@ export function UpcomingCountdown() {
           guest_name: draft.guestName || null,
           terminal: draft.terminal || null,
           flight_no: draft.flightNo || null,
-          flight_at: item.at,
+          flight_at: flightAt,
           notes: draft.notes || null,
           arrival_id: isArrival ? item.sourceId : null,
           departure_id: isArrival ? null : item.sourceId,
@@ -354,8 +354,6 @@ export function UpcomingCountdown() {
       const vehicleText = vehicle
         ? `${vehicle.plate_number}${vehicle.make ? ` · ${vehicle.make}` : ""}`
         : "";
-      const atDate = new Date(item.at);
-      const pad = (n: number) => String(n).padStart(2, "0");
       const { data: card } = await db
         .from("driver_cards")
         .insert({
