@@ -94,13 +94,13 @@ export function UpcomingCountdown() {
         arrivalIds.length
           ? db
               .from("transport_trips")
-              .select("id, arrival_id, ticket_no")
+              .select("id, arrival_id, ticket_no, created_at")
               .in("arrival_id", arrivalIds)
           : { data: [] },
         departureIds.length
           ? db
               .from("transport_trips")
-              .select("id, departure_id, ticket_no")
+              .select("id, departure_id, ticket_no, created_at")
               .in("departure_id", departureIds)
           : { data: [] },
       ]);
