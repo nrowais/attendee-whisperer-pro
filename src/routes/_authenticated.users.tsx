@@ -334,6 +334,37 @@ function UsersPage() {
                   {isAdmin ? (
                     <TableCell className="text-start">
                       {(() => {
+                        const st = statesQuery.data?.[u.id];
+                        return (
+                          <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">
+                              آخر اتصال: {formatDateTime(st?.lastSignInAt)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              آخر عملية: {formatDateTime(st?.lastActivityAt)}
+                            </p>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                setActivityTarget({
+                                  id: u.id,
+                                  name: u.full_name ?? u.email ?? "مستخدم",
+                                  email: u.email ?? null,
+                                })
+                              }
+                            >
+                              سجل النشاط ({st?.activityCount ?? 0})
+                            </Button>
+                          </div>
+                        );
+                      })()}
+                    </TableCell>
+                  ) : null}
+                  {isAdmin ? (
+
+                    <TableCell className="text-start">
+                      {(() => {
                         const disabled = statesQuery.data?.[u.id]?.disabled ?? false;
                         return (
                           <div className="flex flex-wrap items-center gap-2">
