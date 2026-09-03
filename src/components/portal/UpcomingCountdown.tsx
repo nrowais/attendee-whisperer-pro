@@ -277,6 +277,7 @@ export function UpcomingCountdown() {
       receiverPhone: "",
       hotelName,
       hotelLocation,
+      hotelMapUrl,
       driverId: null,
       vehicleId: null,
       notes: "",
@@ -354,6 +355,7 @@ export function UpcomingCountdown() {
           ticket_no: inserted.ticket_no ? String(inserted.ticket_no) : null,
           hotel_name: draft.hotelName || null,
           hotel_location: draft.hotelLocation || null,
+          hotel_map_url: draft.hotelMapUrl || null,
         })
         .select("id, card_no")
         .maybeSingle();
@@ -378,6 +380,7 @@ export function UpcomingCountdown() {
             cardNo: card?.card_no ? String(card.card_no) : "",
             hotelName: draft.hotelName,
             hotelLocation: draft.hotelLocation,
+            hotelMapUrl: draft.hotelMapUrl,
           },
           inserted.ticket_no,
         );
