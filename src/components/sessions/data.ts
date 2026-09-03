@@ -34,6 +34,8 @@ export type SessionRow = {
   session_date: string;
   start_time: string | null;
   end_time: string | null;
+  time_precision?: string | null;
+  exact_start_time?: string | null;
   duration_minutes: number | null;
   description: string | null;
   topic: string | null;
