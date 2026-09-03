@@ -22,6 +22,8 @@ type Item = {
   eventId: string | null;
   point: string | null;
   terminal: string | null;
+  sourceId: string;
+  ticketNos: number[];
 };
 
 /** عدد العناصر الظاهرة قبل توسيع القائمة */
@@ -63,7 +65,6 @@ export function UpcomingCountdown() {
       const nowIso = now.toISOString();
       const horizon = new Date(now.getTime() + 72 * 60 * 60 * 1000).toISOString();
 
-
       const [arrivals, departures] = await Promise.all([
         db
           .from("speaker_arrivals")
@@ -81,6 +82,37 @@ export function UpcomingCountdown() {
           .limit(50),
       ]);
 
+      const arrivalIds = (arrivals.data ?? []).map((a: any) => a.id);
+      const departureIds = (departures.data ?? []).map((d: any) => d.id);
+
+      const [arrivalTickets, departureTickets] = await Promise.all([
+        arrivalIds.length
+          ? db
+              .from("transport_trips")
+              .select("id, arrival_id, ticket_no")
+              .in("arrival_id", arrivalIds)
+          : { data: [] },
+        departureIds.length
+          ? db
+              .from("transport_trips")
+              .select("id, departure_id, ticket_no")
+              .in("departure_id", departureIds)
+          : { data: [] },
+      ]);
+
+      const arrivalTicketMap = new Map<string, number[]>();
+      for (const t of arrivalTickets.data ?? []) {
+        const list = arrivalTicketMap.get(t.arrival_id) ?? [];
+        list.push(t.ticket_no);
+        arrivalTicketMap.set(t.arrival_id, list);
+      }
+      const departureTicketMap = new Map<string, number[]>();
+      for (const t of departureTickets.data ?? []) {
+        const list = departureTicketMap.get(t.departure_id) ?? [];
+        list.push(t.ticket_no);
+        departureTicketMap.set(t.departure_id, list);
+      }
+
       const items: Item[] = [];
       for (const a of arrivals.data ?? []) {
         items.push({
@@ -93,6 +125,8 @@ export function UpcomingCountdown() {
           eventId: a.event_id ?? null,
           point: a.arrival_point ?? null,
           terminal: a.terminal ?? null,
+          sourceId: a.id,
+          ticketNos: arrivalTicketMap.get(a.id) ?? [],
         });
       }
       for (const d of departures.data ?? []) {
@@ -106,6 +140,8 @@ export function UpcomingCountdown() {
           eventId: d.event_id ?? null,
           point: d.departure_point ?? null,
           terminal: d.terminal ?? null,
+          sourceId: d.id,
+          ticketNos: departureTicketMap.get(d.id) ?? [],
         });
       }
 
@@ -136,12 +172,15 @@ export function UpcomingCountdown() {
         guest_name: item.name !== "—" ? item.name : null,
         terminal: item.terminal,
         flight_at: item.at,
+        arrival_id: isArrival ? item.sourceId : null,
+        departure_id: isArrival ? null : item.sourceId,
       });
       if (error) throw error;
     },
     onSuccess: (_d, item) => {
       qc.invalidateQueries({ queryKey: ["transport-tickets"] });
       qc.invalidateQueries({ queryKey: ["fleet-trips"] });
+      qc.invalidateQueries({ queryKey: ["upcoming-countdown"] });
       toast.success(`تم إنشاء تذكرة نقل لـ ${item.name}`);
     },
     onError: (e: any) => toast.error(e.message ?? "تعذر إنشاء التذكرة"),
@@ -191,6 +230,7 @@ export function UpcomingCountdown() {
             const Icon = kindMeta[item.kind].icon;
             const urgent = diff <= ALERT_MINUTES * 60 * 1000;
             const busy = createTicket.isPending && createTicket.variables?.id === item.id;
+            const hasTicket = item.ticketNos.length > 0;
             return (
               <li key={item.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                 <div className="flex min-w-0 items-center gap-3">
@@ -198,7 +238,7 @@ export function UpcomingCountdown() {
                     <Icon className="size-4" />
                   </span>
                   <div className="min-w-0">
-                    {canEditOps && item.speakerId ? (
+                    {canEditOps && item.speakerId && !hasTicket ? (
                       <button
                         type="button"
                         disabled={busy}
@@ -220,6 +260,21 @@ export function UpcomingCountdown() {
                       {item.detail} • {new Date(item.at).toLocaleString("ar-SA-u-ca-gregory")}
                     </p>
                   </div>
+                  {hasTicket && (
+                    <div className="flex shrink-0 flex-wrap items-center gap-1">
+                      {item.ticketNos.map((no) => (
+                        <Badge
+                          key={no}
+                          variant="default"
+                          className="gap-1 bg-primary text-primary-foreground"
+                          title="تذكرة نقل مصدرة"
+                        >
+                          <Ticket className="size-3" />
+                          #{no}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <Badge
                   variant={urgent ? "destructive" : "secondary"}
