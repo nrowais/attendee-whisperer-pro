@@ -122,11 +122,27 @@ function useTickets() {
 }
 
 function TicketsPage() {
-  const { canEditOps, canEdit } = useRoles();
+  const { canEditOps, canEdit, isAdmin } = useRoles();
   const { data, isLoading } = useTickets();
   const qc = useQueryClient();
   const [direction, setDirection] = useState<string>("all");
   const [query, setQuery] = useState("");
+  const [toDelete, setToDelete] = useState<any | null>(null);
+
+  const remove = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await db.from("transport_trips").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["transport-tickets"] });
+      qc.invalidateQueries({ queryKey: ["fleet-trips"] });
+      qc.invalidateQueries({ queryKey: ["upcoming-countdown"] });
+      toast.success("تم حذف التذكرة");
+      setToDelete(null);
+    },
+    onError: (e: any) => toast.error(e.message ?? "تعذر حذف التذكرة"),
+  });
 
   const update = useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: Record<string, any> }) => {
