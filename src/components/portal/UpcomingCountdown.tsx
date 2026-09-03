@@ -184,11 +184,13 @@ export function UpcomingCountdown() {
           لا توجد مواعيد وصول أو مغادرة من المطار خلال الأيام الثلاثة القادمة
         </p>
       ) : (
+        <>
         <ul className="divide-y divide-border">
-          {items.map((item) => {
+          {visibleItems.map((item) => {
             const diff = new Date(item.at).getTime() - tick;
             const Icon = kindMeta[item.kind].icon;
             const urgent = diff <= ALERT_MINUTES * 60 * 1000;
+            const busy = createTicket.isPending && createTicket.variables?.id === item.id;
             return (
               <li key={item.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                 <div className="flex min-w-0 items-center gap-3">
@@ -196,9 +198,24 @@ export function UpcomingCountdown() {
                     <Icon className="size-4" />
                   </span>
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-foreground">
-                      {item.name} — {kindMeta[item.kind].label}
-                    </p>
+                    {canEditOps && item.speakerId ? (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => createTicket.mutate(item)}
+                        title="إنشاء تذكرة نقل لهذا الموعد"
+                        className="group flex items-center gap-1.5 truncate text-sm font-medium text-foreground transition-colors hover:text-primary disabled:opacity-50"
+                      >
+                        <span className="truncate">
+                          {item.name} — {kindMeta[item.kind].label}
+                        </span>
+                        <Ticket className="size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
+                      </button>
+                    ) : (
+                      <p className="truncate text-sm font-medium text-foreground">
+                        {item.name} — {kindMeta[item.kind].label}
+                      </p>
+                    )}
                     <p className="truncate text-xs text-muted-foreground">
                       {item.detail} • {new Date(item.at).toLocaleString("ar-SA-u-ca-gregory")}
                     </p>
@@ -216,6 +233,17 @@ export function UpcomingCountdown() {
             );
           })}
         </ul>
+        {items.length > COLLAPSED_COUNT && (
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            {expanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+            {expanded ? "عرض أقل" : `عرض القائمة كاملة (${items.length})`}
+          </button>
+        )}
+        </>
       )}
     </section>
   );
