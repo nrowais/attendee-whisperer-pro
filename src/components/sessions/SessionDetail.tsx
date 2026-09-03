@@ -98,6 +98,36 @@ export function SessionDetail({
           {session.notes ? <Row label="الملاحظات" value={session.notes} /> : null}
           {session.description ? <Row label="الوصف" value={session.description} /> : null}
 
+          {gaps.length ? (
+            <div className="flex flex-wrap gap-1.5 rounded-xl border border-amber-300 bg-amber-50 p-3 text-amber-900">
+              <span className="text-xs font-bold">بيانات تحتاج استكمال:</span>
+              {gaps.map((g) => (
+                <span key={g} className="rounded-full border border-amber-300 px-2 py-0.5 text-[11px]">
+                  {g}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          {!isBreak ? (
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+              <div className="rounded-xl border border-border bg-secondary/40 p-2 text-center">
+                <p className="text-lg font-bold tabular-nums text-foreground">{breakdown.total}</p>
+                <p className="text-[11px] text-muted-foreground">إجمالي المتحدثين</p>
+              </div>
+              {opsGroups.map((g) => (
+                <div key={g.key} className="rounded-xl border border-border p-2 text-center">
+                  <p className="text-lg font-bold tabular-nums text-foreground">
+                    {breakdown.counts[g.key] ?? 0}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">{g.label}</p>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+
+
           {!isBreak ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
