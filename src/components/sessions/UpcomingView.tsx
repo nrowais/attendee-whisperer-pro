@@ -29,7 +29,7 @@ export function UpcomingView({
   return (
     <div className="space-y-6">
       {buckets.map((bucket, index) => {
-        const min = index === 0 ? 0 : buckets[index - 1].max;
+        const min = index === 0 ? 0 : (buckets[index - 1]?.max ?? 0);
         const items = upcoming.filter(
           (x) => (x.phase as any).inMs / 60_000 > min && (x.phase as any).inMs / 60_000 <= bucket.max,
         );

@@ -60,7 +60,7 @@ export function MatchingQueue({ sessions }: { sessions: SessionRow[] }) {
         {pending.map(({ session, participant }) => {
           const normalized = normalizeName(participant.display_name);
           const suggestions = (speakers ?? []).filter(
-            (s) => normalized && normalizeName(s.full_name).includes(normalized.split(" ")[0]),
+            (s) => normalized && normalizeName(s.full_name).includes(normalized.split(" ")[0] ?? ""),
           );
           return (
             <li key={participant.id} className="grid gap-2 p-3 sm:grid-cols-[1fr_260px]">

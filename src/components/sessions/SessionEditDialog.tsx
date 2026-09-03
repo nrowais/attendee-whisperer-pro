@@ -165,7 +165,7 @@ export function SessionEditDialog({
       }
 
       for (let i = 0; i < parts.length; i += 1) {
-        const p = parts[i];
+        const p = parts[i]!;
         const row = {
           session_id: sessionId,
           speaker_id: p.speaker_id,
@@ -224,7 +224,7 @@ export function SessionEditDialog({
       const next = [...prev];
       const target = index + dir;
       if (target < 0 || target >= next.length) return prev;
-      [next[index], next[target]] = [next[target], next[index]];
+      [next[index], next[target]] = [next[target]!, next[index]!];
       return next;
     });
   };

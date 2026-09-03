@@ -26,7 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { SessionRow, SpeakerOps, TrackRow } from "./data";
 
-function Row({ label, value }: { label: string; value?: string | null }) {
+function Row({ label, value }: { label: string; value?: string | null | undefined }) {
   return (
     <div className="flex gap-2 text-sm">
       <span className="w-32 shrink-0 text-muted-foreground">{label}</span>

@@ -7,7 +7,7 @@ import type { SessionRow, SpeakerOps, TrackRow } from "./data";
 function toMin(time?: string | null) {
   if (!time) return null;
   const [h, m] = time.split(":").map(Number);
-  if (Number.isNaN(h)) return null;
+  if (h === undefined || Number.isNaN(h)) return null;
   return h * 60 + (m || 0);
 }
 
@@ -46,11 +46,11 @@ export function SessionsTimeline({
     for (const track of tracks) {
       const list = sessions
         .filter((s) => s.track_id === track.id && s.start_time)
-        .sort((a, b) => (a.start_time! < b.start_time! ? -1 : 1));
+        .sort((a, b) => ((a.start_time ?? "") < (b.start_time ?? "") ? -1 : 1));
       for (let i = 0; i < list.length; i += 1) {
         for (let j = i + 1; j < list.length; j += 1) {
-          const a = list[i];
-          const b = list[j];
+          const a = list[i]!;
+          const b = list[j]!;
           const aEnd = fmtTime(a.end_time) === "—" ? fmtTime(a.start_time) : fmtTime(a.end_time);
           if (fmtTime(b.start_time) < aEnd) {
             set.add(a.id);
