@@ -426,6 +426,129 @@ export function UpcomingCountdown() {
         )}
         </>
       )}
+
+      {/* حوار مراجعة تذكرة النقل قبل الإصدار */}
+      <Dialog open={!!draft} onOpenChange={(v) => !v && setDraft(null)}>
+        <DialogContent dir="rtl" className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+          <DialogHeader className="text-right">
+            <DialogTitle className="flex items-center gap-2">
+              <Ticket className="size-4 text-primary" />
+              إصدار تذكرة نقل — {draft?.item.kind === "arrival" ? "وصول" : "مغادرة"}
+            </DialogTitle>
+            <DialogDescription>
+              راجع البيانات المعبأة تلقائياً من موعد الرحلة وعدّلها قبل الحفظ.
+              {draft?.item.at && (
+                <> الموعد: {new Date(draft.item.at).toLocaleString("ar-SA-u-ca-gregory")}</>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+
+          {draft && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">اسم الضيف</Label>
+                <Input
+                  value={draft.guestName}
+                  onChange={(e) => setDraft({ ...draft, guestName: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">رقم صالة المطار</Label>
+                <Input
+                  value={draft.terminal}
+                  placeholder="مثال: صالة 1"
+                  onChange={(e) => setDraft({ ...draft, terminal: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">رقم الرحلة (اختياري)</Label>
+                <Input
+                  value={draft.flightNo}
+                  onChange={(e) => setDraft({ ...draft, flightNo: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">نقطة الانطلاق</Label>
+                <Input
+                  value={draft.pickup}
+                  onChange={(e) => setDraft({ ...draft, pickup: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">الوجهة</Label>
+                <Input
+                  value={draft.dropoff}
+                  onChange={(e) => setDraft({ ...draft, dropoff: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">السائق (اختياري)</Label>
+                <Select
+                  value={draft.driverId ?? "none"}
+                  onValueChange={(v) => setDraft({ ...draft, driverId: v === "none" ? null : v })}
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="اختر سائقاً" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">بدون سائق</SelectItem>
+                    {drivers.map((d: any) => (
+                      <SelectItem key={d.id} value={d.id}>
+                        {d.full_name}
+                        {d.phone ? ` · ${d.phone}` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">المركبة (اختياري)</Label>
+                <Select
+                  value={draft.vehicleId ?? "none"}
+                  onValueChange={(v) => setDraft({ ...draft, vehicleId: v === "none" ? null : v })}
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="اختر مركبة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">بدون مركبة</SelectItem>
+                    {vehicles.map((v: any) => (
+                      <SelectItem key={v.id} value={v.id}>
+                        {v.plate_number}
+                        {v.make ? ` · ${v.make}` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1 sm:col-span-2">
+                <Label className="text-xs text-muted-foreground">ملاحظات (اختياري)</Label>
+                <Textarea
+                  rows={2}
+                  value={draft.notes}
+                  onChange={(e) => setDraft({ ...draft, notes: e.target.value })}
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:justify-start">
+            <Button
+              onClick={() => issueTicket.mutate({ withPdf: false })}
+              disabled={issueTicket.isPending}
+            >
+              حفظ
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => issueTicket.mutate({ withPdf: true })}
+              disabled={issueTicket.isPending}
+            >
+              حفظ وتصدير PDF
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
