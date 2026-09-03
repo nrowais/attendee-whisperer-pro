@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { fmtTime } from "@/lib/sessions";
+import { isRealConflict } from "@/lib/sessions";
 import { SessionCard } from "./SessionCard";
 import type { SessionRow, SpeakerOps, TrackRow } from "./data";
 
@@ -43,24 +43,20 @@ export function SessionsTimeline({
 
   const conflictIds = useMemo(() => {
     const set = new Set<string>();
-    for (const track of tracks) {
-      const list = sessions
-        .filter((s) => s.track_id === track.id && s.start_time)
-        .sort((a, b) => ((a.start_time ?? "") < (b.start_time ?? "") ? -1 : 1));
-      for (let i = 0; i < list.length; i += 1) {
-        for (let j = i + 1; j < list.length; j += 1) {
-          const a = list[i]!;
-          const b = list[j]!;
-          const aEnd = fmtTime(a.end_time) === "—" ? fmtTime(a.start_time) : fmtTime(a.end_time);
-          if (fmtTime(b.start_time) < aEnd) {
-            set.add(a.id);
-            set.add(b.id);
-          }
+    for (let i = 0; i < sessions.length; i += 1) {
+      for (let j = i + 1; j < sessions.length; j += 1) {
+        const a = sessions[i]!;
+        const b = sessions[j]!;
+        if (a.session_date !== b.session_date) continue;
+        if (isRealConflict(a, b)) {
+          set.add(a.id);
+          set.add(b.id);
         }
       }
     }
     return set;
-  }, [sessions, tracks]);
+  }, [sessions]);
+
 
   const bySlot = (trackId: string | null, slot: number) =>
     sessions.filter((s) => {

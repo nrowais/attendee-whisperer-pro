@@ -8,10 +8,13 @@ import {
 } from "@/components/ui/dialog";
 import { useRoles } from "@/hooks/useAuth";
 import {
+  completionGaps,
   fmtDuration,
   fmtTime,
   moderatorRoles,
   opStatusLabels,
+  opsBreakdown,
+  opsGroups,
   participantRoleLabels,
   readinessClasses,
   sessionReadiness,
@@ -23,6 +26,7 @@ import {
   type SessionStatus,
   type SessionType,
 } from "@/lib/sessions";
+
 import { cn } from "@/lib/utils";
 import type { SessionRow, SpeakerOps, TrackRow } from "./data";
 
@@ -56,12 +60,13 @@ export function SessionDetail({
   const phase = timePhase(session, now);
   const participants = session.session_participants ?? [];
   const isBreak = nonSpeakerTypes.includes(session.session_type as SessionType);
-  const readiness = sessionReadiness(
-    phase,
-    isBreak
-      ? []
-      : participants.map((p) => (p.speaker_id ? (opsMap?.get(p.speaker_id)?.status ?? null) : null)),
-  );
+  const statuses = isBreak
+    ? []
+    : participants.map((p) => (p.speaker_id ? (opsMap?.get(p.speaker_id)?.status ?? null) : null));
+  const readiness = sessionReadiness(phase, statuses);
+  const breakdown = opsBreakdown(statuses);
+  const gaps = completionGaps(session);
+
 
   return (
     <Dialog open={!!session} onOpenChange={(o) => !o && onClose()}>
@@ -93,6 +98,36 @@ export function SessionDetail({
 
           {session.notes ? <Row label="الملاحظات" value={session.notes} /> : null}
           {session.description ? <Row label="الوصف" value={session.description} /> : null}
+
+          {gaps.length ? (
+            <div className="flex flex-wrap gap-1.5 rounded-xl border border-amber-300 bg-amber-50 p-3 text-amber-900">
+              <span className="text-xs font-bold">بيانات تحتاج استكمال:</span>
+              {gaps.map((g) => (
+                <span key={g} className="rounded-full border border-amber-300 px-2 py-0.5 text-[11px]">
+                  {g}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          {!isBreak ? (
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+              <div className="rounded-xl border border-border bg-secondary/40 p-2 text-center">
+                <p className="text-lg font-bold tabular-nums text-foreground">{breakdown.total}</p>
+                <p className="text-[11px] text-muted-foreground">إجمالي المتحدثين</p>
+              </div>
+              {opsGroups.map((g) => (
+                <div key={g.key} className="rounded-xl border border-border p-2 text-center">
+                  <p className="text-lg font-bold tabular-nums text-foreground">
+                    {breakdown.counts[g.key] ?? 0}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">{g.label}</p>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+
 
           {!isBreak ? (
             <div className="space-y-2">
