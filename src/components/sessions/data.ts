@@ -19,6 +19,7 @@ export type ParticipantRow = {
   display_name: string | null;
   role: string;
   match_status: string;
+  notes?: string | null;
   sort_order: number;
   speakers?: { id: string; full_name: string; phone: string | null; photo_url: string | null } | null;
 };
@@ -33,6 +34,8 @@ export type SessionRow = {
   session_date: string;
   start_time: string | null;
   end_time: string | null;
+  time_precision?: string | null;
+  exact_start_time?: string | null;
   duration_minutes: number | null;
   description: string | null;
   topic: string | null;
@@ -64,7 +67,7 @@ export function useSessions() {
       const { data, error } = await db
         .from("sessions")
         .select(
-          "*, session_participants(id, session_id, speaker_id, display_name, role, match_status, sort_order, speakers(id, full_name, phone, photo_url))",
+          "*, session_participants(id, session_id, speaker_id, display_name, role, match_status, notes, sort_order, speakers(id, full_name, phone, photo_url))",
         )
         .order("session_date")
         .order("start_time");

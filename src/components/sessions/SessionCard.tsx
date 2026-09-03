@@ -14,6 +14,7 @@ import {
   sessionTypeLabels,
   timeAlertLabel,
   timePhase,
+  timePrecisionLabels,
   type ParticipantRole,
   type SessionStatus,
   type SessionType,
@@ -60,8 +61,15 @@ export function SessionCard({
       )}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="font-display text-sm font-bold tabular-nums text-primary" dir="ltr">
-          {fmtTime(session.start_time)} - {fmtTime(session.end_time)}
+        <span className="inline-flex items-center gap-2">
+          <span className="font-display text-sm font-bold tabular-nums text-primary" dir="ltr">
+            {fmtTime(session.start_time)} - {fmtTime(session.end_time)}
+          </span>
+          {session.time_precision === "within_slot" ? (
+            <Badge variant="outline" className="text-[10px]">
+              {timePrecisionLabels.within_slot}
+            </Badge>
+          ) : null}
         </span>
         <Badge variant="outline" className="text-[11px]">
           {sessionTypeLabels[session.session_type as SessionType] ?? session.session_type}

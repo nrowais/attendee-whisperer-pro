@@ -799,6 +799,7 @@ export type Database = {
           display_name: string | null
           id: string
           match_status: string
+          notes: string | null
           role: string
           session_id: string
           sort_order: number
@@ -810,6 +811,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           match_status?: string
+          notes?: string | null
           role?: string
           session_id: string
           sort_order?: number
@@ -821,6 +823,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           match_status?: string
+          notes?: string | null
           role?: string
           session_id?: string
           sort_order?: number
@@ -881,6 +884,7 @@ export type Database = {
           duration_minutes: number | null
           end_time: string | null
           event_id: string | null
+          exact_start_time: string | null
           id: string
           notes: string | null
           partner_text: string | null
@@ -888,6 +892,7 @@ export type Database = {
           session_type: string
           start_time: string | null
           status: string
+          time_precision: string
           title_ar: string | null
           title_en: string | null
           topic: string | null
@@ -900,6 +905,7 @@ export type Database = {
           duration_minutes?: number | null
           end_time?: string | null
           event_id?: string | null
+          exact_start_time?: string | null
           id?: string
           notes?: string | null
           partner_text?: string | null
@@ -907,6 +913,7 @@ export type Database = {
           session_type?: string
           start_time?: string | null
           status?: string
+          time_precision?: string
           title_ar?: string | null
           title_en?: string | null
           topic?: string | null
@@ -919,6 +926,7 @@ export type Database = {
           duration_minutes?: number | null
           end_time?: string | null
           event_id?: string | null
+          exact_start_time?: string | null
           id?: string
           notes?: string | null
           partner_text?: string | null
@@ -926,6 +934,7 @@ export type Database = {
           session_type?: string
           start_time?: string | null
           status?: string
+          time_precision?: string
           title_ar?: string | null
           title_en?: string | null
           topic?: string | null
