@@ -612,7 +612,7 @@ export function UpcomingCountdown() {
                 <Label className="text-xs text-muted-foreground">اسم الفندق (اختياري)</Label>
                 <select
                   className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  value={HOTELS.some((h) => h.name === draft.hotelName) ? draft.hotelName : ""}
+                  value={draft.hotelName}
                   onChange={(e) => {
                     const name = e.target.value;
                     const hotel = HOTELS.find((h) => h.name === name);
