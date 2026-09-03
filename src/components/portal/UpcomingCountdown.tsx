@@ -367,7 +367,7 @@ export function UpcomingCountdown() {
             pickup: draft.pickup,
             dropoff: draft.dropoff,
             ticketNo: String(inserted.ticket_no),
-            cardNo: card?.card_no ? String(card.card_no) : undefined,
+            cardNo: card?.card_no ? String(card.card_no) : "",
             hotelName: draft.hotelName,
             hotelLocation: draft.hotelLocation,
           },
