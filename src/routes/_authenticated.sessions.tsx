@@ -262,9 +262,12 @@ function SessionsPage() {
         <NowView sessions={filtered} tracks={tracks ?? []} now={now} opsMap={opsMap} onOpen={setDetail} />
       ) : view === "upcoming" ? (
         <UpcomingView sessions={filtered} tracks={tracks ?? []} now={now} opsMap={opsMap} onOpen={setDetail} />
+      ) : view === "gaps" ? (
+        <GapsView sessions={filtered} tracks={tracks ?? []} onOpen={setDetail} />
       ) : (
         <MatchingQueue sessions={all} />
       )}
+
 
       <SessionDetail
         session={detail}
