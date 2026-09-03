@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { AlarmClock, PlaneLanding, PlaneTakeoff } from "lucide-react";
+import { AlarmClock, ChevronDown, ChevronUp, PlaneLanding, PlaneTakeoff, Ticket } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRoles } from "@/hooks/useAuth";
 
 const db = supabase as any;
 
@@ -17,7 +18,14 @@ type Item = {
   name: string;
   detail: string;
   at: string;
+  speakerId: string | null;
+  eventId: string | null;
+  point: string | null;
+  terminal: string | null;
 };
+
+/** عدد العناصر الظاهرة قبل توسيع القائمة */
+const COLLAPSED_COUNT = 5;
 
 const kindMeta: Record<Kind, { label: string; icon: typeof PlaneLanding }> = {
   arrival: { label: "وصول رحلة", icon: PlaneLanding },
@@ -59,18 +67,18 @@ export function UpcomingCountdown() {
       const [arrivals, departures] = await Promise.all([
         db
           .from("speaker_arrivals")
-          .select("id, arrival_time, arrival_point, terminal, speakers(full_name)")
+          .select("id, event_id, speaker_id, arrival_time, arrival_point, terminal, speakers(full_name)")
           .gte("arrival_time", nowIso)
           .lte("arrival_time", horizon)
           .order("arrival_time", { ascending: true })
-          .limit(20),
+          .limit(50),
         db
           .from("speaker_departures")
-          .select("id, departure_time, departure_point, terminal, speakers(full_name)")
+          .select("id, event_id, speaker_id, departure_time, departure_point, terminal, speakers(full_name)")
           .gte("departure_time", nowIso)
           .lte("departure_time", horizon)
           .order("departure_time", { ascending: true })
-          .limit(20),
+          .limit(50),
       ]);
 
       const items: Item[] = [];
@@ -81,6 +89,10 @@ export function UpcomingCountdown() {
           name: a.speakers?.full_name ?? "—",
           detail: [a.arrival_point, a.terminal].filter(Boolean).join(" — ") || "المطار",
           at: a.arrival_time,
+          speakerId: a.speaker_id ?? null,
+          eventId: a.event_id ?? null,
+          point: a.arrival_point ?? null,
+          terminal: a.terminal ?? null,
         });
       }
       for (const d of departures.data ?? []) {
@@ -90,17 +102,50 @@ export function UpcomingCountdown() {
           name: d.speakers?.full_name ?? "—",
           detail: [d.departure_point, d.terminal].filter(Boolean).join(" — ") || "المطار",
           at: d.departure_time,
+          speakerId: d.speaker_id ?? null,
+          eventId: d.event_id ?? null,
+          point: d.departure_point ?? null,
+          terminal: d.terminal ?? null,
         });
       }
 
       return items
         .filter((i) => i.at && new Date(i.at).getTime() > Date.now() - 60_000)
-        .sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime())
-        .slice(0, 12);
+        .sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime());
     },
   });
 
   const items = useMemo(() => query.data ?? [], [query.data]);
+  const [expanded, setExpanded] = useState(false);
+  const visibleItems = expanded ? items : items.slice(0, COLLAPSED_COUNT);
+  const qc = useQueryClient();
+  const { canEditOps } = useRoles();
+
+  // إنشاء تذكرة نقل مباشرة من موعد الوصول/المغادرة (للمشرفين فقط)
+  const createTicket = useMutation({
+    mutationFn: async (item: Item) => {
+      const isArrival = item.kind === "arrival";
+      const { error } = await db.from("transport_trips").insert({
+        event_id: item.eventId,
+        speaker_id: item.speakerId,
+        trip_type: isArrival ? "airport_pickup" : "airport_dropoff",
+        pickup_location: isArrival ? (item.point ?? "المطار") : "الفندق",
+        dropoff_location: isArrival ? "الفندق" : (item.point ?? "المطار"),
+        scheduled_at: item.at,
+        status: "scheduled",
+        guest_name: item.name !== "—" ? item.name : null,
+        terminal: item.terminal,
+        flight_at: item.at,
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_d, item) => {
+      qc.invalidateQueries({ queryKey: ["transport-tickets"] });
+      qc.invalidateQueries({ queryKey: ["fleet-trips"] });
+      toast.success(`تم إنشاء تذكرة نقل لـ ${item.name}`);
+    },
+    onError: (e: any) => toast.error(e.message ?? "تعذر إنشاء التذكرة"),
+  });
 
   useEffect(() => {
     for (const item of items) {
