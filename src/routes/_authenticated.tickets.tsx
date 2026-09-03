@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Ticket, Car, User, Search, PlayCircle, CheckCircle2, Clock, IdCard } from "lucide-react";
+import { Ticket, Car, User, Search, PlayCircle, CheckCircle2, Clock, IdCard, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { CrudPage } from "@/components/portal/CrudPage";
