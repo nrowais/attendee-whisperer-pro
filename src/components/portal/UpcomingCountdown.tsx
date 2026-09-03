@@ -318,23 +318,62 @@ export function UpcomingCountdown() {
         .single();
       if (error) throw error;
 
+      // حفظ بطاقة توجيه السائق المرتبطة بالتذكرة (نفس سجل شاشة التذاكر)
+      const driver = drivers.find((d: any) => d.id === draft.driverId);
+      const vehicle = vehicles.find((v: any) => v.id === draft.vehicleId);
+      const vehicleText = vehicle
+        ? `${vehicle.plate_number}${vehicle.make ? ` · ${vehicle.make}` : ""}`
+        : "";
+      const atDate = new Date(item.at);
+      const pad = (n: number) => String(n).padStart(2, "0");
+      const { data: card } = await db
+        .from("driver_cards")
+        .insert({
+          card_type: "airport",
+          speaker_id: item.speakerId,
+          trip_id: inserted.id,
+          guest_name: draft.guestName || null,
+          terminal: draft.terminal || null,
+          receiver_name: draft.receiverName || null,
+          receiver_phone: draft.receiverPhone || null,
+          flight_at: item.at,
+          flight_no: draft.flightNo || null,
+          driver_name: driver?.full_name ?? null,
+          driver_phone: driver?.phone ?? null,
+          vehicle: vehicleText || null,
+          pickup_location: draft.pickup || null,
+          dropoff_location: draft.dropoff || null,
+          ticket_no: inserted.ticket_no ? String(inserted.ticket_no) : null,
+          hotel_name: draft.hotelName || null,
+          hotel_location: draft.hotelLocation || null,
+          notes: draft.notes || null,
+        })
+        .select("id, card_no")
+        .maybeSingle();
+
       if (withPdf && inserted?.ticket_no) {
-        const driver = drivers.find((d: any) => d.id === draft.driverId);
-        const vehicle = vehicles.find((v: any) => v.id === draft.vehicleId);
-        openTicketPdf({
-          ticketNo: inserted.ticket_no,
-          guestName: draft.guestName,
-          direction: item.kind,
-          pickup: draft.pickup,
-          dropoff: draft.dropoff,
-          scheduledAt: item.at,
-          terminal: draft.terminal,
-          flightNo: draft.flightNo,
-          driverName: driver?.full_name ?? "",
-          driverPhone: driver?.phone ?? "",
-          vehicle: vehicle ? `${vehicle.plate_number}${vehicle.make ? ` · ${vehicle.make}` : ""}` : "",
-          notes: draft.notes,
-        });
+        openCardPdf(
+          {
+            cardType: "airport",
+            guestName: draft.guestName,
+            terminal: draft.terminal,
+            receiverName: draft.receiverName,
+            receiverPhone: draft.receiverPhone,
+            flightDate: `${atDate.getFullYear()}-${pad(atDate.getMonth() + 1)}-${pad(atDate.getDate())}`,
+            flightTime: `${pad(atDate.getHours())}:${pad(atDate.getMinutes())}`,
+            flightNo: draft.flightNo,
+            driverName: driver?.full_name ?? "",
+            driverPhone: driver?.phone ?? "",
+            vehicle: vehicleText,
+            pickup: draft.pickup,
+            dropoff: draft.dropoff,
+            ticketNo: String(inserted.ticket_no),
+            cardNo: card?.card_no ? String(card.card_no) : undefined,
+            hotelName: draft.hotelName,
+            hotelLocation: draft.hotelLocation,
+          },
+          inserted.ticket_no,
+        );
       }
       return inserted;
     },
