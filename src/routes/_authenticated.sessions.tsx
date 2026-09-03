@@ -16,6 +16,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRoles } from "@/hooks/useAuth";
 import {
+  completionGaps,
   conferenceDays,
   normalizeName,
   riyadhToday,
@@ -294,6 +295,66 @@ function SessionsPage() {
           if (!o) setEditing(null);
         }}
       />
+    </div>
+  );
+}
+
+function GapsView({
+  sessions,
+  tracks,
+  onOpen,
+}: {
+  sessions: SessionRow[];
+  tracks: { id: string; name_ar: string }[];
+  onOpen: (s: SessionRow) => void;
+}) {
+  const rows = sessions
+    .map((s) => ({ session: s, gaps: completionGaps(s) }))
+    .filter((r) => r.gaps.length > 0);
+
+  if (!rows.length) {
+    return (
+      <p className="surface-card p-8 text-center text-sm text-muted-foreground">
+        لا توجد بيانات ناقصة في الجلسات المعروضة.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-2" dir="rtl">
+      <p className="text-sm text-muted-foreground">
+        {rows.length} نشاطًا يحتاج استكمال بيانات (بدون مدير جلسة، أو عنوان/موضوع/مشارك TBD، أو وقت
+        داخلي غير محدد).
+      </p>
+      <ul className="divide-y divide-border rounded-xl border border-border bg-card">
+        {rows.map(({ session, gaps }) => (
+          <li key={session.id}>
+            <button
+              type="button"
+              onClick={() => onOpen(session)}
+              className="w-full p-3 text-start transition-colors hover:bg-secondary/50"
+            >
+              <p className="text-sm font-medium text-foreground">
+                {session.title_ar || session.title_en || "بدون عنوان"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {session.session_date} · {session.start_time?.slice(0, 5) ?? "—"} ·{" "}
+                {tracks.find((t) => t.id === session.track_id)?.name_ar ?? "بدون مسار"}
+              </p>
+              <div className="mt-1 flex flex-wrap gap-1">
+                {gaps.map((g) => (
+                  <span
+                    key={g}
+                    className="rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-[11px] text-amber-900"
+                  >
+                    {g}
+                  </span>
+                ))}
+              </div>
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
