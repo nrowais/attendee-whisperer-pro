@@ -78,7 +78,7 @@ function SessionsPage() {
 
   const today = riyadhToday();
   const [day, setDay] = useState(
-    conferenceDays.find((d) => d.date === today)?.date ?? conferenceDays[0].date,
+    conferenceDays.find((d) => d.date === today)?.date ?? conferenceDays[0]!.date,
   );
   const [view, setView] = useState<(typeof views)[number]["key"]>("map");
   const [search, setSearch] = useState("");
@@ -193,7 +193,7 @@ function SessionsPage() {
             size="sm"
             className="gap-1"
             onClick={() =>
-              setDay(conferenceDays.find((d) => d.date === today)?.date ?? conferenceDays[0].date)
+              setDay(conferenceDays.find((d) => d.date === today)?.date ?? conferenceDays[0]!.date)
             }
           >
             <CalendarRange className="size-4" /> اليوم الحالي
