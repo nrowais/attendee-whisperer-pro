@@ -251,3 +251,91 @@ export const timePrecisionLabels: Record<TimePrecision, string> = {
   exact: "وقت محدد",
   within_slot: "ضمن الفترة الزمنية",
 };
+
+/* ============ ألقاب تُستبعد قبل المقارنة ============ */
+const NAME_TITLES = [
+  "معالي","سعادة","الدكتور","الدكتورة","دكتور","دكتوره","د","ا د","أ د","استاذ","الاستاذ","الاستاذه",
+  "اللواء","الركن","العميد","العقيد","المهندس","م","الشيخ","السيد","السيده","الشاعر","الاعلامي","الاعلاميه",
+  "الفريق","المستشار","البروفيسور","بروفيسور","سمو","الامير","الاميره","الوزير","السفير","مس","مستر",
+];
+
+/** يزيل الألقاب الأكاديمية والعسكرية ويعيد كلمات الاسم فقط */
+export function nameTokens(value?: string | null) {
+  return normalizeName(value)
+    .split(" ")
+    .filter((w) => w && !NAME_TITLES.includes(w) && !["بن","بنت","ابن","ال","آل"].includes(w));
+}
+
+/** درجة تشابه الاسمين 0..1 — للاقتراح فقط، ولا تُستخدم للدمج التلقائي */
+export function matchConfidence(a?: string | null, b?: string | null) {
+  const ta = nameTokens(a);
+  const tb = nameTokens(b);
+  if (!ta.length || !tb.length) return 0;
+  const setB = new Set(tb);
+  const hits = ta.filter((w) => setB.has(w)).length;
+  const score = (2 * hits) / (ta.length + tb.length);
+  return Math.round(score * 100) / 100;
+}
+
+export function confidenceLabel(score: number) {
+  if (score >= 0.8) return "مرتفعة";
+  if (score >= 0.5) return "متوسطة";
+  if (score > 0) return "منخفضة";
+  return "لا يوجد تشابه";
+}
+
+/** هل النشاطان متعارضان فعليًا (نفس المسار ونفس الوقت) — الكلمات ضمن الفترة الواحدة ليست تعارضًا */
+export function isRealConflict(
+  a: { track_id?: string | null; start_time?: string | null; end_time?: string | null; time_precision?: string | null },
+  b: { track_id?: string | null; start_time?: string | null; end_time?: string | null; time_precision?: string | null },
+) {
+  if (!a.track_id || !b.track_id || a.track_id !== b.track_id) return false;
+  if (a.time_precision === "within_slot" || b.time_precision === "within_slot") return false;
+  const as = a.start_time;
+  const bs = b.start_time;
+  if (!as || !bs) return false;
+  const ae = a.end_time ?? as;
+  const be = b.end_time ?? bs;
+  return as < be && bs < ae;
+}
+
+/** حقول ناقصة تحتاج استكمال */
+export function completionGaps(session: {
+  session_type: string;
+  title_ar?: string | null;
+  title_en?: string | null;
+  topic?: string | null;
+  time_precision?: string | null;
+  session_participants?: { role: string; display_name?: string | null }[] | null;
+}) {
+  const gaps: string[] = [];
+  const isBreak = nonSpeakerTypes.includes(session.session_type as SessionType);
+  const parts = session.session_participants ?? [];
+  const has = (v?: string | null) => !!v && !/TBD|لم يتأكد/i.test(v);
+  if (!has(session.title_ar) && !has(session.title_en)) gaps.push("العنوان غير مكتمل");
+  if (!isBreak && !has(session.topic)) gaps.push("الموضوع غير محدد");
+  if (!isBreak && !parts.some((p) => moderatorRoles.includes(p.role as ParticipantRole)))
+    gaps.push("بدون مدير جلسة");
+  if (parts.some((p) => !has(p.display_name))) gaps.push("مشارك TBD");
+  if (session.time_precision === "within_slot") gaps.push("وقت داخلي غير محدد");
+  return gaps;
+}
+
+/** توزيع الحالة التشغيلية لمتحدثي الجلسة */
+export const opsGroups = [
+  { key: "venue", label: "في موقع الفعالية", statuses: ["at_venue"] },
+  { key: "enroute", label: "بالطريق", statuses: ["to_venue", "in_transport"] },
+  { key: "hotel", label: "في الفندق", statuses: ["at_hotel", "hotel_checked_in"] },
+  { key: "airport", label: "في المطار", statuses: ["arrived_airport", "received"] },
+  { key: "not_arrived", label: "لم يصل", statuses: ["not_arrived"] },
+] as const;
+
+export function opsBreakdown(statuses: (string | null | undefined)[]) {
+  const counts: Record<string, number> = { venue: 0, enroute: 0, hotel: 0, airport: 0, not_arrived: 0 };
+  for (const raw of statuses) {
+    const s = raw ?? "not_arrived";
+    const group = opsGroups.find((g) => (g.statuses as readonly string[]).includes(s));
+    counts[group?.key ?? "not_arrived"] = (counts[group?.key ?? "not_arrived"] ?? 0) + 1;
+  }
+  return { total: statuses.length, counts };
+}
