@@ -26,7 +26,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRoles } from "@/hooks/useAuth";
-import { openTicketPdf } from "@/lib/ticketPdf";
+import { buildDriverCardHtml, type DriverCardData } from "@/components/portal/DriverCardDialog";
+
+/** فتح نافذة طباعة بطاقة السائق — نفس قالب شاشة التذاكر */
+function openCardPdf(card: DriverCardData, ticketNo: number | string) {
+  const win = window.open("", "_blank", "width=900,height=700");
+  if (!win) {
+    toast.error("يرجى السماح بالنوافذ المنبثقة لتحميل البطاقة");
+    return;
+  }
+  const html = buildDriverCardHtml(card).replace(
+    "<title>بطاقة توجيه السائق</title>",
+    `<title>تذكرة-نقل-${String(ticketNo)}</title>`,
+  );
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+}
 
 const db = supabase as any;
 
@@ -200,6 +216,10 @@ export function UpcomingCountdown() {
     flightNo: string;
     pickup: string;
     dropoff: string;
+    receiverName: string;
+    receiverPhone: string;
+    hotelName: string;
+    hotelLocation: string;
     driverId: string | null;
     vehicleId: string | null;
     notes: string;
@@ -222,15 +242,33 @@ export function UpcomingCountdown() {
     },
   });
 
-  const openDraft = (item: Item) => {
+  const openDraft = async (item: Item) => {
     const isArrival = item.kind === "arrival";
+    // تعبئة بيانات الفندق تلقائياً من حجز المتحدث إن وجد
+    let hotelName = "";
+    let hotelLocation = "";
+    if (item.speakerId) {
+      const { data: booking } = await db
+        .from("hotel_bookings")
+        .select("hotels(name, location)")
+        .eq("speaker_id", item.speakerId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      hotelName = booking?.hotels?.name ?? "";
+      hotelLocation = booking?.hotels?.location ?? "";
+    }
     setDraft({
       item,
       guestName: item.name !== "—" ? item.name : "",
       terminal: item.terminal ?? "",
       flightNo: "",
-      pickup: isArrival ? (item.point ?? "المطار") : "الفندق",
-      dropoff: isArrival ? "الفندق" : (item.point ?? "المطار"),
+      pickup: isArrival ? (item.point ?? "المطار") : hotelName || "الفندق",
+      dropoff: isArrival ? hotelName || "الفندق" : (item.point ?? "المطار"),
+      receiverName: "",
+      receiverPhone: "",
+      hotelName,
+      hotelLocation,
       driverId: null,
       vehicleId: null,
       notes: "",
@@ -280,23 +318,61 @@ export function UpcomingCountdown() {
         .single();
       if (error) throw error;
 
+      // حفظ بطاقة توجيه السائق المرتبطة بالتذكرة (نفس سجل شاشة التذاكر)
+      const driver = drivers.find((d: any) => d.id === draft.driverId);
+      const vehicle = vehicles.find((v: any) => v.id === draft.vehicleId);
+      const vehicleText = vehicle
+        ? `${vehicle.plate_number}${vehicle.make ? ` · ${vehicle.make}` : ""}`
+        : "";
+      const atDate = new Date(item.at);
+      const pad = (n: number) => String(n).padStart(2, "0");
+      const { data: card } = await db
+        .from("driver_cards")
+        .insert({
+          card_type: "airport",
+          speaker_id: item.speakerId,
+          trip_id: inserted.id,
+          guest_name: draft.guestName || null,
+          terminal: draft.terminal || null,
+          receiver_name: draft.receiverName || null,
+          receiver_phone: draft.receiverPhone || null,
+          flight_at: item.at,
+          flight_no: draft.flightNo || null,
+          driver_name: driver?.full_name ?? null,
+          driver_phone: driver?.phone ?? null,
+          vehicle: vehicleText || null,
+          pickup_location: draft.pickup || null,
+          dropoff_location: draft.dropoff || null,
+          ticket_no: inserted.ticket_no ? String(inserted.ticket_no) : null,
+          hotel_name: draft.hotelName || null,
+          hotel_location: draft.hotelLocation || null,
+        })
+        .select("id, card_no")
+        .maybeSingle();
+
       if (withPdf && inserted?.ticket_no) {
-        const driver = drivers.find((d: any) => d.id === draft.driverId);
-        const vehicle = vehicles.find((v: any) => v.id === draft.vehicleId);
-        openTicketPdf({
-          ticketNo: inserted.ticket_no,
-          guestName: draft.guestName,
-          direction: item.kind,
-          pickup: draft.pickup,
-          dropoff: draft.dropoff,
-          scheduledAt: item.at,
-          terminal: draft.terminal,
-          flightNo: draft.flightNo,
-          driverName: driver?.full_name ?? "",
-          driverPhone: driver?.phone ?? "",
-          vehicle: vehicle ? `${vehicle.plate_number}${vehicle.make ? ` · ${vehicle.make}` : ""}` : "",
-          notes: draft.notes,
-        });
+        openCardPdf(
+          {
+            cardType: "airport",
+            guestName: draft.guestName,
+            terminal: draft.terminal,
+            receiverName: draft.receiverName,
+            receiverPhone: draft.receiverPhone,
+            flightDate: `${atDate.getFullYear()}-${pad(atDate.getMonth() + 1)}-${pad(atDate.getDate())}`,
+            flightTime: `${pad(atDate.getHours())}:${pad(atDate.getMinutes())}`,
+            flightNo: draft.flightNo,
+            driverName: driver?.full_name ?? "",
+            driverPhone: driver?.phone ?? "",
+            vehicle: vehicleText,
+            pickup: draft.pickup,
+            dropoff: draft.dropoff,
+            ticketNo: String(inserted.ticket_no),
+            cardNo: card?.card_no ? String(card.card_no) : "",
+            hotelName: draft.hotelName,
+            hotelLocation: draft.hotelLocation,
+          },
+          inserted.ticket_no,
+        );
       }
       return inserted;
     },
@@ -304,6 +380,8 @@ export function UpcomingCountdown() {
       qc.invalidateQueries({ queryKey: ["transport-tickets"] });
       qc.invalidateQueries({ queryKey: ["fleet-trips"] });
       qc.invalidateQueries({ queryKey: ["upcoming-countdown"] });
+      qc.invalidateQueries({ queryKey: ["speakers-status-board"] });
+      qc.invalidateQueries({ queryKey: ["driver-card"] });
       toast.success(`تم إصدار تذكرة نقل رقم ${inserted?.ticket_no ?? ""} لـ ${draft?.guestName ?? ""}`);
       setDraft(null);
     },
@@ -465,6 +543,35 @@ export function UpcomingCountdown() {
                 <Input
                   value={draft.flightNo}
                   onChange={(e) => setDraft({ ...draft, flightNo: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">اسم مستقبل الضيف (اختياري)</Label>
+                <Input
+                  value={draft.receiverName}
+                  onChange={(e) => setDraft({ ...draft, receiverName: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">جوال مستقبل الضيف (اختياري)</Label>
+                <Input
+                  dir="ltr"
+                  value={draft.receiverPhone}
+                  onChange={(e) => setDraft({ ...draft, receiverPhone: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">اسم الفندق (اختياري)</Label>
+                <Input
+                  value={draft.hotelName}
+                  onChange={(e) => setDraft({ ...draft, hotelName: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">موقع الفندق (اختياري)</Label>
+                <Input
+                  value={draft.hotelLocation}
+                  onChange={(e) => setDraft({ ...draft, hotelLocation: e.target.value })}
                 />
               </div>
               <div className="space-y-1">
