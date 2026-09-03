@@ -60,12 +60,13 @@ export function SessionDetail({
   const phase = timePhase(session, now);
   const participants = session.session_participants ?? [];
   const isBreak = nonSpeakerTypes.includes(session.session_type as SessionType);
-  const readiness = sessionReadiness(
-    phase,
-    isBreak
-      ? []
-      : participants.map((p) => (p.speaker_id ? (opsMap?.get(p.speaker_id)?.status ?? null) : null)),
-  );
+  const statuses = isBreak
+    ? []
+    : participants.map((p) => (p.speaker_id ? (opsMap?.get(p.speaker_id)?.status ?? null) : null));
+  const readiness = sessionReadiness(phase, statuses);
+  const breakdown = opsBreakdown(statuses);
+  const gaps = completionGaps(session);
+
 
   return (
     <Dialog open={!!session} onOpenChange={(o) => !o && onClose()}>
