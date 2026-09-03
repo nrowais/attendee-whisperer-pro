@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { fmtTime } from "@/lib/sessions";
+import { isRealConflict } from "@/lib/sessions";
 import { SessionCard } from "./SessionCard";
 import type { SessionRow, SpeakerOps, TrackRow } from "./data";
 
