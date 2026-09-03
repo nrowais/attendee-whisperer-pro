@@ -56,7 +56,9 @@ const views = [
   { key: "now", label: "الآن" },
   { key: "upcoming", label: "الجلسات القادمة" },
   { key: "matching", label: "مطابقة المتحدثين" },
+  { key: "gaps", label: "بيانات تحتاج استكمال" },
 ] as const;
+
 
 function SessionsPage() {
   const { canEdit } = useRoles();
