@@ -617,17 +617,47 @@ export function UpcomingCountdown() {
                 />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">اسم مستقبل الضيف (اختياري)</Label>
-                <Input
-                  value={draft.receiverName}
-                  onChange={(e) => setDraft({ ...draft, receiverName: e.target.value })}
-                />
+                <Label className="text-xs text-muted-foreground">اسم مستقبل الضيف</Label>
+                <select
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  value={receiverMode(draft.receiverName)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "") {
+                      setDraft({ ...draft, receiverName: "", receiverPhone: "" });
+                    } else if (val === "__custom__") {
+                      setDraft({ ...draft, receiverName: draft.receiverName || "", receiverPhone: draft.receiverPhone || "" });
+                    } else {
+                      const r = RECEIVERS.find((x) => x.name === val)!;
+                      setDraft({ ...draft, receiverName: r.name, receiverPhone: r.phone });
+                    }
+                  }}
+                >
+                  <option value="">بدون مستقبل</option>
+                  {RECEIVERS.map((r) => (
+                    <option key={r.name} value={r.name}>
+                      {r.name} · {r.phone}
+                    </option>
+                  ))}
+                  <option value="__custom__">أخرى (إدخال يدوي)</option>
+                </select>
               </div>
+              {receiverMode(draft.receiverName) === "__custom__" && (
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">اسم مستقبل الضيف (يدوي)</Label>
+                  <Input
+                    value={draft.receiverName}
+                    onChange={(e) => setDraft({ ...draft, receiverName: e.target.value })}
+                  />
+                </div>
+              )}
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">جوال مستقبل الضيف (اختياري)</Label>
+                <Label className="text-xs text-muted-foreground">رقم جوال مستقبل الضيف</Label>
                 <Input
+                  type="tel"
                   dir="ltr"
                   value={draft.receiverPhone}
+                  disabled={receiverMode(draft.receiverName) !== "__custom__" && receiverMode(draft.receiverName) !== ""}
                   onChange={(e) => setDraft({ ...draft, receiverPhone: e.target.value })}
                 />
               </div>
