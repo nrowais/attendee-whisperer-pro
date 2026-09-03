@@ -116,8 +116,8 @@ export function fmtTime(time?: string | null) {
 
 export function diffMinutes(start?: string | null, end?: string | null) {
   if (!start || !end) return null;
-  const [sh, sm] = start.split(":").map(Number);
-  const [eh, em] = end.split(":").map(Number);
+  const [sh = NaN, sm = 0] = start.split(":").map(Number);
+  const [eh = NaN, em = 0] = end.split(":").map(Number);
   if ([sh, sm, eh, em].some((n) => Number.isNaN(n))) return null;
   return eh * 60 + em - (sh * 60 + sm);
 }
