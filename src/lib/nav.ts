@@ -9,6 +9,7 @@ import {
   Car,
   Ticket,
   ListChecks,
+  LayoutList,
   Sheet,
   Settings,
 
@@ -24,6 +25,7 @@ export const navItems: NavItem[] = [
 
   { to: "/operations", label: "الحالة التشغيلية", icon: ListChecks, hint: "تسجيل الوصول والنقل والفندق والمغادرة" },
   
+  { to: "/sessions", label: "خريطة الجلسات", icon: LayoutList, hint: "الخريطة الزمنية للمسارين والجاهزية" },
   { to: "/speakers", label: "المتحدثون", icon: Mic2, hint: "المتحدثون والجلسات والطلبات" },
   { to: "/invitees", label: "الضيوف والمدعوون", icon: UserCheck, hint: "المدعوون والدعوات والحضور" },
   { to: "/movements", label: "التنقلات", icon: Plane, hint: "الطيران والوصول والنقل الأرضي" },

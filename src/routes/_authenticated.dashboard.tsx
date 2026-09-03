@@ -27,6 +27,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { UpcomingCountdown } from "@/components/portal/UpcomingCountdown";
 import { TodaysSessions } from "@/components/portal/TodaysSessions";
+import { UpcomingSessionsOps } from "@/components/sessions/UpcomingSessionsOps";
 import { GuestJourney } from "@/components/portal/GuestJourney";
 
 

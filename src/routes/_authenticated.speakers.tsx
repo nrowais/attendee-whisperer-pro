@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CrudPage } from "@/components/portal/CrudPage";
 import { HotelCheckIn } from "@/components/portal/HotelCheckIn";
 import { SpeakersStatusBoard } from "@/components/portal/SpeakersStatusBoard";
+import { SpeakerSessionsPanel } from "@/components/sessions/SpeakerSessionsPanel";
 import { Workspace } from "@/components/portal/Workspace";
 import {
   speakerFields,
@@ -82,6 +83,11 @@ function GuestsWorkspace() {
                   fields={sessionFields}
                 />
               ),
+            },
+            {
+              value: "speaker-sessions",
+              label: "جلسات المتحدثين",
+              content: <SpeakerSessionsPanel />,
             },
             {
               value: "driver-cards",
