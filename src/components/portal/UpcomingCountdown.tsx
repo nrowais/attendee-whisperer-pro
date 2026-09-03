@@ -220,6 +220,7 @@ export function UpcomingCountdown() {
     receiverPhone: string;
     hotelName: string;
     hotelLocation: string;
+    hotelMapUrl: string;
     driverId: string | null;
     vehicleId: string | null;
     notes: string;
@@ -247,16 +248,23 @@ export function UpcomingCountdown() {
     // تعبئة بيانات الفندق تلقائياً من حجز المتحدث إن وجد
     let hotelName = "";
     let hotelLocation = "";
+    let hotelMapUrl = "";
     if (item.speakerId) {
       const { data: booking } = await db
         .from("hotel_bookings")
-        .select("hotels(name, location)")
+        .select("hotels(name, address)")
         .eq("speaker_id", item.speakerId)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
       hotelName = booking?.hotels?.name ?? "";
-      hotelLocation = booking?.hotels?.location ?? "";
+      hotelLocation = booking?.hotels?.address ?? "";
+    }
+    // استكمال الموقع ورابط خرائط قوقل من قائمة الفنادق المعتمدة
+    const known = HOTELS.find((h) => h.name === hotelName);
+    if (known) {
+      hotelLocation = hotelLocation || known.location;
+      hotelMapUrl = known.mapUrl ?? "";
     }
     setDraft({
       item,
