@@ -476,6 +476,8 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
           receiver_phone: form.receiverPhone || null,
           flight_no: form.flightNo || null,
           flight_at: flightIso(),
+          driver_id: driverId,
+          vehicle_id: vehicleId,
         })
         .eq("id", trip.id);
       if (error) throw error;
@@ -502,6 +504,47 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
         placeholder={placeholder}
         onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
       />
+    </div>
+  );
+
+  // قائمة اختيار السائق من قاعدة البيانات — تعبئة تلقائية مع إمكانية التعديل اليدوي
+  const driverPicker = (
+    <div className="space-y-1">
+      <Label className="text-xs text-muted-foreground">السائق (من قائمة السائقين)</Label>
+      <Select value={driverId ?? "none"} onValueChange={pickDriver}>
+        <SelectTrigger className="h-9">
+          <SelectValue placeholder="اختر سائقاً" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="none">بدون سائق</SelectItem>
+          {drivers.map((d: any) => (
+            <SelectItem key={d.id} value={d.id}>
+              {d.full_name}
+              {d.phone ? ` · ${d.phone}` : ""}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
+  const vehiclePicker = (
+    <div className="space-y-1">
+      <Label className="text-xs text-muted-foreground">المركبة (من قائمة المركبات)</Label>
+      <Select value={vehicleId ?? "none"} onValueChange={pickVehicle}>
+        <SelectTrigger className="h-9">
+          <SelectValue placeholder="اختر مركبة" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="none">بدون مركبة</SelectItem>
+          {vehicles.map((v: any) => (
+            <SelectItem key={v.id} value={v.id}>
+              {v.plate_number}
+              {v.make ? ` · ${v.make}` : ""}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 
