@@ -67,7 +67,7 @@ export function useSessions() {
       const { data, error } = await db
         .from("sessions")
         .select(
-          "*, session_participants(id, session_id, speaker_id, display_name, role, match_status, sort_order, speakers(id, full_name, phone, photo_url))",
+          "*, session_participants(id, session_id, speaker_id, display_name, role, match_status, notes, sort_order, speakers(id, full_name, phone, photo_url))",
         )
         .order("session_date")
         .order("start_time");
