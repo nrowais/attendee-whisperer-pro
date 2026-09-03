@@ -518,6 +518,61 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
     </div>
   );
 
+  const receiverSelectValue = (() => {
+    if (!form.receiverName) return "";
+    return RECEIVERS.some((r) => r.name === form.receiverName) ? form.receiverName : "__custom__";
+  })();
+
+  const receiverFields = (
+    <>
+      <div className="space-y-1">
+        <Label className="text-xs text-muted-foreground">اسم مستقبل الضيف</Label>
+        <select
+          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          value={receiverSelectValue}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val === "") {
+              setForm((f) => ({ ...f, receiverName: "", receiverPhone: "" }));
+            } else if (val === "__custom__") {
+              setForm((f) => ({ ...f, receiverName: f.receiverName || "", receiverPhone: f.receiverPhone || "" }));
+            } else {
+              const r = RECEIVERS.find((x) => x.name === val)!;
+              setForm((f) => ({ ...f, receiverName: r.name, receiverPhone: r.phone }));
+            }
+          }}
+        >
+          <option value="">بدون مستقبل</option>
+          {RECEIVERS.map((r) => (
+            <option key={r.name} value={r.name}>
+              {r.name} · {r.phone}
+            </option>
+          ))}
+          <option value="__custom__">أخرى (إدخال يدوي)</option>
+        </select>
+      </div>
+      {receiverSelectValue === "__custom__" && (
+        <div className="space-y-1">
+          <Label className="text-xs text-muted-foreground">اسم مستقبل الضيف (يدوي)</Label>
+          <Input
+            value={form.receiverName}
+            onChange={(e) => setForm((f) => ({ ...f, receiverName: e.target.value }))}
+          />
+        </div>
+      )}
+      <div className="space-y-1">
+        <Label className="text-xs text-muted-foreground">رقم جوال مستقبل الضيف</Label>
+        <Input
+          type="tel"
+          dir="ltr"
+          value={form.receiverPhone}
+          disabled={receiverSelectValue !== "__custom__" && receiverSelectValue !== ""}
+          onChange={(e) => setForm((f) => ({ ...f, receiverPhone: e.target.value }))}
+        />
+      </div>
+    </>
+  );
+
   // قائمة اختيار السائق من قاعدة البيانات — تعبئة تلقائية مع إمكانية التعديل اليدوي
   const driverPicker = (
     <div className="space-y-1">
