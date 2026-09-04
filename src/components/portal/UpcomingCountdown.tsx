@@ -423,6 +423,65 @@ export function UpcomingCountdown() {
     onError: (e: any) => toast.error(e.message ?? "تعذر إنشاء التذكرة"),
   });
 
+  // استعراض تذكرة مصدرة وإعادة تحميلها PDF
+  const [viewing, setViewing] = useState<{ html: string; no: string } | null>(null);
+
+  const viewTicket = useMutation({
+    mutationFn: async (ticketNo: number) => {
+      const { data: card, error } = await db
+        .from("driver_cards")
+        .select("*")
+        .eq("ticket_no", String(ticketNo))
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      if (!card) throw new Error("لا توجد بطاقة محفوظة لهذه التذكرة");
+      const { date, time } = splitDateTime(card.flight_at ?? null);
+      const data: DriverCardData = {
+        cardType: card.card_type ?? "airport",
+        guestName: card.guest_name ?? "",
+        terminal: card.terminal ?? "",
+        receiverName: card.receiver_name ?? "",
+        receiverPhone: card.receiver_phone ?? "",
+        flightDate: date,
+        flightTime: time,
+        flightNo: card.flight_no ?? "",
+        driverName: card.driver_name ?? "",
+        driverPhone: card.driver_phone ?? "",
+        vehicle: card.vehicle ?? "",
+        pickup: card.pickup_location ?? "",
+        dropoff: card.dropoff_location ?? "",
+        ticketNo: "",
+        cardNo: card.card_no ? String(card.card_no) : String(ticketNo),
+        hotelName: card.hotel_name ?? "",
+        hotelLocation: card.hotel_location ?? "",
+        hotelMapUrl: card.hotel_map_url ?? "",
+        notes: card.notes ?? "",
+      };
+      const no = card.card_no ? String(card.card_no) : String(ticketNo);
+      const html = buildDriverCardHtml(data).replace(
+        "<title>بطاقة توجيه السائق</title>",
+        `<title>بطاقة-سائق-${no}</title>`,
+      );
+      return { html, no };
+    },
+    onSuccess: (v) => setViewing(v),
+    onError: (e: any) => toast.error(e.message ?? "تعذر فتح التذكرة"),
+  });
+
+  const downloadViewing = () => {
+    if (!viewing) return;
+    const win = window.open("", "_blank", "width=900,height=700");
+    if (!win) {
+      toast.error("يرجى السماح بالنوافذ المنبثقة لتحميل البطاقة");
+      return;
+    }
+    win.document.open();
+    win.document.write(viewing.html);
+    win.document.close();
+  };
+
   useEffect(() => {
     for (const item of items) {
       const diff = new Date(item.at).getTime() - tick;
