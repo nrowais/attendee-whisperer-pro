@@ -71,6 +71,9 @@ function SessionsMapScreen() {
   const [detail, setDetail] = useState<SessionRow | null>(null);
   const [editing, setEditing] = useState<SessionRow | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [hoverTip, setHoverTip] = useState<{ top: number; left: number } | null>(null);
+
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -289,76 +292,101 @@ function SessionsMapScreen() {
                         <button
                           key={s.id}
                           onClick={() => setDetail(s)}
-                          className={cn(
-                            "group absolute top-1/2 z-10 flex h-[88px] -translate-y-1/2 flex-col justify-between overflow-hidden rounded-xl border p-2 text-start shadow-sm transition-all duration-200 hover:z-30 hover:scale-[1.04] hover:overflow-visible hover:shadow-xl focus-visible:z-30 focus-visible:scale-[1.04] focus-visible:overflow-visible focus-visible:shadow-xl focus-visible:outline-none",
-                            typeColor[s.session_type] ?? typeColor["other"],
-                            live && "ring-2 ring-primary shadow-lg",
-                          )}
+                          onMouseEnter={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const tipW = 288;
+                            const tipH = 160;
+                            const pad = 12;
+                            const vw = window.innerWidth;
+                            const vh = window.innerHeight;
+                            const above = rect.bottom + tipH + pad > vh;
+                            const top = above ? Math.max(pad, rect.top - tipH - pad) : rect.bottom + pad;
+                            let left = rect.left + rect.width / 2 - tipW / 2;
+                            left = Math.max(pad, Math.min(left, vw - tipW - pad));
+                            setHoverTip({ top, left });
+                            setHoveredId(s.id);
+                          }}
+                          onMouseLeave={() => {
+                            setHoveredId(null);
+                            setHoverTip(null);
+                          }}
+                          className="group absolute top-[calc(50%-44px)] z-10 h-[88px] text-start transition-all duration-200 hover:z-30 focus-visible:z-30 focus-visible:outline-none"
                           style={{ insetInlineStart: `${inlineStart}%`, width: `${width}%` }}
                         >
-                          <div className="min-w-0">
-                            <p className="flex items-center gap-1 font-mono text-[10px] font-bold tabular-nums opacity-80" dir="ltr">
-                              {fmtTime(s.start_time)} - {fmtTime(s.end_time)}
-                            </p>
-                            <p className="mt-0.5 line-clamp-2 text-xs font-bold leading-snug">
-                              {s.title_ar || s.title_en || "بدون عنوان"}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            {live ? (
-                              <span className="flex items-center gap-1 text-[10px] font-black">
-                                <span className="size-1.5 animate-pulse rounded-full bg-current" />
-                                جارية الآن
-                              </span>
-                            ) : phase.kind === "ended" ? (
-                              <span className="text-[10px] font-semibold opacity-60">انتهت</span>
-                            ) : null}
-                            {!isBreak && participants.length > 0 ? (
-                              <span className="ms-auto text-[10px] opacity-70">{participants.length} مشارك</span>
-                            ) : null}
+                          <div
+                            className={cn(
+                              "absolute inset-0 flex flex-col justify-between overflow-hidden rounded-xl border p-2 shadow-sm transition-all duration-200 group-hover:scale-[1.04] group-hover:overflow-visible group-hover:shadow-xl group-focus-visible:scale-[1.04] group-focus-visible:overflow-visible group-focus-visible:shadow-xl",
+                              typeColor[s.session_type] ?? typeColor["other"],
+                              live && "ring-2 ring-primary shadow-lg",
+                            )}
+                          >
+                            <div className="min-w-0">
+                              <p className="flex items-center gap-1 font-mono text-[10px] font-bold tabular-nums opacity-80" dir="ltr">
+                                {fmtTime(s.start_time)} - {fmtTime(s.end_time)}
+                              </p>
+                              <p className="mt-0.5 line-clamp-2 text-xs font-bold leading-snug">
+                                {s.title_ar || s.title_en || "بدون عنوان"}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {live ? (
+                                <span className="flex items-center gap-1 text-[10px] font-black">
+                                  <span className="size-1.5 animate-pulse rounded-full bg-current" />
+                                  جارية الآن
+                                </span>
+                              ) : phase.kind === "ended" ? (
+                                <span className="text-[10px] font-semibold opacity-60">انتهت</span>
+                              ) : null}
+                              {!isBreak && participants.length > 0 ? (
+                                <span className="ms-auto text-[10px] opacity-70">{participants.length} مشارك</span>
+                              ) : null}
+                            </div>
                           </div>
 
                           {/* تلميح عند التحويم */}
-                          <div
-                            className={cn(
-                              "pointer-events-none absolute top-full start-0 z-40 mt-2 hidden w-72 rounded-xl border border-border bg-popover p-3 text-start shadow-2xl",
-                              "group-hover:block group-focus-visible:block",
-                            )}
-                          >
-                            <p className="text-sm font-bold text-popover-foreground">
-                              {s.title_ar || s.title_en || "بدون عنوان"}
-                            </p>
-                            <p className="mt-1 font-mono text-xs tabular-nums text-muted-foreground" dir="ltr">
-                              {fmtTime(s.start_time)} - {fmtTime(s.end_time)}
-                            </p>
-                            <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                              <Badge variant="outline" className="text-[10px]">
-                                {sessionTypeLabels[s.session_type as SessionType] ?? s.session_type}
-                              </Badge>
-                              {!isBreak ? (
-                                <span
-                                  className={cn(
-                                    "rounded-full border px-2 py-0.5 text-[10px] font-semibold",
-                                    readinessClasses[readiness.key],
-                                  )}
-                                >
-                                  {readiness.label}
-                                </span>
+                          {hoveredId === s.id && hoverTip ? (
+                            <div
+                              className="fixed z-[100] w-72 max-w-[90vw] rounded-xl border border-border bg-popover p-3 text-start shadow-2xl"
+                              style={{ top: hoverTip.top, left: hoverTip.left }}
+                              dir="rtl"
+                            >
+                              <p className="text-sm font-bold text-popover-foreground">
+                                {s.title_ar || s.title_en || "بدون عنوان"}
+                              </p>
+                              <p className="mt-1 font-mono text-xs tabular-nums text-muted-foreground" dir="ltr">
+                                {fmtTime(s.start_time)} - {fmtTime(s.end_time)}
+                              </p>
+                              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                                <Badge variant="outline" className="text-[10px]">
+                                  {sessionTypeLabels[s.session_type as SessionType] ?? s.session_type}
+                                </Badge>
+                                {!isBreak ? (
+                                  <span
+                                    className={cn(
+                                      "rounded-full border px-2 py-0.5 text-[10px] font-semibold",
+                                      readinessClasses[readiness.key],
+                                    )}
+                                  >
+                                    {readiness.label}
+                                  </span>
+                                ) : null}
+                              </div>
+                              {participants.length > 0 ? (
+                                <ul className="mt-2 space-y-0.5 text-[11px] text-muted-foreground">
+                                  {participants.slice(0, 4).map((p) => (
+                                    <li key={p.id} className="truncate">
+                                      • {p.display_name || p.speakers?.full_name || "غير محدد"}
+                                    </li>
+                                  ))}
+                                  {participants.length > 4 ? <li>… و{participants.length - 4} آخرون</li> : null}
+                                </ul>
                               ) : null}
+                              <p className="mt-2 text-[10px] font-semibold text-primary">اضغط لفتح التفاصيل ←</p>
                             </div>
-                            {participants.length > 0 ? (
-                              <ul className="mt-2 space-y-0.5 text-[11px] text-muted-foreground">
-                                {participants.slice(0, 4).map((p) => (
-                                  <li key={p.id} className="truncate">
-                                    • {p.display_name || p.speakers?.full_name || "غير محدد"}
-                                  </li>
-                                ))}
-                                {participants.length > 4 ? <li>… و{participants.length - 4} آخرون</li> : null}
-                              </ul>
-                            ) : null}
-                            <p className="mt-2 text-[10px] font-semibold text-primary">اضغط لفتح التفاصيل ←</p>
-                          </div>
+                          ) : null}
                         </button>
+
+
                       );
                     })}
 
