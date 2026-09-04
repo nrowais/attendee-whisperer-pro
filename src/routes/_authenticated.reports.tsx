@@ -302,6 +302,8 @@ function ReportsPage() {
         </p>
       </div>
 
+      <ArrivalsDayReport />
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {reports.map((r) => (
           <ReportCard key={r.key} report={r} />
