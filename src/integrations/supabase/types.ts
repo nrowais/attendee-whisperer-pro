@@ -630,6 +630,9 @@ export type Database = {
           invitee_id: string
           notes: string | null
           responded_at: string | null
+          seat_area: string | null
+          seat_number: string | null
+          seat_row: string | null
           sent_at: string | null
           status: string
           updated_at: string
@@ -641,6 +644,9 @@ export type Database = {
           invitee_id: string
           notes?: string | null
           responded_at?: string | null
+          seat_area?: string | null
+          seat_number?: string | null
+          seat_row?: string | null
           sent_at?: string | null
           status?: string
           updated_at?: string
@@ -652,6 +658,9 @@ export type Database = {
           invitee_id?: string
           notes?: string | null
           responded_at?: string | null
+          seat_area?: string | null
+          seat_number?: string | null
+          seat_row?: string | null
           sent_at?: string | null
           status?: string
           updated_at?: string

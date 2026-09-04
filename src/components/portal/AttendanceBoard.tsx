@@ -2,9 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
+  Armchair,
   CheckCircle2,
   Clock,
   LogOut,
+  Printer,
   RotateCcw,
   Search,
   UserPlus,
@@ -73,6 +75,11 @@ type Row = {
   attendanceId: string | null;
   checkedInAt: string | null;
   checkedOutAt: string | null;
+  invitationId: string | null;
+  invitationStatus: string | null;
+  seatArea: string | null;
+  seatRow: string | null;
+  seatNumber: string | null;
 };
 
 function useBoard() {
@@ -80,31 +87,50 @@ function useBoard() {
     queryKey: ["attendance-board"],
     refetchInterval: 30_000,
     queryFn: async () => {
-      const [{ data: events }, { data: invitees }, { data: attendance }, { data: hotelMoves }] =
-        await Promise.all([
-          db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
-          db.from("invitees").select("id, full_name, organization, phone, email, invitee_type"),
-          db.from("attendance").select("id, invitee_id, checked_in_at, checked_out_at, event_id"),
-          db
-            .from("attendance")
-            .select("id, checked_in_at, checked_out_at, speakers(full_name)")
-            .eq("method", "hotel")
-            .order("checked_in_at", { ascending: false })
-            .limit(20),
-        ]);
+      const [
+        { data: events },
+        { data: invitees },
+        { data: attendance },
+        { data: hotelMoves },
+        { data: invitations },
+      ] = await Promise.all([
+        db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
+        db.from("invitees").select("id, full_name, organization, phone, email, invitee_type"),
+        db.from("attendance").select("id, invitee_id, checked_in_at, checked_out_at, event_id"),
+        db
+          .from("attendance")
+          .select("id, checked_in_at, checked_out_at, speakers(full_name)")
+          .eq("method", "hotel")
+          .order("checked_in_at", { ascending: false })
+          .limit(20),
+        db
+          .from("invitations")
+          .select("id, event_id, invitee_id, status, seat_area, seat_row, seat_number"),
+      ]);
       const eventId: string | null = events?.[0]?.id ?? null;
       const attMap = new Map<string, any>();
       (attendance ?? [])
         .filter((a: any) => !eventId || a.event_id === eventId)
         .forEach((a: any) => attMap.set(a.invitee_id, a));
 
+      const invMap = new Map<string, any>();
+      (invitations ?? [])
+        .filter((v: any) => !eventId || v.event_id === eventId)
+        .forEach((v: any) => invMap.set(v.invitee_id, v));
+
       const rows: Row[] = (invitees ?? []).map((i: any) => {
         const att = attMap.get(i.id);
+        const inv = invMap.get(i.id);
         return {
           ...i,
           attendanceId: att?.id ?? null,
           checkedInAt: att?.checked_in_at ?? null,
           checkedOutAt: att?.checked_out_at ?? null,
+          invitationId: inv?.id ?? null,
+          invitationStatus: inv?.status ?? null,
+          seatArea: inv?.seat_area ?? null,
+          seatRow: inv?.seat_row ?? null,
+          seatNumber: inv?.seat_number ?? null,
         };
       });
       rows.sort((a, b) => a.full_name.localeCompare(b.full_name, "ar"));
@@ -124,6 +150,18 @@ export function AttendanceBoard() {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+
+  const [seatRow, setSeatRow] = useState<Row | null>(null);
+  const [seatForm, setSeatForm] = useState({ seat_area: "", seat_row: "", seat_number: "" });
+
+  const openSeat = (r: Row) => {
+    setSeatRow(r);
+    setSeatForm({
+      seat_area: r.seatArea ?? "",
+      seat_row: r.seatRow ?? "",
+      seat_number: r.seatNumber ?? "",
+    });
+  };
 
   const [addOpen, setAddOpen] = useState(false);
   const [newGuest, setNewGuest] = useState({
@@ -163,9 +201,91 @@ export function AttendanceBoard() {
       setTimeout(() => setHighlighted((h) => (h === row.id ? null : h)), 3000);
       invalidate();
       toast.success(`تم تأكيد حضور: ${row.full_name}`);
+      openSeat(row);
     },
     onError: (e: any) => toast.error(e?.message ?? "تعذّر تسجيل الحضور"),
   });
+
+  const saveSeat = useMutation({
+    mutationFn: async () => {
+      if (!seatRow) return;
+      const payload = {
+        seat_area: seatForm.seat_area.trim() || null,
+        seat_row: seatForm.seat_row.trim() || null,
+        seat_number: seatForm.seat_number.trim() || null,
+      };
+      if (seatRow.invitationId) {
+        const { error } = await db
+          .from("invitations")
+          .update(payload)
+          .eq("id", seatRow.invitationId);
+        if (error) throw error;
+      } else {
+        if (!eventId) throw new Error("لا توجد فعالية مسجّلة");
+        const { error } = await db.from("invitations").insert({
+          event_id: eventId,
+          invitee_id: seatRow.id,
+          status: "accepted",
+          ...payload,
+        });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      invalidate();
+      setSeatRow((r) =>
+        r
+          ? {
+              ...r,
+              seatArea: seatForm.seat_area.trim() || null,
+              seatRow: seatForm.seat_row.trim() || null,
+              seatNumber: seatForm.seat_number.trim() || null,
+            }
+          : r,
+      );
+      toast.success("تم حفظ بيانات المقعد");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "تعذّر حفظ المقعد"),
+  });
+
+  const printSeatCard = () => {
+    if (!seatRow) return;
+    const html = `<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8">
+<title>بطاقة مقعد - ${seatRow.full_name}</title>
+<style>
+ @page { size: A5 landscape; margin: 10mm; }
+ body { font-family: "Tajawal","Cairo",system-ui,sans-serif; margin:0; color:#0f2a4a; }
+ .card { border:3px solid #0f2a4a; border-radius:16px; padding:24px; text-align:center; }
+ .ev { color:#e07a24; font-weight:700; font-size:16px; }
+ .nm { font-size:30px; font-weight:800; margin:14px 0 4px; }
+ .org { color:#5a6b80; font-size:15px; }
+ .seats { display:flex; gap:16px; justify-content:center; margin-top:22px; }
+ .box { flex:1; border:2px solid #e07a24; border-radius:12px; padding:14px; }
+ .lbl { font-size:14px; color:#5a6b80; }
+ .val { font-size:40px; font-weight:800; }
+ .ft { margin-top:18px; font-size:12px; color:#5a6b80; }
+</style></head><body>
+<div class="card">
+  <div class="ev">${data?.eventName ?? "حفل الافتتاح"}</div>
+  <div class="nm">${seatRow.full_name}</div>
+  <div class="org">${seatRow.organization ?? ""}</div>
+  <div class="seats">
+    ${seatForm.seat_area.trim() ? `<div class="box"><div class="lbl">القاعة / المنطقة</div><div class="val" style="font-size:26px">${seatForm.seat_area}</div></div>` : ""}
+    <div class="box"><div class="lbl">الصف</div><div class="val">${seatForm.seat_row || "—"}</div></div>
+    <div class="box"><div class="lbl">رقم المقعد</div><div class="val">${seatForm.seat_number || "—"}</div></div>
+  </div>
+  <div class="ft">نفذ بواسطة نايف الرويس</div>
+</div>
+<script>window.onload=function(){setTimeout(function(){window.print();},300);};<\/script>
+</body></html>`;
+    const w = window.open("", "_blank", "width=900,height=650");
+    if (!w) {
+      toast.error("متصفحك منع فتح نافذة الطباعة");
+      return;
+    }
+    w.document.write(html);
+    w.document.close();
+  };
 
   const undo = useMutation({
     mutationFn: async (row: Row) => {
@@ -422,6 +542,12 @@ export function AttendanceBoard() {
                     >
                       {TYPE_LABELS[r.invitee_type] ?? r.invitee_type}
                     </Badge>
+                    {(r.seatRow || r.seatNumber) && (
+                      <Badge className="gap-1 bg-accent text-accent-foreground text-[11px]">
+                        <Armchair className="size-3" />
+                        صف {r.seatRow ?? "—"} · مقعد {r.seatNumber ?? "—"}
+                      </Badge>
+                    )}
                   </div>
                   <div className="truncate text-xs text-muted-foreground">
                     {[r.organization, r.phone].filter(Boolean).join(" · ") || "—"}
@@ -449,6 +575,16 @@ export function AttendanceBoard() {
                     )}
                   </div>
                 </div>
+
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="shrink-0 gap-1"
+                  onClick={() => openSeat(r)}
+                >
+                  <Armchair className="size-4" />
+                  المقعد
+                </Button>
 
                 {present ? (
                   <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
@@ -554,6 +690,71 @@ export function AttendanceBoard() {
           </div>
         </div>
       )}
+
+      {/* بطاقة المقعد */}
+      <Dialog open={!!seatRow} onOpenChange={(o) => !o && setSeatRow(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>بطاقة المقعد</DialogTitle>
+          </DialogHeader>
+          {seatRow && (
+            <div className="space-y-4">
+              <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4 text-center">
+                <p className="text-sm text-accent-foreground">{data?.eventName ?? "حفل الافتتاح"}</p>
+                <p className="mt-1 text-xl font-bold">{seatRow.full_name}</p>
+                <p className="text-xs text-muted-foreground">{seatRow.organization ?? ""}</p>
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <div className="rounded-lg border bg-card p-3">
+                    <p className="text-xs text-muted-foreground">الصف</p>
+                    <p className="text-3xl font-extrabold">{seatForm.seat_row || "—"}</p>
+                  </div>
+                  <div className="rounded-lg border bg-card p-3">
+                    <p className="text-xs text-muted-foreground">رقم المقعد</p>
+                    <p className="text-3xl font-extrabold">{seatForm.seat_number || "—"}</p>
+                  </div>
+                </div>
+              </div>
+
+              {canRegister && (
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-1.5">
+                    <Label>القاعة/المنطقة</Label>
+                    <Input
+                      value={seatForm.seat_area}
+                      onChange={(e) => setSeatForm({ ...seatForm, seat_area: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>الصف</Label>
+                    <Input
+                      value={seatForm.seat_row}
+                      onChange={(e) => setSeatForm({ ...seatForm, seat_row: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>رقم المقعد</Label>
+                    <Input
+                      value={seatForm.seat_number}
+                      onChange={(e) => setSeatForm({ ...seatForm, seat_number: e.target.value })}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter className="gap-2">
+            {canRegister && (
+              <Button onClick={() => saveSeat.mutate()} disabled={saveSeat.isPending}>
+                حفظ
+              </Button>
+            )}
+            <Button variant="outline" className="gap-1" onClick={printSeatCard}>
+              <Printer className="size-4" />
+              طباعة / PDF
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
