@@ -8,6 +8,7 @@ import { eventName } from "@/lib/nav";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import eventLogo from "@/assets/event-logo-2026.png";
+import { ArrivalsDayReport } from "@/components/portal/ArrivalsDayReport";
 
 const logoUrl = () =>
   typeof window !== "undefined" ? new URL(eventLogo, window.location.origin).href : eventLogo;
