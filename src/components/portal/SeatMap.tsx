@@ -432,10 +432,72 @@ export function SeatMap() {
             </div>
           ) : (
             <div className="space-y-3">
+              <Button
+                type="button"
+                variant={manualOpen ? "secondary" : "outline"}
+                className="w-full gap-1"
+                onClick={() => setManualOpen((v) => !v)}
+              >
+                <UserPlus className="size-4" />
+                {manualOpen ? "إخفاء الإدخال اليدوي" : "إضافة ضيف يدويًا غير مسجّل"}
+              </Button>
+
+              {manualOpen && (
+                <div className="space-y-3 rounded-lg border bg-muted/30 p-3">
+                  <div className="space-y-1.5">
+                    <Label>اسم الضيف *</Label>
+                    <Input
+                      value={manual.name}
+                      onChange={(e) => setManual({ ...manual, name: e.target.value })}
+                      placeholder="الاسم الكامل"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1.5">
+                      <Label>الجهة</Label>
+                      <Input
+                        value={manual.organization}
+                        onChange={(e) => setManual({ ...manual, organization: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>الجوال</Label>
+                      <Input
+                        dir="ltr"
+                        value={manual.phone}
+                        onChange={(e) => setManual({ ...manual, phone: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>التصنيف</Label>
+                    <select
+                      className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+                      value={manual.type}
+                      onChange={(e) => setManual({ ...manual, type: e.target.value })}
+                    >
+                      <option value="guest">ضيف</option>
+                      <option value="vip">كبار الشخصيات</option>
+                      <option value="media">إعلام</option>
+                      <option value="staff">فريق عمل</option>
+                    </select>
+                  </div>
+                  <Button
+                    className="w-full"
+                    disabled={createAndAssign.isPending || !manual.name.trim()}
+                    onClick={() =>
+                      picker && createAndAssign.mutate({ row: picker.row, col: picker.col })
+                    }
+                  >
+                    {createAndAssign.isPending ? "جارٍ الحفظ…" : "إضافة وتعيين المقعد"}
+                  </Button>
+                </div>
+              )}
+
               <div className="relative">
                 <Search className="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  autoFocus
+                  autoFocus={!manualOpen}
                   value={pickerSearch}
                   onChange={(e) => setPickerSearch(e.target.value)}
                   placeholder="ابحث عن اسم المدعو…"
