@@ -540,6 +540,12 @@ export function AttendanceBoard() {
                     >
                       {TYPE_LABELS[r.invitee_type] ?? r.invitee_type}
                     </Badge>
+                    {(r.seatRow || r.seatNumber) && (
+                      <Badge className="gap-1 bg-accent text-accent-foreground text-[11px]">
+                        <Armchair className="size-3" />
+                        صف {r.seatRow ?? "—"} · مقعد {r.seatNumber ?? "—"}
+                      </Badge>
+                    )}
                   </div>
                   <div className="truncate text-xs text-muted-foreground">
                     {[r.organization, r.phone].filter(Boolean).join(" · ") || "—"}
