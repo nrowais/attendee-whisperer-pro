@@ -440,8 +440,8 @@ function OperationsPage() {
               key={r.id}
               id={`op-row-${r.id}`}
               className={cn(
-                "space-y-3 rounded-xl border bg-card p-4 transition-colors duration-500",
-                highlighted === r.id ? "border-primary ring-2 ring-primary/30" : "border-border"
+                "space-y-3 rounded-xl border p-4 transition-colors duration-500",
+                highlighted === r.id ? "border-primary ring-2 ring-primary/30" : statusCardClass(r.opStatus)
               )}
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
@@ -450,6 +450,12 @@ function OperationsPage() {
                   <p className="truncate text-xs text-muted-foreground">
                     {[r.title, r.organization, r.country].filter(Boolean).join(" · ") || "—"}
                   </p>
+                  {r.arrivalAt && (
+                    <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-primary">
+                      <PlaneLanding className="h-3 w-3" />
+                      وصول: {arrivalDateLabel(r.arrivalAt)}
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-wrap items-center gap-1.5">
                   <Badge variant={r.opStatus === "cancelled" ? "destructive" : "secondary"}>
