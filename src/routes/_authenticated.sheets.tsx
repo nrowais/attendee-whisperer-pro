@@ -356,8 +356,6 @@ function SheetsImportPage() {
           </CardContent>
         </Card>
       )}
-
-      <p className="text-xs text-muted-foreground">نفذ بواسطة نايف الرويس</p>
     </div>
   );
 }
