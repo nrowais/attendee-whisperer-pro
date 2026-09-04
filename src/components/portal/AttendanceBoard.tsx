@@ -199,9 +199,91 @@ export function AttendanceBoard() {
       setTimeout(() => setHighlighted((h) => (h === row.id ? null : h)), 3000);
       invalidate();
       toast.success(`تم تأكيد حضور: ${row.full_name}`);
+      openSeat(row);
     },
     onError: (e: any) => toast.error(e?.message ?? "تعذّر تسجيل الحضور"),
   });
+
+  const saveSeat = useMutation({
+    mutationFn: async () => {
+      if (!seatRow) return;
+      const payload = {
+        seat_area: seatForm.seat_area.trim() || null,
+        seat_row: seatForm.seat_row.trim() || null,
+        seat_number: seatForm.seat_number.trim() || null,
+      };
+      if (seatRow.invitationId) {
+        const { error } = await db
+          .from("invitations")
+          .update(payload)
+          .eq("id", seatRow.invitationId);
+        if (error) throw error;
+      } else {
+        if (!eventId) throw new Error("لا توجد فعالية مسجّلة");
+        const { error } = await db.from("invitations").insert({
+          event_id: eventId,
+          invitee_id: seatRow.id,
+          status: "accepted",
+          ...payload,
+        });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      invalidate();
+      setSeatRow((r) =>
+        r
+          ? {
+              ...r,
+              seatArea: seatForm.seat_area.trim() || null,
+              seatRow: seatForm.seat_row.trim() || null,
+              seatNumber: seatForm.seat_number.trim() || null,
+            }
+          : r,
+      );
+      toast.success("تم حفظ بيانات المقعد");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "تعذّر حفظ المقعد"),
+  });
+
+  const printSeatCard = () => {
+    if (!seatRow) return;
+    const html = `<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8">
+<title>بطاقة مقعد - ${seatRow.full_name}</title>
+<style>
+ @page { size: A5 landscape; margin: 10mm; }
+ body { font-family: "Tajawal","Cairo",system-ui,sans-serif; margin:0; color:#0f2a4a; }
+ .card { border:3px solid #0f2a4a; border-radius:16px; padding:24px; text-align:center; }
+ .ev { color:#e07a24; font-weight:700; font-size:16px; }
+ .nm { font-size:30px; font-weight:800; margin:14px 0 4px; }
+ .org { color:#5a6b80; font-size:15px; }
+ .seats { display:flex; gap:16px; justify-content:center; margin-top:22px; }
+ .box { flex:1; border:2px solid #e07a24; border-radius:12px; padding:14px; }
+ .lbl { font-size:14px; color:#5a6b80; }
+ .val { font-size:40px; font-weight:800; }
+ .ft { margin-top:18px; font-size:12px; color:#5a6b80; }
+</style></head><body>
+<div class="card">
+  <div class="ev">${data?.eventName ?? "حفل الافتتاح"}</div>
+  <div class="nm">${seatRow.full_name}</div>
+  <div class="org">${seatRow.organization ?? ""}</div>
+  <div class="seats">
+    ${seatForm.seat_area.trim() ? `<div class="box"><div class="lbl">القاعة / المنطقة</div><div class="val" style="font-size:26px">${seatForm.seat_area}</div></div>` : ""}
+    <div class="box"><div class="lbl">الصف</div><div class="val">${seatForm.seat_row || "—"}</div></div>
+    <div class="box"><div class="lbl">رقم المقعد</div><div class="val">${seatForm.seat_number || "—"}</div></div>
+  </div>
+  <div class="ft">نفذ بواسطة نايف الرويس</div>
+</div>
+<script>window.onload=function(){setTimeout(function(){window.print();},300);};<\/script>
+</body></html>`;
+    const w = window.open("", "_blank", "width=900,height=650");
+    if (!w) {
+      toast.error("متصفحك منع فتح نافذة الطباعة");
+      return;
+    }
+    w.document.write(html);
+    w.document.close();
+  };
 
   const undo = useMutation({
     mutationFn: async (row: Row) => {
