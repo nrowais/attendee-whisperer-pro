@@ -234,6 +234,35 @@ function timeLabel(value?: string | null) {
   });
 }
 
+function arrivalDateLabel(value?: string | null) {
+  if (!value) return null;
+  return new Date(value).toLocaleString("ar-SA", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function statusCardClass(status: string) {
+  switch (status) {
+    case "arrived":
+      return "border-green-500/40 bg-green-50/60 dark:bg-green-950/20";
+    case "at_hotel":
+      return "border-amber-500/40 bg-amber-50/60 dark:bg-amber-950/20";
+    case "at_event":
+      return "border-green-600/40 bg-green-100/70 dark:bg-green-950/30";
+    case "in_transport":
+      return "border-blue-500/30 bg-blue-50/50 dark:bg-blue-950/20";
+    case "departed":
+      return "border-slate-400/30 bg-slate-50 dark:bg-slate-900/20";
+    default:
+      return "border-border bg-card";
+  }
+}
+
 function isActionDone(row: any, action: (typeof ACTIONS)[number]) {
   if (action.field && row.op?.[action.field]) return true;
   if (action.key === "hotel_checkout" && row.booking?.status === "checked_out") return true;
