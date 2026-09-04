@@ -482,7 +482,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
     mutationFn: persistCard,
     onSuccess: (c) => {
       qc.invalidateQueries({ queryKey: ["crud", "driver_cards"] });
-      toast.success(`تم حفظ البطاقة في ملف الضيف برقم ${c.cardNo ?? ""}`);
+      toast.success(`تم حفظ البطاقة في ملف الضيف ${c.ticketNo ? `برقم التذكرة ${c.ticketNo}` : ""}`);
     },
     onError: (e: any) => toast.error(e.message ?? "تعذر حفظ البطاقة"),
   });
@@ -678,12 +678,6 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
             بطاقة مشوار عادي
           </Button>
         </div>
-
-        {form.cardNo && (
-          <div className="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-xs font-bold text-accent-foreground">
-            رقم البطاقة التسلسلي: {form.cardNo}
-          </div>
-        )}
 
         <div className="grid gap-3 sm:grid-cols-2">
           {field("guestName", "اسم الضيف")}
