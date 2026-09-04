@@ -111,12 +111,17 @@ export function CrudPage({
   subtitle,
   fields,
   compact,
+  overlapCheck,
+  overlapNameKey = "full_name",
 }: {
   table: string;
   title: string;
   subtitle?: string;
   fields: Field[];
   compact?: boolean;
+  /** كشف السجلات المتداخلة مع قائمة أخرى (مثل المتحدثين) لتمييزها وفصلها دون حذف */
+  overlapCheck?: (name: string | null | undefined) => boolean;
+  overlapNameKey?: string;
 }) {
   const queryClient = useQueryClient();
   const { canEdit: canEditAll, canRegister, canDelete: canDeleteRole } = useRoles();
