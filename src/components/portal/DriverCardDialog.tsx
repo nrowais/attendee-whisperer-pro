@@ -238,15 +238,33 @@ export function buildDriverCardHtml(c: DriverCardData) {
 </body></html>`;
 }
 
+export function driverCardFileName(c: DriverCardData) {
+  const no =
+    c.cardNo && c.cardNo.trim() !== ""
+      ? c.cardNo
+      : c.ticketNo && c.ticketNo.trim() !== ""
+        ? c.ticketNo
+        : "";
+  const driver = (c.driverName || "").trim();
+  if (!no) return "بطاقة-سائق";
+  return driver ? `${driver}-${no}` : String(no);
+}
+
 export function downloadDriverCardPdf(c: DriverCardData) {
+  const fileName = driverCardFileName(c);
   const win = window.open("", "_blank", "width=900,height=700");
   if (!win) {
     toast.error("يرجى السماح بالنوافذ المنبثقة لتحميل البطاقة");
     return;
   }
+  const html = buildDriverCardHtml(c).replace(
+    "<title>بطاقة توجيه السائق</title>",
+    `<title>${fileName}</title>`,
+  );
   win.document.open();
-  win.document.write(buildDriverCardHtml(c));
+  win.document.write(html);
   win.document.close();
+  win.document.title = fileName;
   toast.success("جاري تجهيز بطاقة السائق (PDF)");
 }
 

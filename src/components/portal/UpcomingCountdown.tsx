@@ -26,10 +26,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRoles } from "@/hooks/useAuth";
-import { buildDriverCardHtml, HOTELS, RECEIVERS, type DriverCardData } from "@/components/portal/DriverCardDialog";
+import { buildDriverCardHtml, driverCardFileName, HOTELS, RECEIVERS, type DriverCardData } from "@/components/portal/DriverCardDialog";
 
 /** فتح نافذة طباعة بطاقة السائق — نفس قالب شاشة التذاكر */
-function openCardPdf(card: DriverCardData, fileNo: number | string) {
+function openCardPdf(card: DriverCardData) {
+  const fileName = driverCardFileName(card);
   const win = window.open("", "_blank", "width=900,height=700");
   if (!win) {
     toast.error("يرجى السماح بالنوافذ المنبثقة لتحميل البطاقة");
@@ -37,12 +38,12 @@ function openCardPdf(card: DriverCardData, fileNo: number | string) {
   }
   const html = buildDriverCardHtml(card).replace(
     "<title>بطاقة توجيه السائق</title>",
-    `<title>بطاقة-سائق-${String(fileNo)}</title>`,
+    `<title>${fileName}</title>`,
   );
   win.document.open();
   win.document.write(html);
   win.document.close();
-  win.document.title = `بطاقة-سائق-${String(fileNo)}`;
+  win.document.title = fileName;
 }
 
 const db = supabase as any;
@@ -386,30 +387,27 @@ export function UpcomingCountdown() {
         .maybeSingle();
 
       if (withPdf && inserted?.ticket_no) {
-        openCardPdf(
-          {
-            cardType: draft.cardType,
-            guestName: draft.guestName,
-            terminal: draft.terminal,
-            receiverName: draft.receiverName,
-            receiverPhone: draft.receiverPhone,
-            flightDate: draft.flightDate || splitDateTime(item.at).date,
-            flightTime: draft.flightTime || splitDateTime(item.at).time,
-            flightNo: draft.flightNo,
-            driverName: driver?.full_name ?? "",
-            driverPhone: driver?.phone ?? "",
-            vehicle: vehicleText,
-            pickup: draft.pickup,
-            dropoff: draft.dropoff,
-            ticketNo: "",
-            cardNo: card?.card_no ? String(card.card_no) : "",
-            hotelName: draft.hotelName,
-            hotelLocation: draft.hotelLocation,
-            hotelMapUrl: draft.hotelMapUrl,
-            notes: draft.notes,
-          },
-          card?.card_no ?? inserted.ticket_no,
-        );
+        openCardPdf({
+          cardType: draft.cardType,
+          guestName: draft.guestName,
+          terminal: draft.terminal,
+          receiverName: draft.receiverName,
+          receiverPhone: draft.receiverPhone,
+          flightDate: draft.flightDate || splitDateTime(item.at).date,
+          flightTime: draft.flightTime || splitDateTime(item.at).time,
+          flightNo: draft.flightNo,
+          driverName: driver?.full_name ?? "",
+          driverPhone: driver?.phone ?? "",
+          vehicle: vehicleText,
+          pickup: draft.pickup,
+          dropoff: draft.dropoff,
+          ticketNo: String(inserted.ticket_no),
+          cardNo: card?.card_no ? String(card.card_no) : "",
+          hotelName: draft.hotelName,
+          hotelLocation: draft.hotelLocation,
+          hotelMapUrl: draft.hotelMapUrl,
+          notes: draft.notes,
+        });
       }
       return inserted;
     },
@@ -426,7 +424,7 @@ export function UpcomingCountdown() {
   });
 
   // استعراض تذكرة مصدرة وإعادة تحميلها PDF
-  const [viewing, setViewing] = useState<{ html: string; no: string } | null>(null);
+  const [viewing, setViewing] = useState<{ html: string; fileName: string; no: string } | null>(null);
 
   const viewTicket = useMutation({
     mutationFn: async (ticketNo: number) => {
@@ -454,19 +452,20 @@ export function UpcomingCountdown() {
         vehicle: card.vehicle ?? "",
         pickup: card.pickup_location ?? "",
         dropoff: card.dropoff_location ?? "",
-        ticketNo: "",
-        cardNo: card.card_no ? String(card.card_no) : String(ticketNo),
+        ticketNo: String(ticketNo),
+        cardNo: card.card_no ? String(card.card_no) : "",
         hotelName: card.hotel_name ?? "",
         hotelLocation: card.hotel_location ?? "",
         hotelMapUrl: card.hotel_map_url ?? "",
         notes: card.notes ?? "",
       };
       const no = card.card_no ? String(card.card_no) : String(ticketNo);
+      const fileName = driverCardFileName(data);
       const html = buildDriverCardHtml(data).replace(
         "<title>بطاقة توجيه السائق</title>",
-        `<title>بطاقة-سائق-${no}</title>`,
+        `<title>${fileName}</title>`,
       );
-      return { html, no };
+      return { html, fileName, no };
     },
     onSuccess: (v) => setViewing(v),
     onError: (e: any) => toast.error(e.message ?? "تعذر فتح التذكرة"),
@@ -482,7 +481,7 @@ export function UpcomingCountdown() {
     win.document.open();
     win.document.write(viewing.html);
     win.document.close();
-    win.document.title = `بطاقة-سائق-${viewing.no}`;
+    win.document.title = viewing.fileName;
   };
 
   useEffect(() => {
