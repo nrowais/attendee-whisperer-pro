@@ -93,6 +93,11 @@ export function SeatMap() {
   const [colsCount, setColsCount] = useState(12);
   const [picker, setPicker] = useState<{ row: number; col: number } | null>(null);
   const [pickerSearch, setPickerSearch] = useState("");
+  const [manualOpen, setManualOpen] = useState(false);
+  const [manual, setManual] = useState({ name: "", organization: "", phone: "", type: "guest" });
+  const [hover, setHover] = useState<
+    { seat: SeatData | null; row: number; col: number; x: number; y: number } | null
+  >(null);
 
   const seatIndex = useMemo(() => {
     const map = new Map<string, SeatData>();
