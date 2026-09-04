@@ -1,3 +1,7 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CheckCircle2, Undo2 } from "lucide-react";
+import { toast } from "sonner";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useRoles } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import {
   completionGaps,
   fmtDuration,
@@ -54,7 +59,56 @@ export function SessionDetail({
   onClose: () => void;
   onEdit: (session: SessionRow) => void;
 }) {
-  const { canEdit, isAdmin } = useRoles();
+  const { canEdit, isAdmin, canEditOps } = useRoles();
+  const queryClient = useQueryClient();
+
+  const arrival = useMutation({
+    mutationFn: async ({
+      speakerId,
+      arrived,
+    }: {
+      speakerId: string;
+      arrived: boolean;
+      eventId: string | null;
+    }) => {
+      const db = supabase as any;
+      const nowIso = new Date().toISOString();
+      const { data: existing } = await db
+        .from("guest_operations")
+        .select("id")
+        .eq("speaker_id", speakerId)
+        .maybeSingle();
+      const payload: Record<string, unknown> = arrived
+        ? { operational_status: "arrived_airport", arrival_actual_time: nowIso }
+        : { operational_status: "not_arrived", arrival_actual_time: null };
+      if (existing?.id) {
+        const { error } = await db.from("guest_operations").update(payload).eq("id", existing.id);
+        if (error) throw error;
+      } else {
+        if (!arrived) return;
+        const { error } = await db
+          .from("guest_operations")
+          .insert({ speaker_id: speakerId, ...payload });
+        if (error) throw error;
+      }
+      await supabase.auth.getUser().then(({ data }) =>
+        db.from("activity_logs").insert({
+          user_id: data.user?.id ?? null,
+          entity_type: "speakers",
+          entity_id: speakerId,
+          action: arrived ? "session_arrival_checkin" : "session_arrival_undo",
+          details: { source: "session_detail", at: nowIso },
+        }),
+      );
+    },
+    onSuccess: (_v, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["sessions-speaker-ops"] });
+      queryClient.invalidateQueries({ queryKey: ["ops-board"] });
+      toast.success(vars.arrived ? "تم تسجيل الوصول" : "تم التراجع عن الوصول");
+    },
+    onError: () => toast.error("تعذر تحديث حالة الوصول"),
+  });
+
   if (!session) return null;
   const track = tracks.find((t) => t.id === session.track_id);
   const phase = timePhase(session, now);
@@ -166,11 +220,43 @@ export function SessionDetail({
                             {canEdit && ops?.phone ? ` — ${ops.phone}` : ""}
                           </p>
                         </div>
-                        <Badge variant={p.match_status === "needs_matching" ? "destructive" : "secondary"}>
-                          {p.match_status === "needs_matching"
-                            ? "يحتاج مطابقة"
-                            : (opStatusLabels[ops?.status ?? "not_arrived"] ?? "لم يصل")}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          {p.speaker_id && canEditOps ? (
+                            (() => {
+                              const arrived = (ops?.status ?? "not_arrived") !== "not_arrived";
+                              return (
+                                <Button
+                                  size="sm"
+                                  variant={arrived ? "outline" : "default"}
+                                  className="h-7 gap-1 px-2 text-[11px]"
+                                  disabled={arrival.isPending}
+                                  onClick={() =>
+                                    arrival.mutate({
+                                      speakerId: p.speaker_id!,
+                                      arrived: !arrived,
+                                      eventId: session.event_id,
+                                    })
+                                  }
+                                >
+                                  {arrived ? (
+                                    <>
+                                      <Undo2 className="size-3.5" /> تراجع
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCircle2 className="size-3.5" /> وصل
+                                    </>
+                                  )}
+                                </Button>
+                              );
+                            })()
+                          ) : null}
+                          <Badge variant={p.match_status === "needs_matching" ? "destructive" : "secondary"}>
+                            {p.match_status === "needs_matching"
+                              ? "يحتاج مطابقة"
+                              : (opStatusLabels[ops?.status ?? "not_arrived"] ?? "لم يصل")}
+                          </Badge>
+                        </div>
                       </li>
                     );
                   })}
