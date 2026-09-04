@@ -399,7 +399,6 @@ export const eventFields: Field[] = [
 ];
 
 export const driverCardFields: Field[] = [
-  { key: "card_no", label: "رقم البطاقة" },
   { key: "guest_name", label: "اسم الضيف" },
   { key: "hotel_name", label: "الفندق" },
   { key: "hotel_location", label: "موقع الفندق" },
