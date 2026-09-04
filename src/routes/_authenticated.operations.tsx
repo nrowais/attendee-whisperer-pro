@@ -159,7 +159,15 @@ function useOperationsData() {
     queryKey: ["operations-manage"],
     refetchInterval: 30_000,
     queryFn: async () => {
-      const [{ data: speakers }, { data: ops }, { data: trips }, { data: bookings }, { data: hotels }] =
+      const [
+        { data: speakers },
+        { data: ops },
+        { data: trips },
+        { data: bookings },
+        { data: hotels },
+        { data: arrivals },
+        { data: flights },
+      ] =
         await Promise.all([
           db.from("speakers").select("id, full_name, title, organization, country").order("full_name"),
           db.from("guest_operations").select("*"),
@@ -169,6 +177,8 @@ function useOperationsData() {
             .order("scheduled_at", { ascending: false }),
           db.from("hotel_bookings").select("id, speaker_id, hotel_id, check_in, check_out, status"),
           db.from("hotels").select("id, name"),
+          db.from("speaker_arrivals").select("speaker_id, arrival_time, flight_id, terminal"),
+          db.from("flights").select("id, arrival_time"),
         ]);
 
       const hotelNames = new Map((hotels ?? []).map((h: any) => [h.id, h.name]));
@@ -181,18 +191,35 @@ function useOperationsData() {
       (bookings ?? []).forEach((b: any) => {
         if (b.speaker_id && !bookingBy.has(b.speaker_id)) bookingBy.set(b.speaker_id, b);
       });
+      const flightById = new Map<string, any>((flights ?? []).map((f: any) => [f.id, f]));
+      const arrivalBy = new Map<string, string>();
+      (arrivals ?? []).forEach((a: any) => {
+        const flight = a.flight_id ? flightById.get(a.flight_id) : null;
+        const t = a.arrival_time ?? flight?.arrival_time;
+        if (t) arrivalBy.set(a.speaker_id, t);
+      });
 
-      return (speakers ?? []).map((s: any) => {
+      const rows = (speakers ?? []).map((s: any) => {
         const op: any = opsBy.get(s.id);
         const booking = bookingBy.get(s.id);
         return {
           ...s,
           op: op ?? null,
           opStatus: (op?.operational_status as string) ?? "scheduled",
+          arrivalAt: arrivalBy.get(s.id) ?? null,
           trip: tripBy.get(s.id) ?? null,
           booking: booking ? { ...booking, hotelName: hotelNames.get(booking.hotel_id) ?? "—" } : null,
         };
       });
+
+      rows.sort((a: any, b: any) => {
+        if (a.arrivalAt && b.arrivalAt) return new Date(a.arrivalAt).getTime() - new Date(b.arrivalAt).getTime();
+        if (a.arrivalAt) return -1;
+        if (b.arrivalAt) return 1;
+        return a.full_name.localeCompare(b.full_name, "ar");
+      });
+
+      return rows;
     },
   });
 }
