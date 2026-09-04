@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Armchair, CheckCircle2, Grid3x3, Search, Trash2, X } from "lucide-react";
+import { Armchair, CheckCircle2, Grid3x3, Search, Trash2, UserPlus, X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useRoles } from "@/hooks/useAuth";
@@ -38,8 +38,19 @@ type SeatData = {
   inviteeId: string;
   name: string;
   organization: string | null;
+  inviteeType: string | null;
+  phone: string | null;
+  status: string | null;
   present: boolean;
 };
+
+const TYPE_LABELS: Record<string, string> = {
+  vip: "كبار الشخصيات",
+  guest: "ضيف",
+  media: "إعلام",
+  staff: "فريق عمل",
+};
+
 
 function useSeatData() {
   return useQuery({
@@ -49,7 +60,7 @@ function useSeatData() {
       const [{ data: events }, { data: invitees }, { data: invitations }, { data: attendance }] =
         await Promise.all([
           db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
-          db.from("invitees").select("id, full_name, organization, invitee_type"),
+          db.from("invitees").select("id, full_name, organization, invitee_type, phone"),
           db
             .from("invitations")
             .select("id, event_id, invitee_id, status, seat_area, seat_row, seat_number"),
@@ -82,6 +93,11 @@ export function SeatMap() {
   const [colsCount, setColsCount] = useState(12);
   const [picker, setPicker] = useState<{ row: number; col: number } | null>(null);
   const [pickerSearch, setPickerSearch] = useState("");
+  const [manualOpen, setManualOpen] = useState(false);
+  const [manual, setManual] = useState({ name: "", organization: "", phone: "", type: "guest" });
+  const [hover, setHover] = useState<
+    { seat: SeatData | null; row: number; col: number; x: number; y: number } | null
+  >(null);
 
   const seatIndex = useMemo(() => {
     const map = new Map<string, SeatData>();
@@ -95,6 +111,9 @@ export function SeatMap() {
         inviteeId: v.invitee_id,
         name: invitee?.full_name ?? "مدعو",
         organization: invitee?.organization ?? null,
+        inviteeType: invitee?.invitee_type ?? null,
+        phone: invitee?.phone ?? null,
+        status: v.status ?? null,
         present: data?.present.has(v.invitee_id) ?? false,
       });
     });
@@ -163,6 +182,44 @@ export function SeatMap() {
       toast.success("تم إخلاء المقعد");
     },
     onError: (e: any) => toast.error(e?.message ?? "تعذّر إخلاء المقعد"),
+  });
+
+  const createAndAssign = useMutation({
+    mutationFn: async ({ row, col }: { row: number; col: number }) => {
+      const eventId = data?.eventId;
+      if (!eventId) throw new Error("لا توجد فعالية مسجّلة");
+      const name = manual.name.trim();
+      if (!name) throw new Error("الرجاء إدخال اسم الضيف");
+      const { data: created, error } = await db
+        .from("invitees")
+        .insert({
+          full_name: name,
+          organization: manual.organization.trim() || null,
+          phone: manual.phone.trim() || null,
+          invitee_type: manual.type,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      const { error: e2 } = await db.from("invitations").insert({
+        event_id: eventId,
+        invitee_id: created.id,
+        status: "accepted",
+        seat_area: area.trim() || DEFAULT_AREA,
+        seat_row: String(row),
+        seat_number: String(col),
+      });
+      if (e2) throw e2;
+    },
+    onSuccess: () => {
+      setPicker(null);
+      setPickerSearch("");
+      setManual({ name: "", organization: "", phone: "", type: "guest" });
+      setManualOpen(false);
+      invalidate();
+      toast.success("تمت إضافة الضيف وتعيين مقعده");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "تعذّر إضافة الضيف"),
   });
 
   const candidates = useMemo(() => {
@@ -243,20 +300,29 @@ export function SeatMap() {
                     <button
                       key={col}
                       type="button"
-                      title={seat ? `${seat.name}${seat.organization ? ` — ${seat.organization}` : ""}` : `مقعد شاغر ${col}`}
+                      onMouseEnter={(e) => {
+                        const r = e.currentTarget.getBoundingClientRect();
+                        setHover({ seat: seat ?? null, row, col, x: r.left + r.width / 2, y: r.top });
+                      }}
+                      onMouseLeave={() => setHover(null)}
                       onClick={() => canRegister && setPicker({ row, col })}
                       disabled={!canRegister}
                       className={cn(
-                        "flex size-9 items-center justify-center rounded-md border text-[11px] font-bold transition-all",
+                        "flex h-11 w-[4.5rem] flex-col items-center justify-center gap-0 overflow-hidden rounded-md border px-1 transition-all",
                         seat
                           ? seat.present
                             ? "border-primary bg-primary text-primary-foreground"
                             : "border-accent bg-accent/25 text-accent-foreground"
                           : "border-dashed border-border bg-muted/40 text-muted-foreground",
-                        canRegister && "hover:scale-110 hover:border-primary",
+                        canRegister && "hover:z-10 hover:scale-105 hover:border-primary",
                       )}
                     >
-                      {col}
+                      <span className="text-[11px] font-bold leading-none">{col}</span>
+                      {seat && (
+                        <span className="w-full truncate text-[7px] leading-tight opacity-90">
+                          {seat.name}
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -277,12 +343,53 @@ export function SeatMap() {
         </div>
       </div>
 
+      {hover && (
+        <div
+          className="pointer-events-none fixed z-50 w-56 -translate-x-1/2 rounded-lg border bg-popover p-3 text-popover-foreground shadow-lg"
+          style={{
+            left: Math.min(Math.max(hover.x, 120), (typeof window !== "undefined" ? window.innerWidth : 1000) - 120),
+            top: Math.max(hover.y - 8, 8),
+            transform: "translate(-50%, -100%)",
+          }}
+        >
+          <p className="text-[11px] font-bold text-muted-foreground">
+            صف {hover.row} · مقعد {hover.col} · {area}
+          </p>
+          {hover.seat ? (
+            <div className="mt-1 space-y-0.5">
+              <p className="text-sm font-bold leading-tight">{hover.seat.name}</p>
+              {hover.seat.organization && (
+                <p className="text-xs text-muted-foreground">{hover.seat.organization}</p>
+              )}
+              {hover.seat.inviteeType && (
+                <p className="text-xs text-muted-foreground">
+                  التصنيف: {TYPE_LABELS[hover.seat.inviteeType] ?? hover.seat.inviteeType}
+                </p>
+              )}
+              {hover.seat.phone && (
+                <p className="text-xs text-muted-foreground" dir="ltr">
+                  {hover.seat.phone}
+                </p>
+              )}
+              <p className="pt-1 text-xs font-semibold">
+                {hover.seat.present ? "✅ مسجّل الحضور" : "⏳ لم يسجّل الحضور"}
+              </p>
+            </div>
+          ) : (
+            <p className="mt-1 text-sm font-semibold">مقعد شاغر</p>
+          )}
+        </div>
+      )}
+
+
       <Dialog
         open={!!picker}
         onOpenChange={(o) => {
           if (!o) {
             setPicker(null);
             setPickerSearch("");
+            setManualOpen(false);
+            setManual({ name: "", organization: "", phone: "", type: "guest" });
           }
         }}
       >
@@ -298,6 +405,12 @@ export function SeatMap() {
               <div className="rounded-xl border bg-muted/40 p-4">
                 <p className="text-lg font-bold">{current.name}</p>
                 <p className="text-sm text-muted-foreground">{current.organization ?? "—"}</p>
+                <div className="mt-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                  {current.inviteeType && (
+                    <span>التصنيف: {TYPE_LABELS[current.inviteeType] ?? current.inviteeType}</span>
+                  )}
+                  {current.phone && <span dir="ltr">{current.phone}</span>}
+                </div>
                 {current.present && (
                   <Badge className="mt-2 gap-1">
                     <CheckCircle2 className="size-3" />
@@ -327,10 +440,72 @@ export function SeatMap() {
             </div>
           ) : (
             <div className="space-y-3">
+              <Button
+                type="button"
+                variant={manualOpen ? "secondary" : "outline"}
+                className="w-full gap-1"
+                onClick={() => setManualOpen((v) => !v)}
+              >
+                <UserPlus className="size-4" />
+                {manualOpen ? "إخفاء الإدخال اليدوي" : "إضافة ضيف يدويًا غير مسجّل"}
+              </Button>
+
+              {manualOpen && (
+                <div className="space-y-3 rounded-lg border bg-muted/30 p-3">
+                  <div className="space-y-1.5">
+                    <Label>اسم الضيف *</Label>
+                    <Input
+                      value={manual.name}
+                      onChange={(e) => setManual({ ...manual, name: e.target.value })}
+                      placeholder="الاسم الكامل"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1.5">
+                      <Label>الجهة</Label>
+                      <Input
+                        value={manual.organization}
+                        onChange={(e) => setManual({ ...manual, organization: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>الجوال</Label>
+                      <Input
+                        dir="ltr"
+                        value={manual.phone}
+                        onChange={(e) => setManual({ ...manual, phone: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>التصنيف</Label>
+                    <select
+                      className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+                      value={manual.type}
+                      onChange={(e) => setManual({ ...manual, type: e.target.value })}
+                    >
+                      <option value="guest">ضيف</option>
+                      <option value="vip">كبار الشخصيات</option>
+                      <option value="media">إعلام</option>
+                      <option value="staff">فريق عمل</option>
+                    </select>
+                  </div>
+                  <Button
+                    className="w-full"
+                    disabled={createAndAssign.isPending || !manual.name.trim()}
+                    onClick={() =>
+                      picker && createAndAssign.mutate({ row: picker.row, col: picker.col })
+                    }
+                  >
+                    {createAndAssign.isPending ? "جارٍ الحفظ…" : "إضافة وتعيين المقعد"}
+                  </Button>
+                </div>
+              )}
+
               <div className="relative">
                 <Search className="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  autoFocus
+                  autoFocus={!manualOpen}
                   value={pickerSearch}
                   onChange={(e) => setPickerSearch(e.target.value)}
                   placeholder="ابحث عن اسم المدعو…"
