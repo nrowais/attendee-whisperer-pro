@@ -574,6 +574,16 @@ export function AttendanceBoard() {
                   </div>
                 </div>
 
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="shrink-0 gap-1"
+                  onClick={() => openSeat(r)}
+                >
+                  <Armchair className="size-4" />
+                  المقعد
+                </Button>
+
                 {present ? (
                   <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
                     {r.checkedOutAt ? (
