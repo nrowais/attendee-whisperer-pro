@@ -8,6 +8,7 @@ import { eventName } from "@/lib/nav";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import eventLogo from "@/assets/event-logo-2026.png";
+import { ArrivalsDayReport } from "@/components/portal/ArrivalsDayReport";
 
 const logoUrl = () =>
   typeof window !== "undefined" ? new URL(eventLogo, window.location.origin).href : eventLogo;
@@ -301,6 +302,8 @@ function ReportsPage() {
 
         </p>
       </div>
+
+      <ArrivalsDayReport />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {reports.map((r) => (
