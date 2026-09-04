@@ -60,6 +60,7 @@ function InviteesWorkspace() {
                   title="المدعوون"
                   subtitle="قائمة المدعوين"
                   fields={inviteeFields}
+                  overlapCheck={isSpeaker}
                 />
               ),
             },
