@@ -422,10 +422,6 @@ function SessionsMapScreen() {
         </div>
       </main>
 
-      <footer className="border-t border-border py-3 text-center text-xs text-muted-foreground">
-        نفذ بواسطة نايف الرويس
-      </footer>
-
       <SessionDetail
         session={detail}
         tracks={tracks ?? []}

@@ -54,8 +54,6 @@ function TransportHubPage() {
           <FleetWorkspace />
         </TabsContent>
       </Tabs>
-
-      <p className="pt-2 text-center text-xs text-muted-foreground">نفذ بواسطة نايف الرويس</p>
     </div>
   );
 }
