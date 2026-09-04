@@ -179,6 +179,44 @@ export function SeatMap() {
     onError: (e: any) => toast.error(e?.message ?? "تعذّر إخلاء المقعد"),
   });
 
+  const createAndAssign = useMutation({
+    mutationFn: async ({ row, col }: { row: number; col: number }) => {
+      const eventId = data?.eventId;
+      if (!eventId) throw new Error("لا توجد فعالية مسجّلة");
+      const name = manual.name.trim();
+      if (!name) throw new Error("الرجاء إدخال اسم الضيف");
+      const { data: created, error } = await db
+        .from("invitees")
+        .insert({
+          full_name: name,
+          organization: manual.organization.trim() || null,
+          phone: manual.phone.trim() || null,
+          invitee_type: manual.type,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      const { error: e2 } = await db.from("invitations").insert({
+        event_id: eventId,
+        invitee_id: created.id,
+        status: "accepted",
+        seat_area: area.trim() || DEFAULT_AREA,
+        seat_row: String(row),
+        seat_number: String(col),
+      });
+      if (e2) throw e2;
+    },
+    onSuccess: () => {
+      setPicker(null);
+      setPickerSearch("");
+      setManual({ name: "", organization: "", phone: "", type: "guest" });
+      setManualOpen(false);
+      invalidate();
+      toast.success("تمت إضافة الضيف وتعيين مقعده");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "تعذّر إضافة الضيف"),
+  });
+
   const candidates = useMemo(() => {
     const q = normalize(pickerSearch);
     return (data?.invitees ?? [])
