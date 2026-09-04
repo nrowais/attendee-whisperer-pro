@@ -5,7 +5,7 @@ import {
   Plane,
   BarChart3,
   CalendarDays,
-  Car,
+
   Ticket,
   ListChecks,
   LayoutList,
