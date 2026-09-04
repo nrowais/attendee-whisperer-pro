@@ -1,0 +1,2 @@
+ALTER TABLE public.driver_cards ALTER COLUMN card_no SET DEFAULT nextval('public.transport_ticket_seq'::regclass);
+SELECT setval('public.transport_ticket_seq', GREATEST((SELECT COALESCE(MAX(ticket_no),0) FROM public.transport_trips), (SELECT COALESCE(MAX(card_no),0) FROM public.driver_cards), 1019));
