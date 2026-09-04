@@ -310,33 +310,37 @@ function SessionsMapScreen() {
                             setHoveredId(null);
                             setHoverTip(null);
                           }}
-                          className={cn(
-                            "group absolute top-1/2 z-10 flex h-[88px] -translate-y-1/2 flex-col justify-between overflow-hidden rounded-xl border p-2 text-start shadow-sm transition-all duration-200 hover:z-30 hover:scale-[1.04] hover:overflow-visible hover:shadow-xl focus-visible:z-30 focus-visible:scale-[1.04] focus-visible:overflow-visible focus-visible:shadow-xl focus-visible:outline-none",
-                            typeColor[s.session_type] ?? typeColor["other"],
-                            live && "ring-2 ring-primary shadow-lg",
-                          )}
+                          className="group absolute top-[calc(50%-44px)] z-10 h-[88px] text-start transition-all duration-200 hover:z-30 focus-visible:z-30 focus-visible:outline-none"
                           style={{ insetInlineStart: `${inlineStart}%`, width: `${width}%` }}
                         >
-                          <div className="min-w-0">
-                            <p className="flex items-center gap-1 font-mono text-[10px] font-bold tabular-nums opacity-80" dir="ltr">
-                              {fmtTime(s.start_time)} - {fmtTime(s.end_time)}
-                            </p>
-                            <p className="mt-0.5 line-clamp-2 text-xs font-bold leading-snug">
-                              {s.title_ar || s.title_en || "بدون عنوان"}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            {live ? (
-                              <span className="flex items-center gap-1 text-[10px] font-black">
-                                <span className="size-1.5 animate-pulse rounded-full bg-current" />
-                                جارية الآن
-                              </span>
-                            ) : phase.kind === "ended" ? (
-                              <span className="text-[10px] font-semibold opacity-60">انتهت</span>
-                            ) : null}
-                            {!isBreak && participants.length > 0 ? (
-                              <span className="ms-auto text-[10px] opacity-70">{participants.length} مشارك</span>
-                            ) : null}
+                          <div
+                            className={cn(
+                              "absolute inset-0 flex flex-col justify-between overflow-hidden rounded-xl border p-2 shadow-sm transition-all duration-200 group-hover:scale-[1.04] group-hover:overflow-visible group-hover:shadow-xl group-focus-visible:scale-[1.04] group-focus-visible:overflow-visible group-focus-visible:shadow-xl",
+                              typeColor[s.session_type] ?? typeColor["other"],
+                              live && "ring-2 ring-primary shadow-lg",
+                            )}
+                          >
+                            <div className="min-w-0">
+                              <p className="flex items-center gap-1 font-mono text-[10px] font-bold tabular-nums opacity-80" dir="ltr">
+                                {fmtTime(s.start_time)} - {fmtTime(s.end_time)}
+                              </p>
+                              <p className="mt-0.5 line-clamp-2 text-xs font-bold leading-snug">
+                                {s.title_ar || s.title_en || "بدون عنوان"}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {live ? (
+                                <span className="flex items-center gap-1 text-[10px] font-black">
+                                  <span className="size-1.5 animate-pulse rounded-full bg-current" />
+                                  جارية الآن
+                                </span>
+                              ) : phase.kind === "ended" ? (
+                                <span className="text-[10px] font-semibold opacity-60">انتهت</span>
+                              ) : null}
+                              {!isBreak && participants.length > 0 ? (
+                                <span className="ms-auto text-[10px] opacity-70">{participants.length} مشارك</span>
+                              ) : null}
+                            </div>
                           </div>
 
                           {/* تلميح عند التحويم */}
@@ -381,6 +385,7 @@ function SessionsMapScreen() {
                             </div>
                           ) : null}
                         </button>
+
 
                       );
                     })}
