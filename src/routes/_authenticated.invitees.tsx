@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { AttendanceBoard } from "@/components/portal/AttendanceBoard";
+import { SeatMap } from "@/components/portal/SeatMap";
 import { CrudPage } from "@/components/portal/CrudPage";
 import { Workspace } from "@/components/portal/Workspace";
 import {
@@ -40,6 +41,11 @@ function InviteesWorkspace() {
               value: "checkin",
               label: "تسجيل الحضور",
               content: <AttendanceBoard />,
+            },
+            {
+              value: "seatmap",
+              label: "خريطة المقاعد",
+              content: <SeatMap />,
             },
             {
               value: "invitees",
