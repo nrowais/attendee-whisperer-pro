@@ -19,7 +19,7 @@ export function normalizeArabicName(name: string | null | undefined): string {
   // إزالة الألقاب الشائعة في بداية الاسم (قد تتكرر)
   const titles = /^(د|أ|ا|م|الدكتور|الاستاذ|الأستاذ|المهندس|الشيخ|معالي|سعادة|الأستاذه|الاستاذة|برف|بروف|البروفيسور)$/i;
   let parts = n.split(/\s+/).filter(Boolean);
-  while (parts.length > 1 && titles.test(parts[0])) parts = parts.slice(1);
+  while (parts.length > 1 && titles.test(parts[0] ?? "")) parts = parts.slice(1);
   n = parts.join(" ");
   return n.trim();
 }
