@@ -131,6 +131,7 @@ function useMonthItems(from: Date, to: Date) {
             time: t.time,
             title: a.speakers?.full_name ?? "وصول متحدث",
             subtitle: a.arrival_point ?? undefined,
+            status: a.status ?? undefined,
           });
       }
       for (const d of departures.data ?? []) {
@@ -143,6 +144,7 @@ function useMonthItems(from: Date, to: Date) {
             time: t.time,
             title: d.speakers?.full_name ?? "مغادرة متحدث",
             subtitle: d.departure_point ?? undefined,
+            status: d.status ?? undefined,
           });
       }
       for (const tr of trips.data ?? []) {
@@ -155,6 +157,7 @@ function useMonthItems(from: Date, to: Date) {
             time: t.time,
             title: tr.speakers?.full_name ?? "رحلة نقل",
             subtitle: [tr.pickup_location, tr.dropoff_location].filter(Boolean).join(" ← "),
+            status: tr.status ?? undefined,
           });
       }
       return items.sort((x, y) => (x.time ?? "").localeCompare(y.time ?? ""));
@@ -316,6 +319,18 @@ function CalendarPage() {
                   <Badge variant="outline" className={kindMeta[it.kind].className}>
                     {kindMeta[it.kind].label}
                   </Badge>
+                  {statusLabel(it.status) && (
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        it.status === "scheduled" || it.status === "expected"
+                          ? "border-border text-muted-foreground"
+                          : "border-emerald-500/40 bg-emerald-500/10 text-emerald-600",
+                      )}
+                    >
+                      {statusLabel(it.status)}
+                    </Badge>
+                  )}
                 </div>
               </li>
             ))}
