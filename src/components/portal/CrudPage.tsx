@@ -306,6 +306,18 @@ export function CrudPage({
               </SelectContent>
             </Select>
           ) : null}
+          {overlapCheck ? (
+            <Select value={overlapFilter} onValueChange={setOverlapFilter}>
+              <SelectTrigger className="w-44">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hide">المدعوون فقط</SelectItem>
+                <SelectItem value="only">المتحدثون فقط</SelectItem>
+                <SelectItem value="all">الكل معًا</SelectItem>
+              </SelectContent>
+            </Select>
+          ) : null}
           {canEdit ? (
             <Button onClick={startCreate}>
               <Plus className="size-4" />
@@ -356,7 +368,17 @@ export function CrudPage({
                       {f.badge ? (
                         <Badge variant="secondary">{formatValue(row[f.key], f, refMaps)}</Badge>
                       ) : (
-                        <span className="line-clamp-1">{formatValue(row[f.key], f, refMaps)}</span>
+                        <span className="line-clamp-1">
+                          {formatValue(row[f.key], f, refMaps)}
+                          {overlapCheck && f.key === overlapNameKey && overlapCheck(row[overlapNameKey]) ? (
+                            <Badge
+                              variant="outline"
+                              className="ms-2 border-amber-500/60 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                            >
+                              متحدث
+                            </Badge>
+                          ) : null}
+                        </span>
                       )}
                     </TableCell>
                   ))}
