@@ -405,6 +405,12 @@ export function SeatMap() {
               <div className="rounded-xl border bg-muted/40 p-4">
                 <p className="text-lg font-bold">{current.name}</p>
                 <p className="text-sm text-muted-foreground">{current.organization ?? "—"}</p>
+                <div className="mt-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                  {current.inviteeType && (
+                    <span>التصنيف: {TYPE_LABELS[current.inviteeType] ?? current.inviteeType}</span>
+                  )}
+                  {current.phone && <span dir="ltr">{current.phone}</span>}
+                </div>
                 {current.present && (
                   <Badge className="mt-2 gap-1">
                     <CheckCircle2 className="size-3" />
