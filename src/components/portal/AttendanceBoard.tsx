@@ -73,6 +73,11 @@ type Row = {
   attendanceId: string | null;
   checkedInAt: string | null;
   checkedOutAt: string | null;
+  invitationId: string | null;
+  invitationStatus: string | null;
+  seatArea: string | null;
+  seatRow: string | null;
+  seatNumber: string | null;
 };
 
 function useBoard() {
@@ -80,31 +85,50 @@ function useBoard() {
     queryKey: ["attendance-board"],
     refetchInterval: 30_000,
     queryFn: async () => {
-      const [{ data: events }, { data: invitees }, { data: attendance }, { data: hotelMoves }] =
-        await Promise.all([
-          db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
-          db.from("invitees").select("id, full_name, organization, phone, email, invitee_type"),
-          db.from("attendance").select("id, invitee_id, checked_in_at, checked_out_at, event_id"),
-          db
-            .from("attendance")
-            .select("id, checked_in_at, checked_out_at, speakers(full_name)")
-            .eq("method", "hotel")
-            .order("checked_in_at", { ascending: false })
-            .limit(20),
-        ]);
+      const [
+        { data: events },
+        { data: invitees },
+        { data: attendance },
+        { data: hotelMoves },
+        { data: invitations },
+      ] = await Promise.all([
+        db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
+        db.from("invitees").select("id, full_name, organization, phone, email, invitee_type"),
+        db.from("attendance").select("id, invitee_id, checked_in_at, checked_out_at, event_id"),
+        db
+          .from("attendance")
+          .select("id, checked_in_at, checked_out_at, speakers(full_name)")
+          .eq("method", "hotel")
+          .order("checked_in_at", { ascending: false })
+          .limit(20),
+        db
+          .from("invitations")
+          .select("id, event_id, invitee_id, status, seat_area, seat_row, seat_number"),
+      ]);
       const eventId: string | null = events?.[0]?.id ?? null;
       const attMap = new Map<string, any>();
       (attendance ?? [])
         .filter((a: any) => !eventId || a.event_id === eventId)
         .forEach((a: any) => attMap.set(a.invitee_id, a));
 
+      const invMap = new Map<string, any>();
+      (invitations ?? [])
+        .filter((v: any) => !eventId || v.event_id === eventId)
+        .forEach((v: any) => invMap.set(v.invitee_id, v));
+
       const rows: Row[] = (invitees ?? []).map((i: any) => {
         const att = attMap.get(i.id);
+        const inv = invMap.get(i.id);
         return {
           ...i,
           attendanceId: att?.id ?? null,
           checkedInAt: att?.checked_in_at ?? null,
           checkedOutAt: att?.checked_out_at ?? null,
+          invitationId: inv?.id ?? null,
+          invitationStatus: inv?.status ?? null,
+          seatArea: inv?.seat_area ?? null,
+          seatRow: inv?.seat_row ?? null,
+          seatNumber: inv?.seat_number ?? null,
         };
       });
       rows.sort((a, b) => a.full_name.localeCompare(b.full_name, "ar"));
