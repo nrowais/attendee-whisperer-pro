@@ -106,6 +106,9 @@ export function SeatMap() {
         inviteeId: v.invitee_id,
         name: invitee?.full_name ?? "مدعو",
         organization: invitee?.organization ?? null,
+        inviteeType: invitee?.invitee_type ?? null,
+        phone: invitee?.phone ?? null,
+        status: v.status ?? null,
         present: data?.present.has(v.invitee_id) ?? false,
       });
     });
