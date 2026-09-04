@@ -46,7 +46,6 @@ export type DriverCardData = {
   pickup: string;
   dropoff: string;
   ticketNo: string;
-  cardNo?: string;
   hotelName?: string;
   hotelLocation?: string;
   hotelMapUrl?: string;
@@ -205,19 +204,17 @@ export function buildDriverCardHtml(c: DriverCardData) {
 </style></head>
 <body>
   <div class="card">
-    <div class="head">
-      <div class="head-text">
-        <p class="event">${esc(eventName)}</p>
-        <h1>${isTrip ? "بطاقة توجيه سائق — مشوار" : "بطاقة توجيه السائق إلى المطار"}</h1>
-        <p class="sub">${isTrip ? "يرجى تسليم هذه البطاقة للسائق قبل بدء المشوار" : "يرجى تسليم هذه البطاقة للسائق قبل التوجه للمطار"}</p>
-        ${c.cardNo ? `<p class="serial">رقم البطاقة التسلسلي: ${esc(String(c.cardNo))}</p>` : ""}
+      <div class="head">
+        <div class="head-text">
+          <p class="event">${esc(eventName)}</p>
+          <h1>${isTrip ? "بطاقة توجيه سائق — مشوار" : "بطاقة توجيه السائق إلى المطار"}</h1>
+          <p class="sub">${isTrip ? "يرجى تسليم هذه البطاقة للسائق قبل بدء المشوار" : "يرجى تسليم هذه البطاقة للسائق قبل التوجه للمطار"}</p>
+        </div>
+        <div class="logo-badge"><img src="${logoUrl()}" alt="شعار الفعالية" /></div>
       </div>
-      <div class="logo-badge"><img src="${logoUrl()}" alt="شعار الفعالية" /></div>
-    </div>
-    <div class="accent"></div>
-    <div class="body">
-      ${c.cardNo ? `<span class="ticket">رقم البطاقة: ${esc(String(c.cardNo))}</span>` : ""}
-      ${c.ticketNo ? `<span class="ticket">رقم التذكرة: ${esc(c.ticketNo)}</span>` : ""}
+      <div class="accent"></div>
+      <div class="body">
+        ${c.ticketNo ? `<span class="ticket">رقم التذكرة: ${esc(c.ticketNo)}</span>` : ""}
       <table>${rows.map(row).join("")}${extra.map(row).join("")}</table>
       ${c.notes && c.notes.trim() !== "" ? `
       <div class="notes"><p class="t">ملاحظات</p><p>${esc(c.notes)}</p></div>` : ""}
@@ -239,12 +236,7 @@ export function buildDriverCardHtml(c: DriverCardData) {
 }
 
 export function driverCardFileName(c: DriverCardData) {
-  const no =
-    c.cardNo && c.cardNo.trim() !== ""
-      ? c.cardNo
-      : c.ticketNo && c.ticketNo.trim() !== ""
-        ? c.ticketNo
-        : "";
+  const no = c.ticketNo && c.ticketNo.trim() !== "" ? c.ticketNo : "";
   const driver = (c.driverName || "").trim();
   if (!no) return "بطاقة-سائق";
   return driver ? `${driver}-${no}` : String(no);
