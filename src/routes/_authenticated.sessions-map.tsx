@@ -63,7 +63,11 @@ function SessionsMapScreen() {
   const { data: allSessions } = useSessions();
   const { data: opsMap } = useSpeakerOps();
   const [now, setNow] = useState(() => Date.now());
-  const [day, setDay] = useState(() => riyadhToday(new Date()));
+  const [day, setDay] = useState(() => {
+    const today = riyadhToday(new Date());
+    if (conferenceDays.some((d) => d.date === today)) return today;
+    return conferenceDays.find((d) => d.date >= today)?.date ?? conferenceDays[0]!.date;
+  });
   const [detail, setDetail] = useState<SessionRow | null>(null);
   const [editing, setEditing] = useState<SessionRow | null>(null);
   const [editOpen, setEditOpen] = useState(false);
