@@ -109,7 +109,7 @@ function useSpeakersBoard() {
           db.from("flights").select("id, arrival_time, flight_number, airline"),
           db
             .from("driver_cards")
-            .select("speaker_id, guest_name, card_no, ticket_no")
+            .select("speaker_id, guest_name, ticket_no")
             .order("created_at", { ascending: false }),
         ]);
 
@@ -450,8 +450,7 @@ export function SpeakersStatusBoard() {
                       </span>
                      ) : r.card ? (
                        <span className="min-w-0 truncate">
-                         بطاقة سائق #{r.card.card_no}
-                         {r.card.ticket_no ? ` · تذكرة #${r.card.ticket_no}` : ""}
+                         تذكرة نقل #{r.card.ticket_no}
                          <br />
                          <span className="text-[10px] text-muted-foreground">لا توجد رحلة نقل مرتبطة بعد</span>
                        </span>

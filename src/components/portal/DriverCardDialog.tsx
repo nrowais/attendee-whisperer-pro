@@ -46,7 +46,6 @@ export type DriverCardData = {
   pickup: string;
   dropoff: string;
   ticketNo: string;
-  cardNo?: string;
   hotelName?: string;
   hotelLocation?: string;
   hotelMapUrl?: string;
@@ -205,19 +204,17 @@ export function buildDriverCardHtml(c: DriverCardData) {
 </style></head>
 <body>
   <div class="card">
-    <div class="head">
-      <div class="head-text">
-        <p class="event">${esc(eventName)}</p>
-        <h1>${isTrip ? "بطاقة توجيه سائق — مشوار" : "بطاقة توجيه السائق إلى المطار"}</h1>
-        <p class="sub">${isTrip ? "يرجى تسليم هذه البطاقة للسائق قبل بدء المشوار" : "يرجى تسليم هذه البطاقة للسائق قبل التوجه للمطار"}</p>
-        ${c.cardNo ? `<p class="serial">رقم البطاقة التسلسلي: ${esc(String(c.cardNo))}</p>` : ""}
+      <div class="head">
+        <div class="head-text">
+          <p class="event">${esc(eventName)}</p>
+          <h1>${isTrip ? "بطاقة توجيه سائق — مشوار" : "بطاقة توجيه السائق إلى المطار"}</h1>
+          <p class="sub">${isTrip ? "يرجى تسليم هذه البطاقة للسائق قبل بدء المشوار" : "يرجى تسليم هذه البطاقة للسائق قبل التوجه للمطار"}</p>
+        </div>
+        <div class="logo-badge"><img src="${logoUrl()}" alt="شعار الفعالية" /></div>
       </div>
-      <div class="logo-badge"><img src="${logoUrl()}" alt="شعار الفعالية" /></div>
-    </div>
-    <div class="accent"></div>
-    <div class="body">
-      ${c.cardNo ? `<span class="ticket">رقم البطاقة: ${esc(String(c.cardNo))}</span>` : ""}
-      ${c.ticketNo ? `<span class="ticket">رقم التذكرة: ${esc(c.ticketNo)}</span>` : ""}
+      <div class="accent"></div>
+      <div class="body">
+        ${c.ticketNo ? `<span class="ticket">رقم التذكرة: ${esc(c.ticketNo)}</span>` : ""}
       <table>${rows.map(row).join("")}${extra.map(row).join("")}</table>
       ${c.notes && c.notes.trim() !== "" ? `
       <div class="notes"><p class="t">ملاحظات</p><p>${esc(c.notes)}</p></div>` : ""}
@@ -239,12 +236,7 @@ export function buildDriverCardHtml(c: DriverCardData) {
 }
 
 export function driverCardFileName(c: DriverCardData) {
-  const no =
-    c.cardNo && c.cardNo.trim() !== ""
-      ? c.cardNo
-      : c.ticketNo && c.ticketNo.trim() !== ""
-        ? c.ticketNo
-        : "";
+  const no = c.ticketNo && c.ticketNo.trim() !== "" ? c.ticketNo : "";
   const driver = (c.driverName || "").trim();
   if (!no) return "بطاقة-سائق";
   return driver ? `${driver}-${no}` : String(no);
@@ -393,7 +385,6 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       pickup: trip?.pickup_location ?? "",
       dropoff: trip?.dropoff_location ?? "",
       ticketNo: trip?.ticket_no ? String(trip.ticket_no) : "",
-      cardNo: "",
       hotelName: trip?.hotel_name ?? "",
       hotelLocation: trip?.hotel_location ?? hotelMatch?.location ?? "",
       hotelMapUrl: trip?.hotel_map_url ?? hotelMatch?.mapUrl ?? "",
@@ -420,7 +411,6 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       setForm((f) => ({
         ...f,
         cardType: row.card_type === "trip" ? "trip" : "airport",
-        cardNo: String(row.card_no),
         guestName: row.guest_name ?? f.guestName,
         terminal: row.terminal ?? f.terminal,
         receiverName: row.receiver_name ?? f.receiverName,
@@ -457,8 +447,6 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       speakerId = match?.[0]?.id ?? null;
     }
     const payload = {
-      // عند الارتباط بتذكرة نقل تحمل البطاقة نفس رقم التذكرة (تسلسل موحد)
-      ...(!cardId && trip?.ticket_no ? { card_no: trip.ticket_no } : {}),
       card_type: form.cardType,
       speaker_id: speakerId,
       trip_id: trip?.id ?? null,
@@ -479,14 +467,13 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       hotel_map_url: form.hotelMapUrl || null,
     };
     const query = cardId
-      ? db.from("driver_cards").update(payload).eq("id", cardId).select("id, card_no").maybeSingle()
-      : db.from("driver_cards").insert(payload).select("id, card_no").maybeSingle();
+      ? db.from("driver_cards").update(payload).eq("id", cardId).select("id, ticket_no").maybeSingle()
+      : db.from("driver_cards").insert(payload).select("id, ticket_no").maybeSingle();
     const { data, error } = await query;
     if (error) throw error;
     if (data) {
       setCardId(data.id);
-      setForm((f) => ({ ...f, cardNo: String(data.card_no) }));
-      return { ...form, cardNo: String(data.card_no) };
+      return { ...form, ticketNo: data.ticket_no ? String(data.ticket_no) : form.ticketNo };
     }
     return form;
   };
@@ -495,7 +482,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
     mutationFn: persistCard,
     onSuccess: (c) => {
       qc.invalidateQueries({ queryKey: ["crud", "driver_cards"] });
-      toast.success(`تم حفظ البطاقة في ملف الضيف برقم ${c.cardNo ?? ""}`);
+      toast.success(`تم حفظ البطاقة في ملف الضيف ${c.ticketNo ? `برقم التذكرة ${c.ticketNo}` : ""}`);
     },
     onError: (e: any) => toast.error(e.message ?? "تعذر حفظ البطاقة"),
   });
@@ -691,12 +678,6 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
             بطاقة مشوار عادي
           </Button>
         </div>
-
-        {form.cardNo && (
-          <div className="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-xs font-bold text-accent-foreground">
-            رقم البطاقة التسلسلي: {form.cardNo}
-          </div>
-        )}
 
         <div className="grid gap-3 sm:grid-cols-2">
           {field("guestName", "اسم الضيف")}

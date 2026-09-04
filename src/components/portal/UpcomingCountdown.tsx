@@ -363,7 +363,6 @@ export function UpcomingCountdown() {
       const { data: card } = await db
         .from("driver_cards")
         .insert({
-          card_no: inserted.ticket_no ?? undefined,
           card_type: draft.cardType,
           speaker_id: item.speakerId,
           trip_id: inserted.id,
@@ -383,7 +382,7 @@ export function UpcomingCountdown() {
           hotel_location: draft.hotelLocation || null,
           hotel_map_url: draft.hotelMapUrl || null,
         })
-        .select("id, card_no")
+        .select("id, ticket_no")
         .maybeSingle();
 
       if (withPdf && inserted?.ticket_no) {
@@ -402,7 +401,6 @@ export function UpcomingCountdown() {
           pickup: draft.pickup,
           dropoff: draft.dropoff,
           ticketNo: String(inserted.ticket_no),
-          cardNo: card?.card_no ? String(card.card_no) : "",
           hotelName: draft.hotelName,
           hotelLocation: draft.hotelLocation,
           hotelMapUrl: draft.hotelMapUrl,
@@ -453,13 +451,12 @@ export function UpcomingCountdown() {
         pickup: card.pickup_location ?? "",
         dropoff: card.dropoff_location ?? "",
         ticketNo: String(ticketNo),
-        cardNo: card.card_no ? String(card.card_no) : "",
         hotelName: card.hotel_name ?? "",
         hotelLocation: card.hotel_location ?? "",
         hotelMapUrl: card.hotel_map_url ?? "",
         notes: card.notes ?? "",
       };
-      const no = card.card_no ? String(card.card_no) : String(ticketNo);
+      const no = String(ticketNo);
       const fileName = driverCardFileName(data);
       const html = buildDriverCardHtml(data).replace(
         "<title>بطاقة توجيه السائق</title>",
