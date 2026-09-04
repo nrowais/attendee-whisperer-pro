@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { History, Send } from "lucide-react";
+import { BellRing, History, Send } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,8 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useRoles } from "@/hooks/useAuth";
+import { NotificationsPanel } from "@/components/portal/NotificationsPanel";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/activity")({
   head: () => ({
@@ -75,6 +77,7 @@ function ActivityPage() {
   const [entity, setEntity] = useState("general");
   const [action, setAction] = useState("update");
   const [note, setNote] = useState("");
+  const [tab, setTab] = useState<"logs" | "notifications">("logs");
 
   const logs = useQuery({
     queryKey: ["activity-logs"],
@@ -139,12 +142,13 @@ function ActivityPage() {
         <div>
           <h1 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
             <History className="size-5 text-primary" />
-            التحديثات وسجل النشاط
+            التحديثات والإشعارات
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            ارفع تحديثات الميدان وتابع كل ما يجري في الفعالية من الأحدث إلى الأقدم.
+            سجل النشاط وإشعاراتك الخاصة في شاشة واحدة.
           </p>
         </div>
+        {tab === "logs" ? (
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -152,9 +156,32 @@ function ActivityPage() {
           className="w-full sm:w-72"
           aria-label="بحث في سجل النشاط"
         />
+        ) : null}
       </div>
 
-      {canEdit ? (
+      <div className="flex flex-wrap gap-1 rounded-xl bg-secondary/60 p-1">
+        {([
+          { key: "logs", label: "سجل النشاط", icon: History },
+          { key: "notifications", label: "الإشعارات", icon: BellRing },
+        ] as const).map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => setTab(t.key)}
+            className={cn(
+              "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+              tab === t.key ? "bg-card text-foreground shadow-sm" : "text-muted-foreground",
+            )}
+          >
+            <t.icon className="size-4" />
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "notifications" ? <NotificationsPanel /> : null}
+
+      {tab === "logs" && canEdit ? (
         <Card>
           <CardContent className="space-y-4 p-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -209,6 +236,7 @@ function ActivityPage() {
         </Card>
       ) : null}
 
+      {tab === "logs" ? (
       <Card>
         <CardContent className="p-0">
           <Table>
@@ -264,6 +292,7 @@ function ActivityPage() {
           </Table>
         </CardContent>
       </Card>
+      ) : null}
     </div>
   );
 }
