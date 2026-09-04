@@ -290,7 +290,7 @@ function SessionsMapScreen() {
                           key={s.id}
                           onClick={() => setDetail(s)}
                           className={cn(
-                            "group absolute top-1/2 z-10 flex h-[88px] -translate-y-1/2 flex-col justify-between overflow-hidden rounded-xl border p-2 text-start shadow-sm transition-all duration-200 hover:z-30 hover:scale-[1.04] hover:shadow-xl focus-visible:z-30 focus-visible:scale-[1.04] focus-visible:shadow-xl focus-visible:outline-none",
+                            "group absolute top-1/2 z-10 flex h-[88px] -translate-y-1/2 flex-col justify-between overflow-hidden rounded-xl border p-2 text-start shadow-sm transition-all duration-200 hover:z-30 hover:scale-[1.04] hover:overflow-visible hover:shadow-xl focus-visible:z-30 focus-visible:scale-[1.04] focus-visible:overflow-visible focus-visible:shadow-xl focus-visible:outline-none",
                             typeColor[s.session_type] ?? typeColor["other"],
                             live && "ring-2 ring-primary shadow-lg",
                           )}
