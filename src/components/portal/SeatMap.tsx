@@ -343,6 +343,45 @@ export function SeatMap() {
         </div>
       </div>
 
+      {hover && (
+        <div
+          className="pointer-events-none fixed z-50 w-56 -translate-x-1/2 rounded-lg border bg-popover p-3 text-popover-foreground shadow-lg"
+          style={{
+            left: Math.min(Math.max(hover.x, 120), (typeof window !== "undefined" ? window.innerWidth : 1000) - 120),
+            top: Math.max(hover.y - 8, 8),
+            transform: "translate(-50%, -100%)",
+          }}
+        >
+          <p className="text-[11px] font-bold text-muted-foreground">
+            صف {hover.row} · مقعد {hover.col} · {area}
+          </p>
+          {hover.seat ? (
+            <div className="mt-1 space-y-0.5">
+              <p className="text-sm font-bold leading-tight">{hover.seat.name}</p>
+              {hover.seat.organization && (
+                <p className="text-xs text-muted-foreground">{hover.seat.organization}</p>
+              )}
+              {hover.seat.inviteeType && (
+                <p className="text-xs text-muted-foreground">
+                  التصنيف: {TYPE_LABELS[hover.seat.inviteeType] ?? hover.seat.inviteeType}
+                </p>
+              )}
+              {hover.seat.phone && (
+                <p className="text-xs text-muted-foreground" dir="ltr">
+                  {hover.seat.phone}
+                </p>
+              )}
+              <p className="pt-1 text-xs font-semibold">
+                {hover.seat.present ? "✅ مسجّل الحضور" : "⏳ لم يسجّل الحضور"}
+              </p>
+            </div>
+          ) : (
+            <p className="mt-1 text-sm font-semibold">مقعد شاغر</p>
+          )}
+        </div>
+      )}
+
+
       <Dialog
         open={!!picker}
         onOpenChange={(o) => {
