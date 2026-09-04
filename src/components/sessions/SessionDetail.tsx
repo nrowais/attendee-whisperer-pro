@@ -220,11 +220,43 @@ export function SessionDetail({
                             {canEdit && ops?.phone ? ` — ${ops.phone}` : ""}
                           </p>
                         </div>
-                        <Badge variant={p.match_status === "needs_matching" ? "destructive" : "secondary"}>
-                          {p.match_status === "needs_matching"
-                            ? "يحتاج مطابقة"
-                            : (opStatusLabels[ops?.status ?? "not_arrived"] ?? "لم يصل")}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          {p.speaker_id && canEditOps ? (
+                            (() => {
+                              const arrived = (ops?.status ?? "not_arrived") !== "not_arrived";
+                              return (
+                                <Button
+                                  size="sm"
+                                  variant={arrived ? "outline" : "default"}
+                                  className="h-7 gap-1 px-2 text-[11px]"
+                                  disabled={arrival.isPending}
+                                  onClick={() =>
+                                    arrival.mutate({
+                                      speakerId: p.speaker_id!,
+                                      arrived: !arrived,
+                                      eventId: session.event_id,
+                                    })
+                                  }
+                                >
+                                  {arrived ? (
+                                    <>
+                                      <Undo2 className="size-3.5" /> تراجع
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCircle2 className="size-3.5" /> وصل
+                                    </>
+                                  )}
+                                </Button>
+                              );
+                            })()
+                          ) : null}
+                          <Badge variant={p.match_status === "needs_matching" ? "destructive" : "secondary"}>
+                            {p.match_status === "needs_matching"
+                              ? "يحتاج مطابقة"
+                              : (opStatusLabels[ops?.status ?? "not_arrived"] ?? "لم يصل")}
+                          </Badge>
+                        </div>
                       </li>
                     );
                   })}
