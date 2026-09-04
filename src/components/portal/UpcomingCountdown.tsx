@@ -387,30 +387,27 @@ export function UpcomingCountdown() {
         .maybeSingle();
 
       if (withPdf && inserted?.ticket_no) {
-        openCardPdf(
-          {
-            cardType: draft.cardType,
-            guestName: draft.guestName,
-            terminal: draft.terminal,
-            receiverName: draft.receiverName,
-            receiverPhone: draft.receiverPhone,
-            flightDate: draft.flightDate || splitDateTime(item.at).date,
-            flightTime: draft.flightTime || splitDateTime(item.at).time,
-            flightNo: draft.flightNo,
-            driverName: driver?.full_name ?? "",
-            driverPhone: driver?.phone ?? "",
-            vehicle: vehicleText,
-            pickup: draft.pickup,
-            dropoff: draft.dropoff,
-            ticketNo: "",
-            cardNo: card?.card_no ? String(card.card_no) : "",
-            hotelName: draft.hotelName,
-            hotelLocation: draft.hotelLocation,
-            hotelMapUrl: draft.hotelMapUrl,
-            notes: draft.notes,
-          },
-          card?.card_no ?? inserted.ticket_no,
-        );
+        openCardPdf({
+          cardType: draft.cardType,
+          guestName: draft.guestName,
+          terminal: draft.terminal,
+          receiverName: draft.receiverName,
+          receiverPhone: draft.receiverPhone,
+          flightDate: draft.flightDate || splitDateTime(item.at).date,
+          flightTime: draft.flightTime || splitDateTime(item.at).time,
+          flightNo: draft.flightNo,
+          driverName: driver?.full_name ?? "",
+          driverPhone: driver?.phone ?? "",
+          vehicle: vehicleText,
+          pickup: draft.pickup,
+          dropoff: draft.dropoff,
+          ticketNo: String(inserted.ticket_no),
+          cardNo: card?.card_no ? String(card.card_no) : "",
+          hotelName: draft.hotelName,
+          hotelLocation: draft.hotelLocation,
+          hotelMapUrl: draft.hotelMapUrl,
+          notes: draft.notes,
+        });
       }
       return inserted;
     },
