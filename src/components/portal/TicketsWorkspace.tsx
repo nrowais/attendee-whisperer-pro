@@ -184,10 +184,6 @@ export function TicketsWorkspace() {
               ربط السائقين والمركبات بالرحلات المجدولة والفعلية، وتنعكس مباشرة في{" "}
               <Link to="/speakers" className="font-semibold text-primary underline-offset-4 hover:underline">
                 لوحة الحالات
-              </Link>{" "}
-              و{" "}
-              <Link to="/fleet" className="font-semibold text-primary underline-offset-4 hover:underline">
-                صفحة الأسطول
               </Link>
               .
             </p>
