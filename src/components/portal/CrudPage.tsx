@@ -138,6 +138,7 @@ export function CrudPage({
   const refFields = fields.filter((f) => f.type === "ref");
   const statusField = fields.find((f) => f.type === "select" && f.badge);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [overlapFilter, setOverlapFilter] = useState("hide");
 
   const rowsQuery = useQuery({
     queryKey: ["crud", table],
@@ -192,9 +193,19 @@ export function CrudPage({
   }, [rows, search, listFields, refMaps]);
 
   const visible = useMemo(() => {
-    if (!statusField || statusFilter === "all") return filtered;
-    return filtered.filter((row) => row[statusField.key] === statusFilter);
-  }, [filtered, statusField, statusFilter]);
+    let out = filtered;
+    if (statusField && statusFilter !== "all") {
+      out = out.filter((row) => row[statusField.key] === statusFilter);
+    }
+    if (overlapCheck) {
+      if (overlapFilter === "hide") {
+        out = out.filter((row) => !overlapCheck(row[overlapNameKey]));
+      } else if (overlapFilter === "only") {
+        out = out.filter((row) => overlapCheck(row[overlapNameKey]));
+      }
+    }
+    return out;
+  }, [filtered, statusField, statusFilter, overlapCheck, overlapFilter, overlapNameKey]);
 
   const saveMutation = useMutation({
     mutationFn: async (values: Row) => {
