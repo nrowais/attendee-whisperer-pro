@@ -38,8 +38,19 @@ type SeatData = {
   inviteeId: string;
   name: string;
   organization: string | null;
+  inviteeType: string | null;
+  phone: string | null;
+  status: string | null;
   present: boolean;
 };
+
+const TYPE_LABELS: Record<string, string> = {
+  vip: "كبار الشخصيات",
+  guest: "ضيف",
+  media: "إعلام",
+  staff: "فريق عمل",
+};
+
 
 function useSeatData() {
   return useQuery({
