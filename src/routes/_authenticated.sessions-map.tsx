@@ -377,7 +377,7 @@ function SessionsMapScreen() {
           <span>
             انتهت:{" "}
             <b className="text-foreground">
-              {daySessions.filter((s) => timePhase(s, now).kind === "done").length}
+              {daySessions.filter((s) => timePhase(s, now).kind === "ended").length}
             </b>
           </span>
         </div>
