@@ -34,6 +34,7 @@ type CalItem = {
   time?: string;
   title: string;
   subtitle?: string;
+  status?: string;
 };
 
 const kindMeta: Record<Kind, { label: string; className: string }> = {
@@ -42,6 +43,23 @@ const kindMeta: Record<Kind, { label: string; className: string }> = {
   departure: { label: "مغادرة", className: "bg-amber-500/15 text-amber-600 border-amber-500/30" },
   trip: { label: "نقل", className: "bg-sky-500/15 text-sky-600 border-sky-500/30" },
 };
+
+const statusLabels: Record<string, string> = {
+  scheduled: "مجدول",
+  expected: "متوقع",
+  arrived: "تم الوصول",
+  landed: "هبطت الطائرة",
+  received: "تم الاستلام",
+  departed: "غادر",
+  completed: "مكتمل",
+  cancelled: "ملغي",
+  in_progress: "جارٍ",
+};
+
+function statusLabel(status?: string) {
+  if (!status) return undefined;
+  return statusLabels[status] ?? status;
+}
 
 const weekDays = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
 
@@ -74,17 +92,17 @@ function useMonthItems(from: Date, to: Date) {
           .lte("starts_at", toIso),
         db
           .from("speaker_arrivals")
-          .select("id, arrival_time, arrival_point, speakers(full_name)")
+          .select("id, arrival_time, arrival_point, status, speakers(full_name)")
           .gte("arrival_time", fromIso)
           .lte("arrival_time", toIso),
         db
           .from("speaker_departures")
-          .select("id, departure_time, departure_point, speakers(full_name)")
+          .select("id, departure_time, departure_point, status, speakers(full_name)")
           .gte("departure_time", fromIso)
           .lte("departure_time", toIso),
         db
           .from("transport_trips")
-          .select("id, scheduled_at, pickup_location, dropoff_location, speakers(full_name)")
+          .select("id, scheduled_at, pickup_location, dropoff_location, status, speakers(full_name)")
           .gte("scheduled_at", fromIso)
           .lte("scheduled_at", toIso),
       ]);
