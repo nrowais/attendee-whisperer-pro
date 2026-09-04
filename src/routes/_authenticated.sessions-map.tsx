@@ -215,7 +215,12 @@ function SessionsMapScreen() {
             </div>
 
             {/* صفوف المسارات */}
-            {(tracks ?? []).map((track) => {
+            {[
+              ...(tracks ?? []),
+              ...(daySessions.some((s) => !s.track_id)
+                ? [{ id: "__all__", code: "ALL", name_ar: "فعاليات عامة", name_en: null, sort_order: 999 }]
+                : []),
+            ].map((track) => {
               const trackSessions = daySessions.filter((s) => s.track_id === track.id);
               const trackLive = trackSessions.some((s) => timePhase(s, now).kind === "live");
               return (
