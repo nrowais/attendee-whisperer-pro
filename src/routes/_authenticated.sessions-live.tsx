@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarDays, CircleDot, MonitorPlay, Users, X } from "lucide-react";
+import { CalendarDays, CircleDot, Map as MapIcon, MonitorPlay, Users, X } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -249,6 +249,11 @@ function LiveSessionsScreen() {
             >
               {riyadhClock(new Date(now))}
             </span>
+            <Button variant="outline" size="icon" asChild aria-label="خريطة الجلسات" className="size-11 rounded-2xl">
+              <Link to="/sessions-map">
+                <MapIcon className="size-5" />
+              </Link>
+            </Button>
             <Button variant="outline" size="icon" asChild aria-label="إغلاق" className="size-11 rounded-2xl">
               <Link to="/sessions">
                 <X className="size-5" />
