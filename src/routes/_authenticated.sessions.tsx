@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarRange, Map as MapIcon, Monitor, Plus, Search } from "lucide-react";
+import { CalendarRange, Plus, Search } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,8 @@ import { SessionEditDialog } from "@/components/sessions/SessionEditDialog";
 import { NowView } from "@/components/sessions/NowView";
 import { UpcomingView } from "@/components/sessions/UpcomingView";
 import { MatchingQueue } from "@/components/sessions/MatchingQueue";
+import { LiveScreen } from "@/components/sessions/LiveScreen";
+import { MapScreen } from "@/components/sessions/MapScreen";
 
 export const Route = createFileRoute("/_authenticated/sessions")({
   head: () => ({
@@ -54,6 +56,8 @@ export const Route = createFileRoute("/_authenticated/sessions")({
 
 const views = [
   { key: "map", label: "خريطة الجلسات" },
+  { key: "interactive", label: "الخريطة التفاعلية" },
+  { key: "live", label: "الشاشة المباشرة" },
   { key: "now", label: "الآن" },
   { key: "upcoming", label: "الجلسات القادمة" },
   { key: "matching", label: "مطابقة المتحدثين" },
@@ -139,16 +143,6 @@ function SessionsPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" asChild>
-            <Link to="/sessions-map">
-              <MapIcon className="size-4" /> الخريطة التفاعلية
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link to="/sessions-live">
-              <Monitor className="size-4" /> شاشة الجلسات المباشرة
-            </Link>
-          </Button>
           {canEdit ? (
             <Button
               onClick={() => {
@@ -209,7 +203,7 @@ function SessionsPage() {
         </div>
       ) : null}
 
-      {view !== "matching" ? (
+      {view !== "matching" && view !== "interactive" && view !== "live" ? (
         <div className="grid gap-2 md:grid-cols-4">
           <div className="relative md:col-span-2">
             <Search className="absolute inset-y-0 start-3 my-auto size-4 text-muted-foreground" />
