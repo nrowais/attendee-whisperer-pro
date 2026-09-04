@@ -221,7 +221,9 @@ function SessionsMapScreen() {
                 ? [{ id: "__all__", code: "ALL", name_ar: "فعاليات عامة", name_en: null, sort_order: 999 }]
                 : []),
             ].map((track) => {
-              const trackSessions = daySessions.filter((s) => s.track_id === track.id);
+              const trackSessions = daySessions.filter((s) =>
+                track.id === "__all__" ? !s.track_id : s.track_id === track.id,
+              );
               const trackLive = trackSessions.some((s) => timePhase(s, now).kind === "live");
               return (
                 <div key={track.id} className="flex border-b border-border last:border-b-0">
