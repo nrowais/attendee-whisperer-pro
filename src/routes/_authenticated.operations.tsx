@@ -159,7 +159,15 @@ function useOperationsData() {
     queryKey: ["operations-manage"],
     refetchInterval: 30_000,
     queryFn: async () => {
-      const [{ data: speakers }, { data: ops }, { data: trips }, { data: bookings }, { data: hotels }] =
+      const [
+        { data: speakers },
+        { data: ops },
+        { data: trips },
+        { data: bookings },
+        { data: hotels },
+        { data: arrivals },
+        { data: flights },
+      ] =
         await Promise.all([
           db.from("speakers").select("id, full_name, title, organization, country").order("full_name"),
           db.from("guest_operations").select("*"),
@@ -169,6 +177,8 @@ function useOperationsData() {
             .order("scheduled_at", { ascending: false }),
           db.from("hotel_bookings").select("id, speaker_id, hotel_id, check_in, check_out, status"),
           db.from("hotels").select("id, name"),
+          db.from("speaker_arrivals").select("speaker_id, arrival_time, flight_id, terminal"),
+          db.from("flights").select("id, arrival_time"),
         ]);
 
       const hotelNames = new Map((hotels ?? []).map((h: any) => [h.id, h.name]));
@@ -181,18 +191,35 @@ function useOperationsData() {
       (bookings ?? []).forEach((b: any) => {
         if (b.speaker_id && !bookingBy.has(b.speaker_id)) bookingBy.set(b.speaker_id, b);
       });
+      const flightById = new Map<string, any>((flights ?? []).map((f: any) => [f.id, f]));
+      const arrivalBy = new Map<string, string>();
+      (arrivals ?? []).forEach((a: any) => {
+        const flight = a.flight_id ? flightById.get(a.flight_id) : null;
+        const t = a.arrival_time ?? flight?.arrival_time;
+        if (t) arrivalBy.set(a.speaker_id, t);
+      });
 
-      return (speakers ?? []).map((s: any) => {
+      const rows = (speakers ?? []).map((s: any) => {
         const op: any = opsBy.get(s.id);
         const booking = bookingBy.get(s.id);
         return {
           ...s,
           op: op ?? null,
           opStatus: (op?.operational_status as string) ?? "scheduled",
+          arrivalAt: arrivalBy.get(s.id) ?? null,
           trip: tripBy.get(s.id) ?? null,
           booking: booking ? { ...booking, hotelName: hotelNames.get(booking.hotel_id) ?? "—" } : null,
         };
       });
+
+      rows.sort((a: any, b: any) => {
+        if (a.arrivalAt && b.arrivalAt) return new Date(a.arrivalAt).getTime() - new Date(b.arrivalAt).getTime();
+        if (a.arrivalAt) return -1;
+        if (b.arrivalAt) return 1;
+        return a.full_name.localeCompare(b.full_name, "ar");
+      });
+
+      return rows;
     },
   });
 }
@@ -205,6 +232,35 @@ function timeLabel(value?: string | null) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function arrivalDateLabel(value?: string | null) {
+  if (!value) return null;
+  return new Date(value).toLocaleString("ar-SA", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function statusCardClass(status: string) {
+  switch (status) {
+    case "arrived":
+      return "border-green-500/40 bg-green-50/60 dark:bg-green-950/20";
+    case "at_hotel":
+      return "border-amber-500/40 bg-amber-50/60 dark:bg-amber-950/20";
+    case "at_event":
+      return "border-green-600/40 bg-green-100/70 dark:bg-green-950/30";
+    case "in_transport":
+      return "border-blue-500/30 bg-blue-50/50 dark:bg-blue-950/20";
+    case "departed":
+      return "border-slate-400/30 bg-slate-50 dark:bg-slate-900/20";
+    default:
+      return "border-border bg-card";
+  }
 }
 
 function isActionDone(row: any, action: (typeof ACTIONS)[number]) {
@@ -384,8 +440,8 @@ function OperationsPage() {
               key={r.id}
               id={`op-row-${r.id}`}
               className={cn(
-                "space-y-3 rounded-xl border bg-card p-4 transition-colors duration-500",
-                highlighted === r.id ? "border-primary ring-2 ring-primary/30" : "border-border"
+                "space-y-3 rounded-xl border p-4 transition-colors duration-500",
+                highlighted === r.id ? "border-primary ring-2 ring-primary/30" : statusCardClass(r.opStatus)
               )}
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
@@ -394,6 +450,12 @@ function OperationsPage() {
                   <p className="truncate text-xs text-muted-foreground">
                     {[r.title, r.organization, r.country].filter(Boolean).join(" · ") || "—"}
                   </p>
+                  {r.arrivalAt && (
+                    <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-primary">
+                      <PlaneLanding className="h-3 w-3" />
+                      وصول: {arrivalDateLabel(r.arrivalAt)}
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-wrap items-center gap-1.5">
                   <Badge variant={r.opStatus === "cancelled" ? "destructive" : "secondary"}>
