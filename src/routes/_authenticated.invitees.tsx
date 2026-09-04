@@ -4,6 +4,7 @@ import { AttendanceBoard } from "@/components/portal/AttendanceBoard";
 import { SeatMap } from "@/components/portal/SeatMap";
 import { CrudPage } from "@/components/portal/CrudPage";
 import { Workspace } from "@/components/portal/Workspace";
+import { useSpeakerOverlap } from "@/hooks/useSpeakerOverlap";
 import {
   inviteeFields,
   invitationFields,
