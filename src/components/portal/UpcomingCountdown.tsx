@@ -29,7 +29,8 @@ import { useRoles } from "@/hooks/useAuth";
 import { buildDriverCardHtml, driverCardFileName, HOTELS, RECEIVERS, type DriverCardData } from "@/components/portal/DriverCardDialog";
 
 /** فتح نافذة طباعة بطاقة السائق — نفس قالب شاشة التذاكر */
-function openCardPdf(card: DriverCardData, fileNo: number | string) {
+function openCardPdf(card: DriverCardData) {
+  const fileName = driverCardFileName(card);
   const win = window.open("", "_blank", "width=900,height=700");
   if (!win) {
     toast.error("يرجى السماح بالنوافذ المنبثقة لتحميل البطاقة");
@@ -37,12 +38,12 @@ function openCardPdf(card: DriverCardData, fileNo: number | string) {
   }
   const html = buildDriverCardHtml(card).replace(
     "<title>بطاقة توجيه السائق</title>",
-    `<title>بطاقة-سائق-${String(fileNo)}</title>`,
+    `<title>${fileName}</title>`,
   );
   win.document.open();
   win.document.write(html);
   win.document.close();
-  win.document.title = `بطاقة-سائق-${String(fileNo)}`;
+  win.document.title = fileName;
 }
 
 const db = supabase as any;
