@@ -561,15 +561,22 @@ export function UpcomingCountdown() {
                   {hasTicket && (
                     <div className="flex shrink-0 flex-wrap items-center gap-1">
                       {item.ticketNos.map((no) => (
-                        <Badge
+                        <button
                           key={no}
-                          variant="default"
-                          className="gap-1 bg-primary text-primary-foreground"
-                          title="تذكرة نقل مصدرة"
+                          type="button"
+                          onClick={() => viewTicket.mutate(no)}
+                          disabled={viewTicket.isPending}
+                          title="استعراض التذكرة وإعادة تحميلها PDF"
+                          className="transition-transform hover:scale-105 disabled:opacity-50"
                         >
-                          <Ticket className="size-3" />
-                          #{no}
-                        </Badge>
+                          <Badge
+                            variant="default"
+                            className="cursor-pointer gap-1 bg-primary text-primary-foreground"
+                          >
+                            <Ticket className="size-3" />
+                            #{no}
+                          </Badge>
+                        </button>
                       ))}
                     </div>
                   )}
