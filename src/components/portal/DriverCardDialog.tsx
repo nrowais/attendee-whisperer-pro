@@ -50,6 +50,7 @@ export type DriverCardData = {
   hotelName?: string;
   hotelLocation?: string;
   hotelMapUrl?: string;
+  notes?: string;
 };
 
 export const HOTELS: Array<{ name: string; location: string; mapUrl?: string }> = [
@@ -191,6 +192,12 @@ export function buildDriverCardHtml(c: DriverCardData) {
   .maps-sub { text-align: center; font-size: 11px; color: #7d8ea8; margin-top: 5px; }
   .maps-sub a { color: #1d4677; word-break: break-all; }
   @media print { .maps-link { background: #0f2a4a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  .notes { margin-top: 12px; border: 1px solid #f7d9ac; background: #fff8ec;
+    border-right: 5px solid #f7a23b; border-radius: 10px; padding: 10px 14px; }
+  .notes .t { font-size: 12px; font-weight: 700; color: #b45309; margin: 0 0 4px; }
+  .notes p { margin: 0; font-size: 14px; font-weight: 600; color: #0f2a4a;
+    white-space: pre-wrap; line-height: 1.7; }
+  @media print { .notes { background: #fff8ec !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   footer { background: #f7f9fc; border-top: 1px solid #dbe3ee; padding: 8px 22px;
     font-size: 11px; color: #7d8ea8; text-align: center; display: flex;
     align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; }
@@ -212,6 +219,8 @@ export function buildDriverCardHtml(c: DriverCardData) {
       ${c.cardNo ? `<span class="ticket">رقم البطاقة: ${esc(String(c.cardNo))}</span>` : ""}
       ${c.ticketNo ? `<span class="ticket">رقم التذكرة: ${esc(c.ticketNo)}</span>` : ""}
       <table>${rows.map(row).join("")}${extra.map(row).join("")}</table>
+      ${c.notes && c.notes.trim() !== "" ? `
+      <div class="notes"><p class="t">ملاحظات</p><p>${esc(c.notes)}</p></div>` : ""}
       ${!isTrip && mapsUrl ? `
       <a class="maps-link" href="${mapsUrl}" target="_blank" rel="noopener">
         <span class="pin">📍</span> فتح موقع الفندق في خرائط قوقل
@@ -280,6 +289,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
     hotelName: "",
     hotelLocation: "",
     hotelMapUrl: "",
+    notes: "",
   });
 
   const [cardId, setCardId] = useState<string | null>(null);
@@ -369,6 +379,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       hotelName: trip?.hotel_name ?? "",
       hotelLocation: trip?.hotel_location ?? hotelMatch?.location ?? "",
       hotelMapUrl: trip?.hotel_map_url ?? hotelMatch?.mapUrl ?? "",
+      notes: trip?.notes ?? trip?.ticket_notes ?? "",
     });
 
     // استرجاع بطاقة محفوظة سابقاً لهذا الضيف/التذكرة (من نفس النوع)
@@ -494,6 +505,7 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
           flight_at: flightIso(),
           driver_id: driverId,
           vehicle_id: vehicleId,
+          notes: form.notes || null,
         })
         .eq("id", trip.id);
       if (error) throw error;
@@ -729,6 +741,15 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
               )}
             </>
           )}
+          <div className="space-y-1 sm:col-span-2">
+            <Label className="text-xs text-muted-foreground">ملاحظات (تظهر في البطاقة عند التصدير)</Label>
+            <textarea
+              className="flex min-h-[70px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              value={form.notes ?? ""}
+              placeholder="مثال: الضيف بحاجة إلى كرسي متحرك"
+              onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+            />
+          </div>
         </div>
 
         <DialogFooter className="gap-2 sm:justify-start">

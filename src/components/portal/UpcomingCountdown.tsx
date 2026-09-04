@@ -404,6 +404,7 @@ export function UpcomingCountdown() {
             hotelName: draft.hotelName,
             hotelLocation: draft.hotelLocation,
             hotelMapUrl: draft.hotelMapUrl,
+            notes: draft.notes,
           },
           card?.card_no ?? inserted.ticket_no,
         );
