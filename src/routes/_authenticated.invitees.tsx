@@ -30,6 +30,7 @@ export const Route = createFileRoute("/_authenticated/invitees")({
 });
 
 function InviteesWorkspace() {
+  const { isSpeaker } = useSpeakerOverlap();
   return (
     <Workspace
       title="الضيوف والمدعوون"
