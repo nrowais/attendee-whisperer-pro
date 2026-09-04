@@ -452,19 +452,19 @@ export function UpcomingCountdown() {
         vehicle: card.vehicle ?? "",
         pickup: card.pickup_location ?? "",
         dropoff: card.dropoff_location ?? "",
-        ticketNo: "",
-        cardNo: card.card_no ? String(card.card_no) : String(ticketNo),
+        ticketNo: String(ticketNo),
+        cardNo: card.card_no ? String(card.card_no) : "",
         hotelName: card.hotel_name ?? "",
         hotelLocation: card.hotel_location ?? "",
         hotelMapUrl: card.hotel_map_url ?? "",
         notes: card.notes ?? "",
       };
-      const no = card.card_no ? String(card.card_no) : String(ticketNo);
+      const fileName = driverCardFileName(data);
       const html = buildDriverCardHtml(data).replace(
         "<title>بطاقة توجيه السائق</title>",
-        `<title>بطاقة-سائق-${no}</title>`,
+        `<title>${fileName}</title>`,
       );
-      return { html, no };
+      return { html, fileName };
     },
     onSuccess: (v) => setViewing(v),
     onError: (e: any) => toast.error(e.message ?? "تعذر فتح التذكرة"),
@@ -480,7 +480,7 @@ export function UpcomingCountdown() {
     win.document.open();
     win.document.write(viewing.html);
     win.document.close();
-    win.document.title = `بطاقة-سائق-${viewing.no}`;
+    win.document.title = viewing.fileName;
   };
 
   useEffect(() => {
