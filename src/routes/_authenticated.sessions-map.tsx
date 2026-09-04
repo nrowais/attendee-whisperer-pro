@@ -321,7 +321,7 @@ function SessionsMapScreen() {
                           {/* تلميح عند التحويم */}
                           <div
                             className={cn(
-                              "pointer-events-none absolute bottom-full start-0 z-40 mb-2 hidden w-72 rounded-xl border border-border bg-popover p-3 text-start shadow-2xl",
+                              "pointer-events-none absolute top-full start-0 z-40 mt-2 hidden w-72 rounded-xl border border-border bg-popover p-3 text-start shadow-2xl",
                               "group-hover:block group-focus-visible:block",
                             )}
                           >
