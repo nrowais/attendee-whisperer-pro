@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRoles } from "@/hooks/useAuth";
-import { buildDriverCardHtml, HOTELS, RECEIVERS, type DriverCardData } from "@/components/portal/DriverCardDialog";
+import { buildDriverCardHtml, driverCardFileName, HOTELS, RECEIVERS, type DriverCardData } from "@/components/portal/DriverCardDialog";
 
 /** فتح نافذة طباعة بطاقة السائق — نفس قالب شاشة التذاكر */
 function openCardPdf(card: DriverCardData, fileNo: number | string) {
