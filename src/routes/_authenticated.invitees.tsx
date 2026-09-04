@@ -4,6 +4,7 @@ import { AttendanceBoard } from "@/components/portal/AttendanceBoard";
 import { SeatMap } from "@/components/portal/SeatMap";
 import { CrudPage } from "@/components/portal/CrudPage";
 import { Workspace } from "@/components/portal/Workspace";
+import { useSpeakerOverlap } from "@/hooks/useSpeakerOverlap";
 import {
   inviteeFields,
   invitationFields,
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/_authenticated/invitees")({
 });
 
 function InviteesWorkspace() {
+  const { isSpeaker } = useSpeakerOverlap();
   return (
     <Workspace
       title="الضيوف والمدعوون"
@@ -58,6 +60,7 @@ function InviteesWorkspace() {
                   title="المدعوون"
                   subtitle="قائمة المدعوين"
                   fields={inviteeFields}
+                  overlapCheck={isSpeaker}
                 />
               ),
             },

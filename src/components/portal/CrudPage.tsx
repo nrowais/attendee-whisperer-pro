@@ -111,12 +111,17 @@ export function CrudPage({
   subtitle,
   fields,
   compact,
+  overlapCheck,
+  overlapNameKey = "full_name",
 }: {
   table: string;
   title: string;
   subtitle?: string;
   fields: Field[];
   compact?: boolean;
+  /** كشف السجلات المتداخلة مع قائمة أخرى (مثل المتحدثين) لتمييزها وفصلها دون حذف */
+  overlapCheck?: (name: string | null | undefined) => boolean;
+  overlapNameKey?: string;
 }) {
   const queryClient = useQueryClient();
   const { canEdit: canEditAll, canRegister, canDelete: canDeleteRole } = useRoles();
@@ -133,6 +138,7 @@ export function CrudPage({
   const refFields = fields.filter((f) => f.type === "ref");
   const statusField = fields.find((f) => f.type === "select" && f.badge);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [overlapFilter, setOverlapFilter] = useState("hide");
 
   const rowsQuery = useQuery({
     queryKey: ["crud", table],
@@ -187,9 +193,19 @@ export function CrudPage({
   }, [rows, search, listFields, refMaps]);
 
   const visible = useMemo(() => {
-    if (!statusField || statusFilter === "all") return filtered;
-    return filtered.filter((row) => row[statusField.key] === statusFilter);
-  }, [filtered, statusField, statusFilter]);
+    let out = filtered;
+    if (statusField && statusFilter !== "all") {
+      out = out.filter((row) => row[statusField.key] === statusFilter);
+    }
+    if (overlapCheck) {
+      if (overlapFilter === "hide") {
+        out = out.filter((row) => !overlapCheck(row[overlapNameKey]));
+      } else if (overlapFilter === "only") {
+        out = out.filter((row) => overlapCheck(row[overlapNameKey]));
+      }
+    }
+    return out;
+  }, [filtered, statusField, statusFilter, overlapCheck, overlapFilter, overlapNameKey]);
 
   const saveMutation = useMutation({
     mutationFn: async (values: Row) => {
@@ -290,6 +306,18 @@ export function CrudPage({
               </SelectContent>
             </Select>
           ) : null}
+          {overlapCheck ? (
+            <Select value={overlapFilter} onValueChange={setOverlapFilter}>
+              <SelectTrigger className="w-44">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hide">المدعوون فقط</SelectItem>
+                <SelectItem value="only">المتحدثون فقط</SelectItem>
+                <SelectItem value="all">الكل معًا</SelectItem>
+              </SelectContent>
+            </Select>
+          ) : null}
           {canEdit ? (
             <Button onClick={startCreate}>
               <Plus className="size-4" />
@@ -340,7 +368,17 @@ export function CrudPage({
                       {f.badge ? (
                         <Badge variant="secondary">{formatValue(row[f.key], f, refMaps)}</Badge>
                       ) : (
-                        <span className="line-clamp-1">{formatValue(row[f.key], f, refMaps)}</span>
+                        <span className="line-clamp-1">
+                          {formatValue(row[f.key], f, refMaps)}
+                          {overlapCheck && f.key === overlapNameKey && overlapCheck(row[overlapNameKey]) ? (
+                            <Badge
+                              variant="outline"
+                              className="ms-2 border-amber-500/60 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                            >
+                              متحدث
+                            </Badge>
+                          ) : null}
+                        </span>
                       )}
                     </TableCell>
                   ))}
