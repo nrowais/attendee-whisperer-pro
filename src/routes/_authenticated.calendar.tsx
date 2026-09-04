@@ -281,6 +281,7 @@ function CalendarPage() {
                       >
                         {it.time ? `${it.time} ` : ""}
                         {it.title}
+                        {it.status && it.status !== "arrived" && it.status !== "completed" ? ` · ${statusLabel(it.status)}` : ""}
                       </div>
                     ))}
                     {items.length > 3 && (
