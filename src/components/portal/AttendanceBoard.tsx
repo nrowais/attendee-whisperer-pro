@@ -556,6 +556,14 @@ export function AttendanceBoard() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="truncate font-semibold">{r.full_name}</span>
+                    {isSpeaker(r.full_name) ? (
+                      <Badge
+                        variant="outline"
+                        className="shrink-0 border-amber-500/60 bg-amber-500/10 text-[10px] text-amber-700 dark:text-amber-400"
+                      >
+                        متحدث
+                      </Badge>
+                    ) : null}
                     <Badge
                       variant="secondary"
                       className={cn("text-[11px]", TYPE_STYLES[r.invitee_type])}
