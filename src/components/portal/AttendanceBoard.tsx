@@ -16,6 +16,7 @@ import {
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useRoles } from "@/hooks/useAuth";
+import { useSpeakerOverlap } from "@/hooks/useSpeakerOverlap";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -144,10 +145,12 @@ export function AttendanceBoard() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data, isLoading } = useBoard();
+  const { isSpeaker } = useSpeakerOverlap();
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "present" | "absent">("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [speakerFilter, setSpeakerFilter] = useState<"all" | "guests" | "speakers">("all");
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -345,6 +348,9 @@ export function AttendanceBoard() {
       if (typeFilter !== "all" && r.invitee_type !== typeFilter) return false;
       if (filter === "present" && !r.attendanceId) return false;
       if (filter === "absent" && r.attendanceId) return false;
+      const sp = isSpeaker(r.full_name);
+      if (speakerFilter === "guests" && sp) return false;
+      if (speakerFilter === "speakers" && !sp) return false;
       if (!q) return true;
       return (
         normalize(r.full_name).includes(q) ||
@@ -352,7 +358,7 @@ export function AttendanceBoard() {
         (r.phone ?? "").includes(search.trim())
       );
     });
-  }, [rows, search, filter, typeFilter]);
+  }, [rows, search, filter, typeFilter, speakerFilter, isSpeaker]);
 
   const counts = useMemo(
     () => ({
@@ -427,6 +433,20 @@ export function AttendanceBoard() {
               {f.label}
             </Button>
           ))}
+
+          <Select
+            value={speakerFilter}
+            onValueChange={(v) => setSpeakerFilter(v as "all" | "guests" | "speakers")}
+          >
+            <SelectTrigger className="h-9 w-[150px]">
+              <SelectValue placeholder="القائمة" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">الكل معًا</SelectItem>
+              <SelectItem value="guests">المدعوون فقط</SelectItem>
+              <SelectItem value="speakers">المتحدثون فقط</SelectItem>
+            </SelectContent>
+          </Select>
 
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="h-9 w-[150px]">
