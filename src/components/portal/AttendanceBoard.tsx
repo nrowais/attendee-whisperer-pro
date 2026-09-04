@@ -688,6 +688,71 @@ export function AttendanceBoard() {
           </div>
         </div>
       )}
+
+      {/* بطاقة المقعد */}
+      <Dialog open={!!seatRow} onOpenChange={(o) => !o && setSeatRow(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>بطاقة المقعد</DialogTitle>
+          </DialogHeader>
+          {seatRow && (
+            <div className="space-y-4">
+              <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4 text-center">
+                <p className="text-sm text-accent-foreground">{data?.eventName ?? "حفل الافتتاح"}</p>
+                <p className="mt-1 text-xl font-bold">{seatRow.full_name}</p>
+                <p className="text-xs text-muted-foreground">{seatRow.organization ?? ""}</p>
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <div className="rounded-lg border bg-card p-3">
+                    <p className="text-xs text-muted-foreground">الصف</p>
+                    <p className="text-3xl font-extrabold">{seatForm.seat_row || "—"}</p>
+                  </div>
+                  <div className="rounded-lg border bg-card p-3">
+                    <p className="text-xs text-muted-foreground">رقم المقعد</p>
+                    <p className="text-3xl font-extrabold">{seatForm.seat_number || "—"}</p>
+                  </div>
+                </div>
+              </div>
+
+              {canRegister && (
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-1.5">
+                    <Label>القاعة/المنطقة</Label>
+                    <Input
+                      value={seatForm.seat_area}
+                      onChange={(e) => setSeatForm({ ...seatForm, seat_area: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>الصف</Label>
+                    <Input
+                      value={seatForm.seat_row}
+                      onChange={(e) => setSeatForm({ ...seatForm, seat_row: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>رقم المقعد</Label>
+                    <Input
+                      value={seatForm.seat_number}
+                      onChange={(e) => setSeatForm({ ...seatForm, seat_number: e.target.value })}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter className="gap-2">
+            {canRegister && (
+              <Button onClick={() => saveSeat.mutate()} disabled={saveSeat.isPending}>
+                حفظ
+              </Button>
+            )}
+            <Button variant="outline" className="gap-1" onClick={printSeatCard}>
+              <Printer className="size-4" />
+              طباعة / PDF
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
