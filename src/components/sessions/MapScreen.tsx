@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, Map as MapIcon, MonitorPlay, X } from "lucide-react";
+import { CalendarDays, Map as MapIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   conferenceDays,
   fmtTime,
@@ -44,7 +43,7 @@ function toMin(time?: string | null) {
   return h * 60 + m;
 }
 
-export function MapScreen() {
+export function MapScreen({ embedded }: { embedded?: boolean }) {
   const { data: tracks } = useTracks();
   const { data: allSessions } = useSessions();
   const { data: opsMap } = useSpeakerOps();
@@ -104,7 +103,7 @@ export function MapScreen() {
   const eventId = daySessions.find((s) => s.event_id)?.event_id ?? null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-background" dir="rtl">
+    <div className={cn("flex flex-col bg-background", !embedded && "fixed inset-0 z-50 overflow-y-auto")} dir="rtl">
       {/* Header */}
       <header className="border-b border-border bg-card/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-[1400px] flex-wrap items-center justify-between gap-4 px-6 py-4">
@@ -147,16 +146,6 @@ export function MapScreen() {
             >
               {riyadhClock(new Date(now))}
             </span>
-            <Button variant="outline" size="icon" asChild aria-label="الشاشة المباشرة" className="size-11 rounded-2xl">
-              <Link to="/sessions-live">
-                <MonitorPlay className="size-5" />
-              </Link>
-            </Button>
-            <Button variant="outline" size="icon" asChild aria-label="إغلاق" className="size-11 rounded-2xl">
-              <Link to="/sessions">
-                <X className="size-5" />
-              </Link>
-            </Button>
           </div>
         </div>
       </header>
