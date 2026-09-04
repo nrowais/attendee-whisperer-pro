@@ -5,7 +5,6 @@ import {
   Plane,
   BarChart3,
   CalendarDays,
-  ClipboardPlus,
   Car,
   Ticket,
   ListChecks,
@@ -21,7 +20,7 @@ export type NavItem = { to: string; label: string; icon: LucideIcon; hint?: stri
 export const navItems: NavItem[] = [
   { to: "/dashboard", label: "المتابعة اللحظية", icon: Activity, hint: "الأرقام والحالة الآن" },
   { to: "/calendar", label: "التقويم", icon: CalendarDays, hint: "كل المواعيد في شهر واحد" },
-  { to: "/daily", label: "الإدخال اليومي", icon: ClipboardPlus, hint: "نقل وإقامة يوماً بيوم" },
+  
 
   { to: "/operations", label: "الحالة التشغيلية", icon: ListChecks, hint: "تسجيل الوصول والنقل والفندق والمغادرة" },
   

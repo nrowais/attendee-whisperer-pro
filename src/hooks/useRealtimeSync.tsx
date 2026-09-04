@@ -52,8 +52,6 @@ const GLOBAL_KEYS = [
   "hotel-checkin-board",
   "transport-tickets",
   "fleet-trips",
-  "daily-entry",
-  "daily-lookups",
   "calendar",
   "attendance-board",
   "todays-sessions",
