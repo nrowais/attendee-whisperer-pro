@@ -149,6 +149,18 @@ export function AttendanceBoard() {
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
+  const [seatRow, setSeatRow] = useState<Row | null>(null);
+  const [seatForm, setSeatForm] = useState({ seat_area: "", seat_row: "", seat_number: "" });
+
+  const openSeat = (r: Row) => {
+    setSeatRow(r);
+    setSeatForm({
+      seat_area: r.seatArea ?? "",
+      seat_row: r.seatRow ?? "",
+      seat_number: r.seatNumber ?? "",
+    });
+  };
+
   const [addOpen, setAddOpen] = useState(false);
   const [newGuest, setNewGuest] = useState({
     full_name: "",
