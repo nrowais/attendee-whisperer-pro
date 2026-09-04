@@ -423,6 +423,65 @@ export function UpcomingCountdown() {
     onError: (e: any) => toast.error(e.message ?? "تعذر إنشاء التذكرة"),
   });
 
+  // استعراض تذكرة مصدرة وإعادة تحميلها PDF
+  const [viewing, setViewing] = useState<{ html: string; no: string } | null>(null);
+
+  const viewTicket = useMutation({
+    mutationFn: async (ticketNo: number) => {
+      const { data: card, error } = await db
+        .from("driver_cards")
+        .select("*")
+        .eq("ticket_no", String(ticketNo))
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      if (!card) throw new Error("لا توجد بطاقة محفوظة لهذه التذكرة");
+      const { date, time } = splitDateTime(card.flight_at ?? null);
+      const data: DriverCardData = {
+        cardType: card.card_type ?? "airport",
+        guestName: card.guest_name ?? "",
+        terminal: card.terminal ?? "",
+        receiverName: card.receiver_name ?? "",
+        receiverPhone: card.receiver_phone ?? "",
+        flightDate: date,
+        flightTime: time,
+        flightNo: card.flight_no ?? "",
+        driverName: card.driver_name ?? "",
+        driverPhone: card.driver_phone ?? "",
+        vehicle: card.vehicle ?? "",
+        pickup: card.pickup_location ?? "",
+        dropoff: card.dropoff_location ?? "",
+        ticketNo: "",
+        cardNo: card.card_no ? String(card.card_no) : String(ticketNo),
+        hotelName: card.hotel_name ?? "",
+        hotelLocation: card.hotel_location ?? "",
+        hotelMapUrl: card.hotel_map_url ?? "",
+        notes: card.notes ?? "",
+      };
+      const no = card.card_no ? String(card.card_no) : String(ticketNo);
+      const html = buildDriverCardHtml(data).replace(
+        "<title>بطاقة توجيه السائق</title>",
+        `<title>بطاقة-سائق-${no}</title>`,
+      );
+      return { html, no };
+    },
+    onSuccess: (v) => setViewing(v),
+    onError: (e: any) => toast.error(e.message ?? "تعذر فتح التذكرة"),
+  });
+
+  const downloadViewing = () => {
+    if (!viewing) return;
+    const win = window.open("", "_blank", "width=900,height=700");
+    if (!win) {
+      toast.error("يرجى السماح بالنوافذ المنبثقة لتحميل البطاقة");
+      return;
+    }
+    win.document.open();
+    win.document.write(viewing.html);
+    win.document.close();
+  };
+
   useEffect(() => {
     for (const item of items) {
       const diff = new Date(item.at).getTime() - tick;
@@ -502,15 +561,22 @@ export function UpcomingCountdown() {
                   {hasTicket && (
                     <div className="flex shrink-0 flex-wrap items-center gap-1">
                       {item.ticketNos.map((no) => (
-                        <Badge
+                        <button
                           key={no}
-                          variant="default"
-                          className="gap-1 bg-primary text-primary-foreground"
-                          title="تذكرة نقل مصدرة"
+                          type="button"
+                          onClick={() => viewTicket.mutate(no)}
+                          disabled={viewTicket.isPending}
+                          title="استعراض التذكرة وإعادة تحميلها PDF"
+                          className="transition-transform hover:scale-105 disabled:opacity-50"
                         >
-                          <Ticket className="size-3" />
-                          #{no}
-                        </Badge>
+                          <Badge
+                            variant="default"
+                            className="cursor-pointer gap-1 bg-primary text-primary-foreground"
+                          >
+                            <Ticket className="size-3" />
+                            #{no}
+                          </Badge>
+                        </button>
                       ))}
                     </div>
                   )}
@@ -539,6 +605,34 @@ export function UpcomingCountdown() {
         )}
         </>
       )}
+
+      {/* حوار استعراض تذكرة مصدرة وإعادة تحميلها */}
+      <Dialog open={!!viewing} onOpenChange={(v) => !v && setViewing(null)}>
+        <DialogContent dir="rtl" className="max-h-[90vh] sm:max-w-3xl">
+          <DialogHeader className="text-right">
+            <DialogTitle className="flex items-center gap-2">
+              <Ticket className="size-4 text-primary" />
+              استعراض بطاقة السائق #{viewing?.no}
+            </DialogTitle>
+            <DialogDescription>
+              معاينة البطاقة كما ستُطبع، مع إمكانية إعادة تحميلها بصيغة PDF.
+            </DialogDescription>
+          </DialogHeader>
+          {viewing && (
+            <iframe
+              title={`بطاقة-سائق-${viewing.no}`}
+              srcDoc={viewing.html}
+              className="h-[55vh] w-full rounded-lg border border-border bg-white"
+            />
+          )}
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setViewing(null)}>
+              إغلاق
+            </Button>
+            <Button onClick={downloadViewing}>إعادة تحميل PDF</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* حوار مراجعة تذكرة النقل قبل الإصدار */}
       <Dialog open={!!draft} onOpenChange={(v) => !v && setDraft(null)}>
