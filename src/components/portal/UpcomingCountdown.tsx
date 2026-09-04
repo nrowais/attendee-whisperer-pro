@@ -424,7 +424,7 @@ export function UpcomingCountdown() {
   });
 
   // استعراض تذكرة مصدرة وإعادة تحميلها PDF
-  const [viewing, setViewing] = useState<{ html: string; fileName: string } | null>(null);
+  const [viewing, setViewing] = useState<{ html: string; fileName: string; no: string } | null>(null);
 
   const viewTicket = useMutation({
     mutationFn: async (ticketNo: number) => {
