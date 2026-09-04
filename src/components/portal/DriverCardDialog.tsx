@@ -439,6 +439,8 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       speakerId = match?.[0]?.id ?? null;
     }
     const payload = {
+      // عند الارتباط بتذكرة نقل تحمل البطاقة نفس رقم التذكرة (تسلسل موحد)
+      ...(!cardId && trip?.ticket_no ? { card_no: trip.ticket_no } : {}),
       card_type: form.cardType,
       speaker_id: speakerId,
       trip_id: trip?.id ?? null,

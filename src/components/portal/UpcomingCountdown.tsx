@@ -362,6 +362,7 @@ export function UpcomingCountdown() {
       const { data: card } = await db
         .from("driver_cards")
         .insert({
+          card_no: inserted.ticket_no ?? undefined,
           card_type: draft.cardType,
           speaker_id: item.speakerId,
           trip_id: inserted.id,
