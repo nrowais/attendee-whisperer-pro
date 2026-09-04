@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useRoles } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import {
   completionGaps,
   fmtDuration,
