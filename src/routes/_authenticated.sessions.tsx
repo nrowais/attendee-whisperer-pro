@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarRange, Monitor, Plus, Search } from "lucide-react";
+import { CalendarRange, Map as MapIcon, Monitor, Plus, Search } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -139,6 +139,11 @@ function SessionsPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button variant="outline" asChild>
+            <Link to="/sessions-map">
+              <MapIcon className="size-4" /> الخريطة التفاعلية
+            </Link>
+          </Button>
           <Button variant="outline" asChild>
             <Link to="/sessions-live">
               <Monitor className="size-4" /> شاشة الجلسات المباشرة
