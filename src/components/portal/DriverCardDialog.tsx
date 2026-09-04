@@ -385,7 +385,6 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       pickup: trip?.pickup_location ?? "",
       dropoff: trip?.dropoff_location ?? "",
       ticketNo: trip?.ticket_no ? String(trip.ticket_no) : "",
-      cardNo: "",
       hotelName: trip?.hotel_name ?? "",
       hotelLocation: trip?.hotel_location ?? hotelMatch?.location ?? "",
       hotelMapUrl: trip?.hotel_map_url ?? hotelMatch?.mapUrl ?? "",
@@ -412,7 +411,6 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       setForm((f) => ({
         ...f,
         cardType: row.card_type === "trip" ? "trip" : "airport",
-        cardNo: String(row.card_no),
         guestName: row.guest_name ?? f.guestName,
         terminal: row.terminal ?? f.terminal,
         receiverName: row.receiver_name ?? f.receiverName,
@@ -449,8 +447,6 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       speakerId = match?.[0]?.id ?? null;
     }
     const payload = {
-      // عند الارتباط بتذكرة نقل تحمل البطاقة نفس رقم التذكرة (تسلسل موحد)
-      ...(!cardId && trip?.ticket_no ? { card_no: trip.ticket_no } : {}),
       card_type: form.cardType,
       speaker_id: speakerId,
       trip_id: trip?.id ?? null,
@@ -471,14 +467,13 @@ export function DriverCardDialog({ trip, canEdit = false, trigger, defaultType =
       hotel_map_url: form.hotelMapUrl || null,
     };
     const query = cardId
-      ? db.from("driver_cards").update(payload).eq("id", cardId).select("id, card_no").maybeSingle()
-      : db.from("driver_cards").insert(payload).select("id, card_no").maybeSingle();
+      ? db.from("driver_cards").update(payload).eq("id", cardId).select("id, ticket_no").maybeSingle()
+      : db.from("driver_cards").insert(payload).select("id, ticket_no").maybeSingle();
     const { data, error } = await query;
     if (error) throw error;
     if (data) {
       setCardId(data.id);
-      setForm((f) => ({ ...f, cardNo: String(data.card_no) }));
-      return { ...form, cardNo: String(data.card_no) };
+      return { ...form, ticketNo: data.ticket_no ? String(data.ticket_no) : form.ticketNo };
     }
     return form;
   };
