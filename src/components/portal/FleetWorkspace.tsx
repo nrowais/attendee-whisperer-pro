@@ -95,7 +95,7 @@ export function FleetWorkspace() {
   return (
     <div className="space-y-6" dir="rtl">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold text-foreground">السائقون والمركبات</h1>
+        <h2 className="text-lg font-bold text-foreground">السائقون والمركبات</h2>
         <p className="text-sm text-muted-foreground">
           إدارة أسطول النقل وتوزيعه على رحلات الوصول والمغادرة، مع انعكاس مباشر في{" "}
           <Link to="/speakers" className="font-semibold text-primary underline-offset-4 hover:underline">

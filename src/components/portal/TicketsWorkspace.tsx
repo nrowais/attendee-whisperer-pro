@@ -176,10 +176,10 @@ export function TicketsWorkspace() {
       <header className="space-y-1">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
-            <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
+            <h2 className="flex items-center gap-2 text-lg font-bold text-foreground">
               <Ticket className="h-6 w-6 text-primary" />
               تذاكر النقل
-            </h1>
+            </h2>
             <p className="text-sm text-muted-foreground">
               ربط السائقين والمركبات بالرحلات المجدولة والفعلية، وتنعكس مباشرة في{" "}
               <Link to="/speakers" className="font-semibold text-primary underline-offset-4 hover:underline">
