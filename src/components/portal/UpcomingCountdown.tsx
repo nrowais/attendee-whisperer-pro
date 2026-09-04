@@ -459,12 +459,13 @@ export function UpcomingCountdown() {
         hotelMapUrl: card.hotel_map_url ?? "",
         notes: card.notes ?? "",
       };
+      const no = card.card_no ? String(card.card_no) : String(ticketNo);
       const fileName = driverCardFileName(data);
       const html = buildDriverCardHtml(data).replace(
         "<title>بطاقة توجيه السائق</title>",
         `<title>${fileName}</title>`,
       );
-      return { html, fileName };
+      return { html, fileName, no };
     },
     onSuccess: (v) => setViewing(v),
     onError: (e: any) => toast.error(e.message ?? "تعذر فتح التذكرة"),
