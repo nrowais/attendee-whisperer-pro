@@ -300,20 +300,29 @@ export function SeatMap() {
                     <button
                       key={col}
                       type="button"
-                      title={seat ? `${seat.name}${seat.organization ? ` — ${seat.organization}` : ""}` : `مقعد شاغر ${col}`}
+                      onMouseEnter={(e) => {
+                        const r = e.currentTarget.getBoundingClientRect();
+                        setHover({ seat: seat ?? null, row, col, x: r.left + r.width / 2, y: r.top });
+                      }}
+                      onMouseLeave={() => setHover(null)}
                       onClick={() => canRegister && setPicker({ row, col })}
                       disabled={!canRegister}
                       className={cn(
-                        "flex size-9 items-center justify-center rounded-md border text-[11px] font-bold transition-all",
+                        "flex h-11 w-[4.5rem] flex-col items-center justify-center gap-0 overflow-hidden rounded-md border px-1 transition-all",
                         seat
                           ? seat.present
                             ? "border-primary bg-primary text-primary-foreground"
                             : "border-accent bg-accent/25 text-accent-foreground"
                           : "border-dashed border-border bg-muted/40 text-muted-foreground",
-                        canRegister && "hover:scale-110 hover:border-primary",
+                        canRegister && "hover:z-10 hover:scale-105 hover:border-primary",
                       )}
                     >
-                      {col}
+                      <span className="text-[11px] font-bold leading-none">{col}</span>
+                      {seat && (
+                        <span className="w-full truncate text-[7px] leading-tight opacity-90">
+                          {seat.name}
+                        </span>
+                      )}
                     </button>
                   );
                 })}
