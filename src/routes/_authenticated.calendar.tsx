@@ -34,6 +34,7 @@ type CalItem = {
   time?: string;
   title: string;
   subtitle?: string;
+  status?: string;
 };
 
 const kindMeta: Record<Kind, { label: string; className: string }> = {
@@ -42,6 +43,23 @@ const kindMeta: Record<Kind, { label: string; className: string }> = {
   departure: { label: "مغادرة", className: "bg-amber-500/15 text-amber-600 border-amber-500/30" },
   trip: { label: "نقل", className: "bg-sky-500/15 text-sky-600 border-sky-500/30" },
 };
+
+const statusLabels: Record<string, string> = {
+  scheduled: "مجدول",
+  expected: "متوقع",
+  arrived: "تم الوصول",
+  landed: "هبطت الطائرة",
+  received: "تم الاستلام",
+  departed: "غادر",
+  completed: "مكتمل",
+  cancelled: "ملغي",
+  in_progress: "جارٍ",
+};
+
+function statusLabel(status?: string) {
+  if (!status) return undefined;
+  return statusLabels[status] ?? status;
+}
 
 const weekDays = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
 
@@ -74,17 +92,17 @@ function useMonthItems(from: Date, to: Date) {
           .lte("starts_at", toIso),
         db
           .from("speaker_arrivals")
-          .select("id, arrival_time, arrival_point, speakers(full_name)")
+          .select("id, arrival_time, arrival_point, status, speakers(full_name)")
           .gte("arrival_time", fromIso)
           .lte("arrival_time", toIso),
         db
           .from("speaker_departures")
-          .select("id, departure_time, departure_point, speakers(full_name)")
+          .select("id, departure_time, departure_point, status, speakers(full_name)")
           .gte("departure_time", fromIso)
           .lte("departure_time", toIso),
         db
           .from("transport_trips")
-          .select("id, scheduled_at, pickup_location, dropoff_location, speakers(full_name)")
+          .select("id, scheduled_at, pickup_location, dropoff_location, status, speakers(full_name)")
           .gte("scheduled_at", fromIso)
           .lte("scheduled_at", toIso),
       ]);
@@ -113,6 +131,7 @@ function useMonthItems(from: Date, to: Date) {
             time: t.time,
             title: a.speakers?.full_name ?? "وصول متحدث",
             subtitle: a.arrival_point ?? undefined,
+            status: a.status ?? undefined,
           });
       }
       for (const d of departures.data ?? []) {
@@ -125,6 +144,7 @@ function useMonthItems(from: Date, to: Date) {
             time: t.time,
             title: d.speakers?.full_name ?? "مغادرة متحدث",
             subtitle: d.departure_point ?? undefined,
+            status: d.status ?? undefined,
           });
       }
       for (const tr of trips.data ?? []) {
@@ -137,6 +157,7 @@ function useMonthItems(from: Date, to: Date) {
             time: t.time,
             title: tr.speakers?.full_name ?? "رحلة نقل",
             subtitle: [tr.pickup_location, tr.dropoff_location].filter(Boolean).join(" ← "),
+            status: tr.status ?? undefined,
           });
       }
       return items.sort((x, y) => (x.time ?? "").localeCompare(y.time ?? ""));
@@ -260,6 +281,7 @@ function CalendarPage() {
                       >
                         {it.time ? `${it.time} ` : ""}
                         {it.title}
+                        {it.status && it.status !== "arrived" && it.status !== "completed" ? ` · ${statusLabel(it.status)}` : ""}
                       </div>
                     ))}
                     {items.length > 3 && (
@@ -298,6 +320,18 @@ function CalendarPage() {
                   <Badge variant="outline" className={kindMeta[it.kind].className}>
                     {kindMeta[it.kind].label}
                   </Badge>
+                  {statusLabel(it.status) && (
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        it.status === "scheduled" || it.status === "expected"
+                          ? "border-border text-muted-foreground"
+                          : "border-emerald-500/40 bg-emerald-500/10 text-emerald-600",
+                      )}
+                    >
+                      {statusLabel(it.status)}
+                    </Badge>
+                  )}
                 </div>
               </li>
             ))}
