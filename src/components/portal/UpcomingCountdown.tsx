@@ -481,6 +481,7 @@ export function UpcomingCountdown() {
     win.document.open();
     win.document.write(viewing.html);
     win.document.close();
+    win.document.title = `بطاقة-سائق-${viewing.no}`;
   };
 
   useEffect(() => {
