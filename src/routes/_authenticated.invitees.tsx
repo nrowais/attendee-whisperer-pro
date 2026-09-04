@@ -43,6 +43,11 @@ function InviteesWorkspace() {
               content: <AttendanceBoard />,
             },
             {
+              value: "seatmap",
+              label: "خريطة المقاعد",
+              content: <SeatMap />,
+            },
+            {
               value: "invitees",
               label: "المدعوون",
               content: (
