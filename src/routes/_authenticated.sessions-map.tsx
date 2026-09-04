@@ -71,6 +71,9 @@ function SessionsMapScreen() {
   const [detail, setDetail] = useState<SessionRow | null>(null);
   const [editing, setEditing] = useState<SessionRow | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [hoverTip, setHoverTip] = useState<{ top: number; left: number } | null>(null);
+
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
