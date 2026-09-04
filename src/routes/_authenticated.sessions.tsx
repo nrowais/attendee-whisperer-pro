@@ -258,7 +258,16 @@ function SessionsPage() {
           opsMap={opsMap}
           onOpen={setDetail}
         />
+      ) : view === "interactive" ? (
+        <div className="overflow-hidden rounded-2xl border border-border">
+          <MapScreen embedded />
+        </div>
+      ) : view === "live" ? (
+        <div className="overflow-hidden rounded-2xl border border-border">
+          <LiveScreen embedded />
+        </div>
       ) : view === "now" ? (
+
         <NowView sessions={filtered} tracks={tracks ?? []} now={now} opsMap={opsMap} onOpen={setDetail} />
       ) : view === "upcoming" ? (
         <UpcomingView sessions={filtered} tracks={tracks ?? []} now={now} opsMap={opsMap} onOpen={setDetail} />
