@@ -606,6 +606,34 @@ export function UpcomingCountdown() {
         </>
       )}
 
+      {/* حوار استعراض تذكرة مصدرة وإعادة تحميلها */}
+      <Dialog open={!!viewing} onOpenChange={(v) => !v && setViewing(null)}>
+        <DialogContent dir="rtl" className="max-h-[90vh] sm:max-w-3xl">
+          <DialogHeader className="text-right">
+            <DialogTitle className="flex items-center gap-2">
+              <Ticket className="size-4 text-primary" />
+              استعراض بطاقة السائق #{viewing?.no}
+            </DialogTitle>
+            <DialogDescription>
+              معاينة البطاقة كما ستُطبع، مع إمكانية إعادة تحميلها بصيغة PDF.
+            </DialogDescription>
+          </DialogHeader>
+          {viewing && (
+            <iframe
+              title={`بطاقة-سائق-${viewing.no}`}
+              srcDoc={viewing.html}
+              className="h-[55vh] w-full rounded-lg border border-border bg-white"
+            />
+          )}
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setViewing(null)}>
+              إغلاق
+            </Button>
+            <Button onClick={downloadViewing}>إعادة تحميل PDF</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* حوار مراجعة تذكرة النقل قبل الإصدار */}
       <Dialog open={!!draft} onOpenChange={(v) => !v && setDraft(null)}>
         <DialogContent dir="rtl" className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
