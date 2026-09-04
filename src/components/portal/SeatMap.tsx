@@ -60,7 +60,7 @@ function useSeatData() {
       const [{ data: events }, { data: invitees }, { data: invitations }, { data: attendance }] =
         await Promise.all([
           db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
-          db.from("invitees").select("id, full_name, organization, invitee_type"),
+          db.from("invitees").select("id, full_name, organization, invitee_type, phone"),
           db
             .from("invitations")
             .select("id, event_id, invitee_id, status, seat_area, seat_row, seat_number"),
