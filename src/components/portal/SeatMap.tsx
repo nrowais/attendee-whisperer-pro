@@ -332,30 +332,10 @@ export function SeatMap() {
             ))}
           </datalist>
         </div>
-        <div className="w-28 space-y-1.5">
-          <Label>عدد الصفوف</Label>
-          <Input
-            type="number"
-            min={1}
-            max={40}
-            value={rowsCount}
-            onChange={(e) => setRowsCount(Math.min(40, Math.max(1, Number(e.target.value) || 1)))}
-          />
-        </div>
-        <div className="w-28 space-y-1.5">
-          <Label>مقاعد الصف</Label>
-          <Input
-            type="number"
-            min={1}
-            max={40}
-            value={colsCount}
-            onChange={(e) => setColsCount(Math.min(40, Math.max(1, Number(e.target.value) || 1)))}
-          />
-        </div>
         <div className="flex items-center gap-2 pb-1">
           <Badge variant="secondary" className="gap-1">
             <Grid3x3 className="size-3" />
-            {rowsCount * colsCount} مقعد
+            {HALL_TOTAL} مقعد
           </Badge>
           <Badge className="gap-1 bg-accent text-accent-foreground">
             <Armchair className="size-3" />
@@ -365,64 +345,96 @@ export function SeatMap() {
       </div>
 
       <div className="overflow-x-auto rounded-xl border bg-card p-4">
-        <div className="mx-auto mb-5 w-2/3 rounded-b-2xl border-b-4 border-primary bg-primary/10 py-2 text-center text-sm font-semibold text-primary">
-          المنصة
+        <div className="mx-auto mb-6 w-2/3 min-w-[20rem] rounded-b-2xl border-b-4 border-primary bg-primary/10 py-2 text-center text-sm font-semibold tracking-widest text-primary">
+          المنصة · STAGE
         </div>
-        <div className="space-y-2">
-          {Array.from({ length: rowsCount }, (_, r) => r + 1).map((row) => (
-            <div key={row} className="flex items-center gap-2">
-              <span className="w-10 shrink-0 text-center text-xs font-bold text-muted-foreground">
-                صف {row}
+        <div className="min-w-max space-y-1.5" dir="ltr">
+          {HALL_ROWS.map((hallRow) => (
+            <div key={hallRow.label} className="flex items-center gap-2">
+              <span className="w-8 shrink-0 text-center text-xs font-bold text-primary">
+                {hallRow.label}
               </span>
-              <div className="flex flex-1 flex-wrap gap-1.5">
-                {Array.from({ length: colsCount }, (_, c) => c + 1).map((col) => {
-                  const seat = seatIndex.get(`${row}-${col}`);
+              <div className="flex flex-1 items-center justify-center gap-1">
+                {hallRow.cells.map((cell, idx) => {
+                  if (cell.kind === "table")
+                    return (
+                      <span
+                        key={`t-${idx}`}
+                        title="طاولة"
+                        className="size-7 shrink-0 rounded-full bg-foreground"
+                      />
+                    );
+                  if (cell.kind === "blank")
+                    return (
+                      <span
+                        key={`b-${idx}`}
+                        className="h-7 w-8 shrink-0 rounded-sm border border-amber-500 bg-amber-400"
+                      />
+                    );
+                  const col = cell.n;
+                  const s = seatIndex.get(`${hallRow.label}-${col}`);
                   return (
                     <button
-                      key={col}
+                      key={`s-${col}`}
                       type="button"
                       onMouseEnter={(e) => {
                         const r = e.currentTarget.getBoundingClientRect();
-                        setHover({ seat: seat ?? null, row, col, x: r.left + r.width / 2, y: r.top });
+                        setHover({
+                          seat: s ?? null,
+                          row: hallRow.label,
+                          col,
+                          x: r.left + r.width / 2,
+                          y: r.top,
+                        });
                       }}
                       onMouseLeave={() => setHover(null)}
-                      onClick={() => canRegister && setPicker({ row, col })}
+                      onClick={() => canRegister && setPicker({ row: hallRow.label, col })}
                       disabled={!canRegister}
                       className={cn(
-                        "flex h-11 w-[4.5rem] flex-col items-center justify-center gap-0 overflow-hidden rounded-md border px-1 transition-all",
-                        seat
-                          ? seat.present
+                        "flex h-9 w-8 shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm border px-0.5 transition-all",
+                        s
+                          ? s.present
                             ? "border-primary bg-primary text-primary-foreground"
-                            : "border-accent bg-accent/25 text-accent-foreground"
-                          : "border-dashed border-border bg-muted/40 text-muted-foreground",
-                        canRegister && "hover:z-10 hover:scale-105 hover:border-primary",
+                            : "border-accent bg-accent/30 text-accent-foreground"
+                          : "border-border bg-muted/50 text-muted-foreground",
+                        canRegister && "hover:z-10 hover:scale-125 hover:border-primary",
                       )}
                     >
-                      <span className="text-[11px] font-bold leading-none">{col}</span>
-                      {seat && (
-                        <span className="w-full truncate text-[7px] leading-tight opacity-90">
-                          {seat.name}
+                      <span className="text-[9px] font-bold leading-none">{col}</span>
+                      {s && (
+                        <span className="w-full truncate text-[5px] leading-tight opacity-90">
+                          {s.name}
                         </span>
                       )}
                     </button>
                   );
                 })}
               </div>
+              <span className="w-8 shrink-0 text-center text-[10px] font-semibold text-muted-foreground">
+                {hallRow.count}
+              </span>
             </div>
           ))}
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-4 border-t pt-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded border border-dashed bg-muted/40" /> شاغر
+            <span className="size-3 rounded-sm border bg-muted/50" /> شاغر
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded border border-accent bg-accent/25" /> محجوز
+            <span className="size-3 rounded-sm border border-accent bg-accent/30" /> محجوز
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded bg-primary" /> حاضر
+            <span className="size-3 rounded-sm bg-primary" /> حاضر
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="size-3 rounded-full bg-foreground" /> طاولة
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="size-3 rounded-sm border border-amber-500 bg-amber-400" /> مساحة محجوزة
           </span>
         </div>
       </div>
+
 
       {hover && (
         <div
