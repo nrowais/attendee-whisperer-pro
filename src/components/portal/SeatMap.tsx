@@ -221,7 +221,7 @@ export function SeatMap() {
   };
 
   const assign = useMutation({
-    mutationFn: async ({ inviteeId, row, col }: { inviteeId: string; row: number; col: number }) => {
+    mutationFn: async ({ inviteeId, row, col }: { inviteeId: string; row: string; col: number }) => {
       const eventId = data?.eventId;
       if (!eventId) throw new Error("لا توجد فعالية مسجّلة");
       const existing = (data?.invitations ?? []).find((v: any) => v.invitee_id === inviteeId);
@@ -266,7 +266,7 @@ export function SeatMap() {
   });
 
   const createAndAssign = useMutation({
-    mutationFn: async ({ row, col }: { row: number; col: number }) => {
+    mutationFn: async ({ row, col }: { row: string; col: number }) => {
       const eventId = data?.eventId;
       if (!eventId) throw new Error("لا توجد فعالية مسجّلة");
       const name = manual.name.trim();
