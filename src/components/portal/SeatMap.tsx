@@ -267,6 +267,58 @@ export function SeatMap() {
     return parts.length > 1 ? (parts[parts.length - 1] ?? name) : name;
   };
 
+  const printSeatCard = (seat: SeatData, row: string, col: number) => {
+    const esc = (s: string) =>
+      s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const logo =
+      typeof window !== "undefined" ? new URL(eventLogo, window.location.origin).href : eventLogo;
+    const win = window.open("", "_blank", "width=700,height=800");
+    if (!win) {
+      toast.error("تعذّر فتح نافذة الطباعة");
+      return;
+    }
+    win.document.write(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8">
+<title>كرت مقعد — ${esc(seat.name)}</title>
+<style>
+  @page { size: A5 portrait; margin: 10mm; }
+  * { box-sizing: border-box; font-family: "Segoe UI", Tahoma, Arial, sans-serif; }
+  body { margin: 0; color: #12233f; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .card { width: 100%; max-width: 380px; border: 2px solid #0e2a52; border-radius: 18px;
+    overflow: hidden; text-align: center; box-shadow: 0 6px 18px rgba(14,42,82,.12); }
+  .head { background: #0e2a52; padding: 18px 16px 14px; }
+  .head img { height: 64px; display: block; margin: 0 auto 8px; background: #fff;
+    border-radius: 10px; padding: 6px 10px; }
+  .head p { margin: 0; color: #f8c471; font-size: 13px; font-weight: 700; letter-spacing: .5px; }
+  .body { padding: 22px 16px 18px; background: #fff; }
+  .name { font-size: 22px; font-weight: 800; color: #0e2a52; margin: 0 0 4px; }
+  .org { font-size: 12px; color: #64748b; margin: 0 0 16px; }
+  .seat { display: inline-block; background: #fdf0dc; border: 2px solid #d97706; border-radius: 14px;
+    padding: 10px 26px; }
+  .seat .n { font-size: 34px; font-weight: 800; color: #d97706; line-height: 1; }
+  .seat .r { font-size: 12px; font-weight: 700; color: #92400e; margin-top: 4px; }
+  .foot { background: #0e2a52; color: #94a3b8; font-size: 10px; padding: 8px; }
+  .foot b { color: #f8c471; }
+</style></head><body>
+<div class="card">
+  <div class="head">
+    <img src="${logo}" alt="شعار الفعالية" />
+    <p>${esc(eventName)}</p>
+  </div>
+  <div class="body">
+    <p class="name">${esc(seat.name)}</p>
+    <p class="org">${seat.organization ? esc(seat.organization) : "&nbsp;"}</p>
+    <div class="seat">
+      <div class="n">${col}</div>
+      <div class="r">رقم المقعد — صف ${esc(row)}</div>
+    </div>
+  </div>
+  <div class="foot">${esc(area)} · <b>نفذ بواسطة نايف الرويس</b></div>
+</div>
+<script>window.onload = function () { setTimeout(function () { window.print(); }, 600); };<\/script>
+</body></html>`);
+    win.document.close();
+  };
+
   const exportSeatMapPdf = () => {
     const esc = (s: string) =>
       s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
