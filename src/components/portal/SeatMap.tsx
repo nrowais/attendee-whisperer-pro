@@ -171,15 +171,14 @@ export function SeatMap() {
   const { data, isLoading } = useSeatData();
 
   const [area, setArea] = useState(DEFAULT_AREA);
-  const [rowsCount, setRowsCount] = useState(8);
-  const [colsCount, setColsCount] = useState(12);
-  const [picker, setPicker] = useState<{ row: number; col: number } | null>(null);
+  const [picker, setPicker] = useState<{ row: string; col: number } | null>(null);
   const [pickerSearch, setPickerSearch] = useState("");
   const [manualOpen, setManualOpen] = useState(false);
   const [manual, setManual] = useState({ name: "", organization: "", phone: "", type: "guest" });
   const [hover, setHover] = useState<
-    { seat: SeatData | null; row: number; col: number; x: number; y: number } | null
+    { seat: SeatData | null; row: string; col: number; x: number; y: number } | null
   >(null);
+
 
   const seatIndex = useMemo(() => {
     const map = new Map<string, SeatData>();
