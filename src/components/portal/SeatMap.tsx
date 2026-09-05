@@ -211,6 +211,35 @@ export function SeatMap() {
     return map;
   }, [data, area]);
 
+  const colorMap = useMemo(() => {
+    const map = new Map<string, string>();
+    (data?.colors ?? []).forEach((c: any) => {
+      if (normalize(c.area ?? "") !== normalize(area)) return;
+      map.set(`${String(c.seat_row).trim()}-${String(c.seat_number).trim()}`, c.color);
+    });
+    return map;
+  }, [data, area]);
+
+  const setColor = useMutation({
+    mutationFn: async ({ row, col, color }: { row: string; col: number; color: string | null }) => {
+      const target = { area: area.trim() || DEFAULT_AREA, seat_row: String(row), seat_number: String(col) };
+      if (!color) {
+        const { error } = await db.from("seat_colors").delete().match(target);
+        if (error) throw error;
+      } else {
+        const { error } = await db
+          .from("seat_colors")
+          .upsert({ ...target, color }, { onConflict: "area,seat_row,seat_number" });
+        if (error) throw error;
+      }
+    },
+    onSuccess: (_d, vars) => {
+      invalidate();
+      toast.success(vars.color ? "تم تلوين المقعد" : "تمت إزالة اللون");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "تعذّر حفظ اللون"),
+  });
+
   const areas = useMemo(() => {
     const s = new Set<string>([DEFAULT_AREA]);
     (data?.invitations ?? []).forEach((v: any) => {
