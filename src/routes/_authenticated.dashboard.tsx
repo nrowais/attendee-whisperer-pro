@@ -376,18 +376,11 @@ function DashboardPage() {
           icon={PlaneLanding}
           label="تم وصولهم"
           value={`${data.arrived} / ${data.arrivalsTotal}`}
-          sub="من حركات الوصول المسجلة"
+          sub={`من حركات الوصول المسجلة — ${data.checkedIn} تم تسجيل دخولهم للفندق`}
           to="/movements"
         />
         <Kpi icon={UserCheck} label="الحضور المسجل" value={data.attendance} sub="تسجيل في الموقع" to="/invitees" />
         <Kpi icon={Car} label="رحلات النقل" value={data.tripsTotal} sub={`${data.tripsActive} جارية الآن`} to="/movements" />
-        <Kpi
-          icon={BedDouble}
-          label="حجوزات الإقامة"
-          value={data.bookingsTotal}
-          sub={`${data.checkedIn} تم تسجيل دخولهم`}
-          to="/hotels"
-        />
         <Kpi icon={ClipboardList} label="طلبات مفتوحة" value={data.requestsOpen} sub="بحاجة إلى متابعة" to="/speakers" />
         <Kpi icon={AlertTriangle} label="تنبيهات نشطة" value={data.alertsPending} sub="رحلات قريبة" to="/flight-alerts" />
       </div>
