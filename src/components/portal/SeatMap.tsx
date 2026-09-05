@@ -1,7 +1,10 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Armchair, CheckCircle2, FileDown, FileText, Grid3x3, Search, Trash2, UserPlus, X } from "lucide-react";
+import { Armchair, CheckCircle2, FileDown, FileText, Grid3x3, Printer, Search, Trash2, UserPlus, X } from "lucide-react";
+
+import eventLogo from "@/assets/event-logo-2026.png";
+import { eventName } from "@/lib/nav";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useRoles } from "@/hooks/useAuth";
