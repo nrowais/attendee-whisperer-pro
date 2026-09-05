@@ -648,16 +648,14 @@ ${rowsHtml}
                         });
                       }}
                       onMouseLeave={() => setHover(null)}
-                      onClick={() => canRegister && setPicker({ row: hallRow.label, col })}
-                      disabled={!canRegister}
+                      onClick={() => setPicker({ row: hallRow.label, col })}
                       className={cn(
-                        "flex h-9 w-8 shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm border px-0.5 transition-all",
+                        "flex h-9 w-8 shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm border px-0.5 transition-all hover:z-10 hover:scale-125 hover:border-primary",
                         s
                           ? s.present
                             ? "border-primary bg-primary text-primary-foreground"
                             : "border-accent bg-accent/30 text-accent-foreground"
                           : "border-border bg-muted/50 text-muted-foreground",
-                        canRegister && "hover:z-10 hover:scale-125 hover:border-primary",
                       )}
                     >
                       <span className="text-[9px] font-bold leading-none">{col}</span>
