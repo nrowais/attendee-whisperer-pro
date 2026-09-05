@@ -301,6 +301,70 @@ ${rowsHtml}
     win.document.close();
   };
 
+  const exportSeatTablePdf = () => {
+    const esc = (s: string) =>
+      s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    const rows: { row: string; col: number; seat: SeatData | undefined }[] = [];
+    HALL_ROWS.forEach((hallRow) => {
+      hallRow.cells.forEach((cell) => {
+        if (cell.kind !== "seat") return;
+        rows.push({ row: hallRow.label, col: cell.n, seat: seatIndex.get(`${hallRow.label}-${cell.n}`) });
+      });
+    });
+    rows.sort((a, b) => a.col - b.col);
+
+    const listHtml = rows
+      .map((r) => {
+        const name = r.seat ? esc(r.seat.name) : "—";
+        const org = r.seat && r.seat.organization ? esc(r.seat.organization) : "—";
+        const status = r.seat ? (r.seat.present ? "حاضر" : "مسجّل") : "شاغر";
+        return `<tr>
+          <td>${r.col}</td>
+          <td>${r.row}</td>
+          <td class="name">${name}</td>
+          <td>${org}</td>
+          <td>${status}</td>
+        </tr>`;
+      })
+      .join("");
+
+    const win = window.open("", "_blank", "width=900,height=800");
+    if (!win) {
+      toast.error("تعذّر فتح نافذة الطباعة");
+      return;
+    }
+    win.document.write(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8">
+<title>جدول المقاعد — ${esc(area)}</title>
+<style>
+  @page { size: A4 portrait; margin: 10mm; }
+  * { box-sizing: border-box; font-family: "Segoe UI", Tahoma, Arial, sans-serif; }
+  body { margin: 0; color: #12233f; }
+  h1 { font-size: 18px; margin: 0 0 4px; color: #0e2a52; }
+  .sub { font-size: 11px; color: #64748b; margin-bottom: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  th, td { border: 1px solid #cbd5e1; padding: 5px 7px; text-align: right; }
+  th { background: #0e2a52; color: #fff; font-weight: 700; }
+  tr:nth-child(even) { background: #f8fafc; }
+  td.name { font-weight: 600; }
+  .footer { margin-top: 14px; text-align: center; font-size: 10px; color: #94a3b8; }
+</style></head><body>
+<h1>جدول المقاعد — ${esc(area)}</h1>
+<p class="sub">إجمالي المقاعد: ${HALL_TOTAL} · المحجوز: ${seatIndex.size} · ${new Date().toLocaleString("ar-SA", { timeZone: "Asia/Riyadh" })}</p>
+<table>
+  <thead>
+    <tr><th>رقم المقعد</th><th>الصف</th><th>الاسم</th><th>الجهة</th><th>الحالة</th></tr>
+  </thead>
+  <tbody>
+    ${listHtml}
+  </tbody>
+</table>
+<p class="footer">نفذ بواسطة نايف الرويس</p>
+<script>window.onload = function () { setTimeout(function () { window.print(); }, 500); };<\/script>
+</body></html>`);
+    win.document.close();
+  };
+
   const assign = useMutation({
     mutationFn: async ({ inviteeId, row, col }: { inviteeId: string; row: string; col: number }) => {
       const eventId = data?.eventId;
