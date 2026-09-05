@@ -91,7 +91,7 @@ function PortalLayout() {
     isOperator || isFieldStaff
       ? navItems.filter((item) => item.to === "/operations")
       : isRegistration
-        ? navItems.filter((item) => item.to === "/invitees")
+        ? navItems.filter((item) => item.to === "/gate" || item.to === "/invitees")
         : navItems.filter((item) => !item.adminOnly || isAdmin);
 
   return (
