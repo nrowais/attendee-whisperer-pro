@@ -220,6 +220,87 @@ export function SeatMap() {
     queryClient.invalidateQueries({ queryKey: ["attendance-board"] });
   };
 
+  const familyName = (name: string) => {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    return parts.length > 1 ? parts[parts.length - 1] : name;
+  };
+
+  const exportSeatMapPdf = () => {
+    const esc = (s: string) =>
+      s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    const rowsHtml = HALL_ROWS.map((hallRow) => {
+      const cells = hallRow.cells
+        .map((cell) => {
+          if (cell.kind === "table")
+            return `<span class="cell table" title="طاولة"></span>`;
+          if (cell.kind === "blank") return `<span class="cell blank"></span>`;
+          const s = seatIndex.get(`${hallRow.label}-${cell.n}`);
+          const cls = s ? (s.present ? "cell present" : "cell reserved") : "cell";
+          const label = s ? esc(familyName(s.name)) : "";
+          return `<span class="${cls}"><b>${cell.n}</b><i>${label}</i></span>`;
+        })
+        .join("");
+      return `<div class="row"><span class="rlabel">${hallRow.label}</span><div class="cells">${cells}</div><span class="rcount">${hallRow.count}</span></div>`;
+    }).join("");
+
+    const win = window.open("", "_blank", "width=1200,height=900");
+    if (!win) {
+      toast.error("تعذّر فتح نافذة الطباعة");
+      return;
+    }
+    win.document.write(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8">
+<title>خريطة المقاعد — ${esc(area)}</title>
+<style>
+  @page { size: A4 landscape; margin: 8mm; }
+  * { box-sizing: border-box; font-family: "Segoe UI", Tahoma, Arial, sans-serif; }
+  body { margin: 0; color: #12233f; }
+  h1 { font-size: 18px; margin: 0 0 2px; color: #0e2a52; }
+  .sub { font-size: 11px; color: #64748b; margin-bottom: 10px; }
+  .stage { width: 60%; margin: 0 auto 12px; padding: 5px; text-align: center; font-size: 12px;
+    font-weight: 700; letter-spacing: 3px; color: #0e2a52; background: #e8eef8;
+    border-bottom: 3px solid #0e2a52; border-radius: 0 0 12px 12px; }
+  .map { direction: ltr; }
+  .row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .rlabel { width: 30px; text-align: center; font-size: 10px; font-weight: 700; color: #0e2a52; }
+  .rcount { width: 30px; text-align: center; font-size: 9px; color: #64748b; }
+  .cells { flex: 1; display: flex; justify-content: center; gap: 3px; }
+  .cell { width: 26px; height: 28px; border: 1px solid #cbd5e1; border-radius: 3px;
+    background: #f8fafc; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; overflow: hidden; }
+  .cell b { font-size: 8px; line-height: 1; color: #475569; }
+  .cell i { font-style: normal; font-size: 7px; line-height: 1.15; font-weight: 600;
+    max-width: 100%; padding: 0 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cell.reserved { background: #fdf0dc; border-color: #d97706; }
+  .cell.reserved i { color: #92400e; }
+  .cell.present { background: #0e2a52; border-color: #0e2a52; }
+  .cell.present b, .cell.present i { color: #fff; }
+  .cell.table { width: 24px; height: 24px; border-radius: 50%; background: #12233f; border: none; align-self: center; }
+  .cell.blank { width: 28px; height: 24px; background: #fbbf24; border: 1px solid #d97706; align-self: center; }
+  .legend { display: flex; gap: 18px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #475569; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .sw { width: 12px; height: 12px; border-radius: 2px; border: 1px solid #cbd5e1; display: inline-block; }
+  .footer { margin-top: 12px; text-align: center; font-size: 10px; color: #94a3b8; }
+</style></head><body>
+<h1>خريطة المقاعد — ${esc(area)}</h1>
+<p class="sub">إجمالي المقاعد: ${HALL_TOTAL} · المحجوز: ${seatIndex.size} · ${new Date().toLocaleString("ar-SA", { timeZone: "Asia/Riyadh" })}</p>
+<div class="map" dir="ltr">
+<div class="stage">المنصة · STAGE</div>
+${rowsHtml}
+</div>
+<div class="legend">
+  <span><i class="sw" style="background:#f8fafc"></i> شاغر</span>
+  <span><i class="sw" style="background:#fdf0dc;border-color:#d97706"></i> محجوز</span>
+  <span><i class="sw" style="background:#0e2a52"></i> حاضر</span>
+  <span><i class="sw" style="background:#12233f;border-radius:50%"></i> طاولة</span>
+  <span><i class="sw" style="background:#fbbf24"></i> مساحة محجوزة</span>
+</div>
+<p class="footer">نفذ بواسطة نايف الرويس</p>
+<script>window.onload = function () { setTimeout(function () { window.print(); }, 500); };<\/script>
+</body></html>`);
+    win.document.close();
+  };
+
   const assign = useMutation({
     mutationFn: async ({ inviteeId, row, col }: { inviteeId: string; row: string; col: number }) => {
       const eventId = data?.eventId;
