@@ -169,13 +169,14 @@ function useSeatData() {
         invitees: invitees ?? [],
         invitations: (invitations ?? []).filter((v: any) => !eventId || v.event_id === eventId),
         present,
+        colors: colors ?? [],
       };
     },
   });
 }
 
 export function SeatMap() {
-  const { canRegister } = useRoles();
+  const { canRegister, isAdmin } = useRoles();
   const queryClient = useQueryClient();
   const { data, isLoading } = useSeatData();
 
