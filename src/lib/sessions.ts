@@ -331,11 +331,7 @@ export const opsGroups = [
 ] as const;
 
 export function opsBreakdown(statuses: (string | null | undefined)[]) {
-  const counts: Record<string, number> = { venue: 0, enroute: 0, hotel: 0, airport: 0, not_arrived: 0 };
-  for (const raw of statuses) {
-    const s = raw ?? "not_arrived";
-    const group = opsGroups.find((g) => (g.statuses as readonly string[]).includes(s));
-    counts[group?.key ?? "not_arrived"] = (counts[group?.key ?? "not_arrived"] ?? 0) + 1;
-  }
-  return { total: statuses.length, counts };
+  const total = statuses.length;
+  const notArrived = statuses.filter((raw) => (raw ?? "not_arrived") === "not_arrived").length;
+  return { total, arrived: total - notArrived, notArrived };
 }
