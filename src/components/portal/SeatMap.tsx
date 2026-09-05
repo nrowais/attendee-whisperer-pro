@@ -422,6 +422,10 @@ ${rowsHtml}
             <Armchair className="size-3" />
             {occupied} محجوز
           </Badge>
+          <Button variant="outline" size="sm" className="gap-1" onClick={exportSeatMapPdf}>
+            <FileDown className="size-4" />
+            تصدير PDF
+          </Button>
         </div>
       </div>
 
