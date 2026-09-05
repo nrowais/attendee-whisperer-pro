@@ -19,7 +19,6 @@ import {
   moderatorRoles,
   opStatusLabels,
   opsBreakdown,
-  opsGroups,
   participantRoleLabels,
   readinessClasses,
   sessionReadiness,
@@ -165,19 +164,19 @@ export function SessionDetail({
           ) : null}
 
           {!isBreak ? (
-            <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+            <div className="grid grid-cols-3 gap-2">
               <div className="rounded-xl border border-border bg-secondary/40 p-2 text-center">
                 <p className="text-lg font-bold tabular-nums text-foreground">{breakdown.total}</p>
                 <p className="text-[11px] text-muted-foreground">إجمالي المتحدثين</p>
               </div>
-              {opsGroups.map((g) => (
-                <div key={g.key} className="rounded-xl border border-border p-2 text-center">
-                  <p className="text-lg font-bold tabular-nums text-foreground">
-                    {breakdown.counts[g.key] ?? 0}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground">{g.label}</p>
-                </div>
-              ))}
+              <div className="rounded-xl border border-border p-2 text-center">
+                <p className="text-lg font-bold tabular-nums text-foreground">{breakdown.arrived}</p>
+                <p className="text-[11px] text-muted-foreground">وصل</p>
+              </div>
+              <div className="rounded-xl border border-border p-2 text-center">
+                <p className="text-lg font-bold tabular-nums text-foreground">{breakdown.notArrived}</p>
+                <p className="text-[11px] text-muted-foreground">لم يصل</p>
+              </div>
             </div>
           ) : null}
 
