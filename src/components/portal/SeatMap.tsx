@@ -648,16 +648,14 @@ ${rowsHtml}
                         });
                       }}
                       onMouseLeave={() => setHover(null)}
-                      onClick={() => canRegister && setPicker({ row: hallRow.label, col })}
-                      disabled={!canRegister}
+                      onClick={() => setPicker({ row: hallRow.label, col })}
                       className={cn(
-                        "flex h-9 w-8 shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm border px-0.5 transition-all",
+                        "flex h-9 w-8 shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm border px-0.5 transition-all hover:z-10 hover:scale-125 hover:border-primary",
                         s
                           ? s.present
                             ? "border-primary bg-primary text-primary-foreground"
                             : "border-accent bg-accent/30 text-accent-foreground"
                           : "border-border bg-muted/50 text-muted-foreground",
-                        canRegister && "hover:z-10 hover:scale-125 hover:border-primary",
                       )}
                     >
                       <span className="text-[9px] font-bold leading-none">{col}</span>
@@ -818,26 +816,30 @@ ${rowsHtml}
                   <Printer className="size-4" />
                   طباعة كرت المقعد
                 </Button>
-                <Button
-                  variant="destructive"
-                  className="gap-1"
-                  disabled={clear.isPending}
-                  onClick={() => clear.mutate(current.invitationId)}
-                >
-                  <Trash2 className="size-4" />
-                  إزالة من المقعد
-                </Button>
-                <Button
-                  variant="outline"
-                  className="gap-1"
-                  onClick={() => clear.mutate(current.invitationId)}
-                >
-                  <X className="size-4" />
-                  تغيير الضيف
-                </Button>
+                {canRegister && (
+                  <>
+                    <Button
+                      variant="destructive"
+                      className="gap-1"
+                      disabled={clear.isPending}
+                      onClick={() => clear.mutate(current.invitationId)}
+                    >
+                      <Trash2 className="size-4" />
+                      إزالة من المقعد
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="gap-1"
+                      onClick={() => clear.mutate(current.invitationId)}
+                    >
+                      <X className="size-4" />
+                      تغيير الضيف
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
-          ) : (
+          ) : canRegister ? (
             <div className="space-y-3">
               <Button
                 type="button"
@@ -933,6 +935,10 @@ ${rowsHtml}
                   </button>
                 ))}
               </div>
+            </div>
+          ) : (
+            <div className="rounded-xl border bg-muted/40 p-6 text-center">
+              <p className="text-sm text-muted-foreground">مقعد شاغر — عرض فقط</p>
             </div>
           )}
         </DialogContent>
