@@ -565,10 +565,16 @@ ${rowsHtml}
                     );
                   const col = cell.n;
                   const s = seatIndex.get(`${hallRow.label}-${col}`);
+                  const seatColor = colorMap.get(`${hallRow.label}-${col}`);
                   return (
                     <button
                       key={`s-${col}`}
                       type="button"
+                      style={
+                        seatColor && !s?.present
+                          ? { backgroundColor: `${seatColor}33`, borderColor: seatColor }
+                          : undefined
+                      }
                       onMouseEnter={(e) => {
                         const r = e.currentTarget.getBoundingClientRect();
                         setHover({
