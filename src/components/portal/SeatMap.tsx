@@ -51,6 +51,14 @@ const TYPE_LABELS: Record<string, string> = {
   staff: "فريق عمل",
 };
 
+const SEAT_COLORS = [
+  { name: "أحمر", hex: "#ef4444" },
+  { name: "أخضر", hex: "#22c55e" },
+  { name: "أزرق", hex: "#3b82f6" },
+  { name: "بنفسجي", hex: "#a855f7" },
+  { name: "برتقالي", hex: "#f97316" },
+] as const;
+
 type Cell =
   | { kind: "seat"; n: number }
   | { kind: "table" }
@@ -139,7 +147,7 @@ function useSeatData() {
     queryKey: ["seat-map"],
     refetchInterval: 30_000,
     queryFn: async () => {
-      const [{ data: events }, { data: invitees }, { data: invitations }, { data: attendance }] =
+      const [{ data: events }, { data: invitees }, { data: invitations }, { data: attendance }, { data: colors }] =
         await Promise.all([
           db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
           db.from("invitees").select("id, full_name, organization, invitee_type, phone"),
@@ -147,6 +155,7 @@ function useSeatData() {
             .from("invitations")
             .select("id, event_id, invitee_id, status, seat_area, seat_row, seat_number"),
           db.from("attendance").select("invitee_id, event_id, checked_in_at"),
+          db.from("seat_colors").select("area, seat_row, seat_number, color"),
         ]);
       const eventId: string | null = events?.[0]?.id ?? null;
       const present = new Set(
@@ -160,13 +169,14 @@ function useSeatData() {
         invitees: invitees ?? [],
         invitations: (invitations ?? []).filter((v: any) => !eventId || v.event_id === eventId),
         present,
+        colors: colors ?? [],
       };
     },
   });
 }
 
 export function SeatMap() {
-  const { canRegister } = useRoles();
+  const { canRegister, isAdmin } = useRoles();
   const queryClient = useQueryClient();
   const { data, isLoading } = useSeatData();
 
@@ -200,6 +210,35 @@ export function SeatMap() {
     });
     return map;
   }, [data, area]);
+
+  const colorMap = useMemo(() => {
+    const map = new Map<string, string>();
+    (data?.colors ?? []).forEach((c: any) => {
+      if (normalize(c.area ?? "") !== normalize(area)) return;
+      map.set(`${String(c.seat_row).trim()}-${String(c.seat_number).trim()}`, c.color);
+    });
+    return map;
+  }, [data, area]);
+
+  const setColor = useMutation({
+    mutationFn: async ({ row, col, color }: { row: string; col: number; color: string | null }) => {
+      const target = { area: area.trim() || DEFAULT_AREA, seat_row: String(row), seat_number: String(col) };
+      if (!color) {
+        const { error } = await db.from("seat_colors").delete().match(target);
+        if (error) throw error;
+      } else {
+        const { error } = await db
+          .from("seat_colors")
+          .upsert({ ...target, color }, { onConflict: "area,seat_row,seat_number" });
+        if (error) throw error;
+      }
+    },
+    onSuccess: (_d, vars) => {
+      invalidate();
+      toast.success(vars.color ? "تم تلوين المقعد" : "تمت إزالة اللون");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "تعذّر حفظ اللون"),
+  });
 
   const areas = useMemo(() => {
     const s = new Set<string>([DEFAULT_AREA]);
@@ -238,7 +277,9 @@ export function SeatMap() {
           const s = seatIndex.get(`${hallRow.label}-${cell.n}`);
           const cls = s ? (s.present ? "cell present" : "cell reserved") : "cell";
           const label = s ? esc(familyName(s.name)) : "";
-          return `<span class="${cls}"><b>${cell.n}</b><i>${label}</i></span>`;
+          const c = colorMap.get(`${hallRow.label}-${cell.n}`);
+          const style = c && !s?.present ? ` style="background:${c}33;border-color:${c}"` : "";
+          return `<span class="${cls}"${style}><b>${cell.n}</b><i>${label}</i></span>`;
         })
         .join("");
       return `<div class="row"><span class="rlabel">${hallRow.label}</span><div class="cells">${cells}</div><span class="rcount">${hallRow.count}</span></div>`;
@@ -526,10 +567,16 @@ ${rowsHtml}
                     );
                   const col = cell.n;
                   const s = seatIndex.get(`${hallRow.label}-${col}`);
+                  const seatColor = colorMap.get(`${hallRow.label}-${col}`);
                   return (
                     <button
                       key={`s-${col}`}
                       type="button"
+                      style={
+                        seatColor && !s?.present
+                          ? { backgroundColor: `${seatColor}33`, borderColor: seatColor }
+                          : undefined
+                      }
                       onMouseEnter={(e) => {
                         const r = e.currentTarget.getBoundingClientRect();
                         setHover({
@@ -645,6 +692,44 @@ ${rowsHtml}
               مقعد {picker?.col} — صف {picker?.row} · {area}
             </DialogTitle>
           </DialogHeader>
+
+          {isAdmin && picker && (
+            <div className="space-y-2 rounded-lg border bg-muted/30 p-3">
+              <Label className="text-xs">لون المقعد (للمدير فقط)</Label>
+              <div className="flex flex-wrap items-center gap-2">
+                {SEAT_COLORS.map((c) => {
+                  const active = colorMap.get(`${picker.row}-${picker.col}`) === c.hex;
+                  return (
+                    <button
+                      key={c.hex}
+                      type="button"
+                      title={c.name}
+                      disabled={setColor.isPending}
+                      onClick={() => setColor.mutate({ row: picker.row, col: picker.col, color: c.hex })}
+                      className={cn(
+                        "size-8 rounded-md border-2 transition-transform hover:scale-110",
+                        active ? "ring-2 ring-foreground ring-offset-2" : "",
+                      )}
+                      style={{ backgroundColor: c.hex, borderColor: c.hex }}
+                    />
+                  );
+                })}
+                {colorMap.get(`${picker.row}-${picker.col}`) && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1 text-xs"
+                    disabled={setColor.isPending}
+                    onClick={() => setColor.mutate({ row: picker.row, col: picker.col, color: null })}
+                  >
+                    <X className="size-3" />
+                    إزالة اللون
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
 
           {current ? (
             <div className="space-y-4">
