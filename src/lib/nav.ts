@@ -7,6 +7,7 @@ import {
   CalendarDays,
 
   Ticket,
+  ScanLine,
   ListChecks,
   LayoutList,
   Sheet,
