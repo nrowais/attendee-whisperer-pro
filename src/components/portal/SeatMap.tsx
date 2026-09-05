@@ -691,6 +691,44 @@ ${rowsHtml}
             </DialogTitle>
           </DialogHeader>
 
+          {isAdmin && picker && (
+            <div className="space-y-2 rounded-lg border bg-muted/30 p-3">
+              <Label className="text-xs">لون المقعد (للمدير فقط)</Label>
+              <div className="flex flex-wrap items-center gap-2">
+                {SEAT_COLORS.map((c) => {
+                  const active = colorMap.get(`${picker.row}-${picker.col}`) === c.hex;
+                  return (
+                    <button
+                      key={c.hex}
+                      type="button"
+                      title={c.name}
+                      disabled={setColor.isPending}
+                      onClick={() => setColor.mutate({ row: picker.row, col: picker.col, color: c.hex })}
+                      className={cn(
+                        "size-8 rounded-md border-2 transition-transform hover:scale-110",
+                        active ? "ring-2 ring-foreground ring-offset-2" : "",
+                      )}
+                      style={{ backgroundColor: c.hex, borderColor: c.hex }}
+                    />
+                  );
+                })}
+                {colorMap.get(`${picker.row}-${picker.col}`) && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1 text-xs"
+                    disabled={setColor.isPending}
+                    onClick={() => setColor.mutate({ row: picker.row, col: picker.col, color: null })}
+                  >
+                    <X className="size-3" />
+                    إزالة اللون
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+
           {current ? (
             <div className="space-y-4">
               <div className="rounded-xl border bg-muted/40 p-4">
