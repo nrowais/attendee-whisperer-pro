@@ -40,8 +40,14 @@ function PortalLayout() {
     if (rolesLoading) return;
     if ((isOperator || isFieldStaff) && pathname !== "/operations") {
       navigate({ to: "/operations", replace: true });
-    } else if (isRegistration && !isOperator && !isFieldStaff && pathname !== "/invitees") {
-      navigate({ to: "/invitees", replace: true });
+    } else if (
+      isRegistration &&
+      !isOperator &&
+      !isFieldStaff &&
+      pathname !== "/gate" &&
+      pathname !== "/invitees"
+    ) {
+      navigate({ to: "/gate", replace: true });
     }
   }, [rolesLoading, isOperator, isFieldStaff, isRegistration, pathname, navigate]);
 
