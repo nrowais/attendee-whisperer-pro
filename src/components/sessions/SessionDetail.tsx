@@ -108,6 +108,8 @@ export function SessionDetail({
     onSuccess: (_v, vars) => {
       queryClient.invalidateQueries({ queryKey: ["sessions-speaker-ops"] });
       queryClient.invalidateQueries({ queryKey: ["ops-board"] });
+      queryClient.invalidateQueries({ queryKey: ["live-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       toast.success(vars.arrived ? "تم تسجيل الوصول" : "تم التراجع عن الوصول");
     },
     onError: () => toast.error("تعذر تحديث حالة الوصول"),
