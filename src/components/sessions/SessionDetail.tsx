@@ -90,6 +90,11 @@ export function SessionDetail({
           .insert({ speaker_id: speakerId, ...payload });
         if (error) throw error;
       }
+      // عكس حالة الوصول على سجلات وصول المطار لتظهر في شاشة المتابعة اللحظية
+      await db
+        .from("speaker_arrivals")
+        .update({ status: arrived ? "arrived" : "pending" })
+        .eq("speaker_id", speakerId);
       await supabase.auth.getUser().then(({ data }) =>
         db.from("activity_logs").insert({
           user_id: data.user?.id ?? null,
@@ -103,6 +108,8 @@ export function SessionDetail({
     onSuccess: (_v, vars) => {
       queryClient.invalidateQueries({ queryKey: ["sessions-speaker-ops"] });
       queryClient.invalidateQueries({ queryKey: ["ops-board"] });
+      queryClient.invalidateQueries({ queryKey: ["live-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       toast.success(vars.arrived ? "تم تسجيل الوصول" : "تم التراجع عن الوصول");
     },
     onError: () => toast.error("تعذر تحديث حالة الوصول"),
