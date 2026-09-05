@@ -40,8 +40,14 @@ function PortalLayout() {
     if (rolesLoading) return;
     if ((isOperator || isFieldStaff) && pathname !== "/operations") {
       navigate({ to: "/operations", replace: true });
-    } else if (isRegistration && !isOperator && !isFieldStaff && pathname !== "/invitees") {
-      navigate({ to: "/invitees", replace: true });
+    } else if (
+      isRegistration &&
+      !isOperator &&
+      !isFieldStaff &&
+      pathname !== "/gate" &&
+      pathname !== "/invitees"
+    ) {
+      navigate({ to: "/gate", replace: true });
     }
   }, [rolesLoading, isOperator, isFieldStaff, isRegistration, pathname, navigate]);
 
@@ -85,7 +91,7 @@ function PortalLayout() {
     isOperator || isFieldStaff
       ? navItems.filter((item) => item.to === "/operations")
       : isRegistration
-        ? navItems.filter((item) => item.to === "/invitees")
+        ? navItems.filter((item) => item.to === "/gate" || item.to === "/invitees")
         : navItems.filter((item) => !item.adminOnly || isAdmin);
 
   return (

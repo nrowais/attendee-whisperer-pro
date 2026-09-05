@@ -7,6 +7,7 @@ import {
   CalendarDays,
 
   Ticket,
+  ScanLine,
   ListChecks,
   LayoutList,
   Sheet,
@@ -27,6 +28,7 @@ export const navItems: NavItem[] = [
   { to: "/sessions", label: "خريطة الجلسات", icon: LayoutList, hint: "الخريطة الزمنية للمسارين والجاهزية" },
   { to: "/speakers", label: "المتحدثون", icon: Mic2, hint: "المتحدثون والجلسات والطلبات" },
   { to: "/invitees", label: "الضيوف والمدعوون", icon: UserCheck, hint: "المدعوون والدعوات والحضور" },
+  { to: "/gate", label: "بوابة تسجيل الحضور", icon: ScanLine, hint: "شاشة مبسّطة لمسجّل الحضور" },
   { to: "/movements", label: "التنقلات", icon: Plane, hint: "الطيران والوصول والنقل الأرضي" },
   { to: "/fleet", label: "النقل والتذاكر", icon: Ticket, hint: "تذاكر النقل والسائقون والمركبات في شاشة واحدة" },
   { to: "/reports", label: "التقارير", icon: BarChart3, hint: "ملخصات قابلة للتصدير" },
