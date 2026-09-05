@@ -56,6 +56,7 @@ const GLOBAL_KEYS = [
   "fleet-trips",
   "calendar",
   "attendance-board",
+  "gate-board",
   "seat-map",
   "todays-sessions",
   "today-sessions",
