@@ -277,7 +277,9 @@ export function SeatMap() {
           const s = seatIndex.get(`${hallRow.label}-${cell.n}`);
           const cls = s ? (s.present ? "cell present" : "cell reserved") : "cell";
           const label = s ? esc(familyName(s.name)) : "";
-          return `<span class="${cls}"><b>${cell.n}</b><i>${label}</i></span>`;
+          const c = colorMap.get(`${hallRow.label}-${cell.n}`);
+          const style = c && !s?.present ? ` style="background:${c}33;border-color:${c}"` : "";
+          return `<span class="${cls}"${style}><b>${cell.n}</b><i>${label}</i></span>`;
         })
         .join("");
       return `<div class="row"><span class="rlabel">${hallRow.label}</span><div class="cells">${cells}</div><span class="rcount">${hallRow.count}</span></div>`;
