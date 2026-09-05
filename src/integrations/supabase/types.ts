@@ -802,6 +802,36 @@ export type Database = {
         }
         Relationships: []
       }
+      seat_colors: {
+        Row: {
+          area: string
+          color: string
+          created_at: string
+          id: string
+          seat_number: string
+          seat_row: string
+          updated_at: string
+        }
+        Insert: {
+          area: string
+          color: string
+          created_at?: string
+          id?: string
+          seat_number: string
+          seat_row: string
+          updated_at?: string
+        }
+        Update: {
+          area?: string
+          color?: string
+          created_at?: string
+          id?: string
+          seat_number?: string
+          seat_row?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       session_participants: {
         Row: {
           created_at: string
