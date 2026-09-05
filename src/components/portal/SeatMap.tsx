@@ -490,6 +490,10 @@ ${rowsHtml}
             <FileDown className="size-4" />
             تصدير PDF
           </Button>
+          <Button variant="outline" size="sm" className="gap-1" onClick={exportSeatTablePdf}>
+            <FileText className="size-4" />
+            جدول المقاعد
+          </Button>
         </div>
       </div>
 
