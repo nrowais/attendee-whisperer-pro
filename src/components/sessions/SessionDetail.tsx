@@ -19,7 +19,6 @@ import {
   moderatorRoles,
   opStatusLabels,
   opsBreakdown,
-  opsGroups,
   participantRoleLabels,
   readinessClasses,
   sessionReadiness,
