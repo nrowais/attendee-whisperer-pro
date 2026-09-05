@@ -816,26 +816,30 @@ ${rowsHtml}
                   <Printer className="size-4" />
                   طباعة كرت المقعد
                 </Button>
-                <Button
-                  variant="destructive"
-                  className="gap-1"
-                  disabled={clear.isPending}
-                  onClick={() => clear.mutate(current.invitationId)}
-                >
-                  <Trash2 className="size-4" />
-                  إزالة من المقعد
-                </Button>
-                <Button
-                  variant="outline"
-                  className="gap-1"
-                  onClick={() => clear.mutate(current.invitationId)}
-                >
-                  <X className="size-4" />
-                  تغيير الضيف
-                </Button>
+                {canRegister && (
+                  <>
+                    <Button
+                      variant="destructive"
+                      className="gap-1"
+                      disabled={clear.isPending}
+                      onClick={() => clear.mutate(current.invitationId)}
+                    >
+                      <Trash2 className="size-4" />
+                      إزالة من المقعد
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="gap-1"
+                      onClick={() => clear.mutate(current.invitationId)}
+                    >
+                      <X className="size-4" />
+                      تغيير الضيف
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
-          ) : (
+          ) : canRegister ? (
             <div className="space-y-3">
               <Button
                 type="button"
@@ -931,6 +935,10 @@ ${rowsHtml}
                   </button>
                 ))}
               </div>
+            </div>
+          ) : (
+            <div className="rounded-xl border bg-muted/40 p-6 text-center">
+              <p className="text-sm text-muted-foreground">مقعد شاغر — عرض فقط</p>
             </div>
           )}
         </DialogContent>
