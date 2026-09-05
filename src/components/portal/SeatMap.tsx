@@ -51,6 +51,88 @@ const TYPE_LABELS: Record<string, string> = {
   staff: "فريق عمل",
 };
 
+type Cell =
+  | { kind: "seat"; n: number }
+  | { kind: "table" }
+  | { kind: "blank" };
+
+type HallRow = { label: string; cells: Cell[]; count: number };
+
+const seat = (n: number): Cell => ({ kind: "seat", n });
+const range = (from: number, to: number, step: number) => {
+  const out: number[] = [];
+  if (step > 0) for (let i = from; i <= to; i += step) out.push(i);
+  else for (let i = from; i >= to; i += step) out.push(i);
+  return out;
+};
+
+/** توزيع القاعة كما في المخطط المعتمد (لا يُعدَّل) */
+function buildHall(): HallRow[] {
+  const rows: HallRow[] = [];
+
+  // A1 — 21 مقعدًا مع 4 طاولات في الوسط
+  rows.push({
+    label: "A1",
+    count: 21,
+    cells: [
+      ...range(20, 4, -2).map(seat),
+      { kind: "table" },
+      seat(2),
+      { kind: "table" },
+      seat(0),
+      { kind: "table" },
+      seat(1),
+      { kind: "table" },
+      seat(3),
+      ...range(5, 19, 2).map(seat),
+    ],
+  });
+
+  // A2 — 18 مقعدًا مع 4 مربعات صفراء فارغة في الوسط
+  rows.push({
+    label: "A2",
+    count: 18,
+    cells: [
+      ...range(38, 22, -2).map(seat),
+      { kind: "blank" },
+      { kind: "blank" },
+      { kind: "blank" },
+      { kind: "blank" },
+      ...range(21, 37, 2).map(seat),
+    ],
+  });
+
+  // A3 → A8 — 24 مقعدًا لكل صف
+  [39, 63, 87, 111, 135, 159].forEach((base, idx) => {
+    rows.push({
+      label: `A${idx + 3}`,
+      count: 24,
+      cells: [
+        ...range(base + 22, base, -2).map(seat),
+        ...range(base + 1, base + 23, 2).map(seat),
+      ],
+    });
+  });
+
+  // B1 → B6 — 30 مقعدًا لكل صف
+  [183, 213, 243, 273, 303, 333].forEach((base, idx) => {
+    rows.push({
+      label: `B${idx + 1}`,
+      count: 30,
+      cells: [
+        ...range(base + 29, base + 1, -2).map(seat),
+        ...range(base, base + 28, 2).map(seat),
+      ],
+    });
+  });
+
+  return rows;
+}
+
+const HALL_ROWS = buildHall();
+const HALL_TOTAL = HALL_ROWS.reduce((s, r) => s + r.count, 0);
+
+
 
 function useSeatData() {
   return useQuery({
