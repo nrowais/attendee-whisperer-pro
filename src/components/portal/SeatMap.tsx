@@ -806,6 +806,14 @@ ${rowsHtml}
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button
+                  variant="secondary"
+                  className="gap-1"
+                  onClick={() => picker && printSeatCard(current, picker.row, picker.col)}
+                >
+                  <Printer className="size-4" />
+                  طباعة كرت المقعد
+                </Button>
+                <Button
                   variant="destructive"
                   className="gap-1"
                   disabled={clear.isPending}
