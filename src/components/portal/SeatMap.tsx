@@ -51,6 +51,14 @@ const TYPE_LABELS: Record<string, string> = {
   staff: "فريق عمل",
 };
 
+const SEAT_COLORS = [
+  { name: "أحمر", hex: "#ef4444" },
+  { name: "أخضر", hex: "#22c55e" },
+  { name: "أزرق", hex: "#3b82f6" },
+  { name: "بنفسجي", hex: "#a855f7" },
+  { name: "برتقالي", hex: "#f97316" },
+] as const;
+
 type Cell =
   | { kind: "seat"; n: number }
   | { kind: "table" }
@@ -139,7 +147,7 @@ function useSeatData() {
     queryKey: ["seat-map"],
     refetchInterval: 30_000,
     queryFn: async () => {
-      const [{ data: events }, { data: invitees }, { data: invitations }, { data: attendance }] =
+      const [{ data: events }, { data: invitees }, { data: invitations }, { data: attendance }, { data: colors }] =
         await Promise.all([
           db.from("events").select("id, name, start_date").order("start_date", { ascending: false }),
           db.from("invitees").select("id, full_name, organization, invitee_type, phone"),
@@ -147,6 +155,7 @@ function useSeatData() {
             .from("invitations")
             .select("id, event_id, invitee_id, status, seat_area, seat_row, seat_number"),
           db.from("attendance").select("invitee_id, event_id, checked_in_at"),
+          db.from("seat_colors").select("area, seat_row, seat_number, color"),
         ]);
       const eventId: string | null = events?.[0]?.id ?? null;
       const present = new Set(
