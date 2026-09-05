@@ -81,11 +81,13 @@ const range = (from: number, to: number, step: number) => {
 function buildHall(): HallRow[] {
   const rows: HallRow[] = [];
 
-  // A1 — 22 مقعدًا مع 4 طاولات في الوسط (+ مقعد إضافي 363 بجانب 19)
+  // A1 — 23 مقعدًا مع 4 طاولات في الوسط
+  // مقعد 363 بجانب 19 (يمين المنصة) ومقعد 366 في الطرف الأيسر للمنصة
   rows.push({
     label: "A1",
-    count: 22,
+    count: 23,
     cells: [
+      seat(366),
       ...range(20, 4, -2).map(seat),
       { kind: "table" },
       seat(2),
