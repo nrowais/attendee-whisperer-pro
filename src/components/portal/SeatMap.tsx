@@ -222,7 +222,7 @@ export function SeatMap() {
 
   const familyName = (name: string) => {
     const parts = name.trim().split(/\s+/).filter(Boolean);
-    return parts.length > 1 ? parts[parts.length - 1] : name;
+    return parts.length > 1 ? (parts[parts.length - 1] ?? name) : name;
   };
 
   const exportSeatMapPdf = () => {
