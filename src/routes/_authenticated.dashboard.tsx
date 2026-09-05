@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   FileDown,
   FileSpreadsheet,
+  Waypoints,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -310,6 +311,14 @@ function DashboardPage() {
     { label: "وصول اليوم", value: data?.todayArrivals ?? 0, sub: "حركات وصول مجدولة", icon: PlaneLanding },
   ];
   const summaryRows = summaryCards.map(({ label, value }) => ({ label, value }));
+  const movementTotal = data
+    ? data.todayArrivals + data.todayCheckIns + data.todayTrips
+    : 0;
+  const movementSteps = [
+    { label: "وصول المطار", value: data?.todayArrivals ?? 0, icon: PlaneLanding },
+    { label: "تسجيل الفندق", value: data?.todayCheckIns ?? 0, icon: BedDouble },
+    { label: "رحلات النقل", value: data?.todayTrips ?? 0, icon: Car },
+  ];
 
   if (isLoading || !data) {
     return (
@@ -338,11 +347,18 @@ function DashboardPage() {
 
       <UpcomingSessionsOps />
 
-      <section className="surface-card p-6">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <section className="surface-card overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-5 py-4 sm:px-6">
           <div>
-            <p className="font-display text-lg font-bold text-foreground">الملخص اليومي</p>
-            <span className="text-xs text-muted-foreground">{todayLabel()}</span>
+            <div className="flex items-center gap-2">
+              <span className="flex size-9 items-center justify-center rounded-lg bg-secondary text-primary">
+                <Waypoints className="size-5" />
+              </span>
+              <div>
+                <p className="font-display text-lg font-bold text-foreground">الملخص اليومي</p>
+                <span className="text-xs text-muted-foreground">{todayLabel()}</span>
+              </div>
+            </div>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" className="gap-2" onClick={() => exportSummaryCsv(summaryRows)}>
@@ -355,17 +371,43 @@ function DashboardPage() {
             </Button>
           </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {summaryCards.map((item) => (
-            <div key={item.label} className="rounded-xl border border-border bg-secondary/40 p-4">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-sm text-muted-foreground">{item.label}</p>
-                <item.icon className="size-4 text-primary" />
+
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_220px]">
+          <div className="px-5 py-6 sm:px-8 sm:py-8">
+            <div className="mb-7 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">حركة الضيوف اليوم</p>
+                <p className="mt-1 font-display text-3xl font-bold text-foreground">{movementTotal}</p>
               </div>
-              <p className="mt-2 font-display text-2xl font-bold text-foreground">{item.value}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{item.sub}</p>
+              <Badge variant="secondary">محدّث تلقائيًا</Badge>
             </div>
-          ))}
+
+            <div className="relative">
+              <div className="absolute inset-x-[12%] top-7 h-1 rounded-full bg-border" />
+              <div className="relative grid grid-cols-3 gap-2">
+                {movementSteps.map((step) => (
+                  <div key={step.label} className="group flex min-w-0 flex-col items-center text-center">
+                    <span className="z-10 flex size-14 items-center justify-center rounded-lg border-4 border-primary bg-card text-primary shadow-sm transition-transform group-hover:-translate-y-1">
+                      <step.icon className="size-6" />
+                    </span>
+                    <span className="mt-3 text-xs font-medium text-muted-foreground sm:text-sm">{step.label}</span>
+                    <strong className="mt-1 font-display text-xl text-foreground">{step.value}</strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center border-t border-border bg-secondary/40 p-5 lg:border-r lg:border-t-0">
+            <div className="w-full rounded-lg border border-border bg-card p-5">
+              <span className="flex size-10 items-center justify-center rounded-lg bg-secondary text-primary">
+                <UserCheck className="size-5" />
+              </span>
+              <p className="mt-4 text-sm font-medium text-muted-foreground">الحضور اليوم</p>
+              <p className="mt-1 font-display text-3xl font-bold text-foreground">{data.todayAttendance}</p>
+              <p className="mt-1 text-xs text-muted-foreground">تسجيل دخول في الموقع</p>
+            </div>
+          </div>
         </div>
       </section>
 
