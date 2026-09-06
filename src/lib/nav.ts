@@ -11,6 +11,7 @@ import {
   ListChecks,
   LayoutList,
   Sheet,
+  SearchCheck,
   Settings,
 
   type LucideIcon,
@@ -32,6 +33,7 @@ export const navItems: NavItem[] = [
   { to: "/movements", label: "التنقلات", icon: Plane, hint: "الطيران والوصول والنقل الأرضي" },
   { to: "/fleet", label: "النقل والتذاكر", icon: Ticket, hint: "تذاكر النقل والسائقون والمركبات في شاشة واحدة" },
   { to: "/reports", label: "التقارير", icon: BarChart3, hint: "ملخصات قابلة للتصدير" },
+  { to: "/verify", label: "التحقق من الأسماء", icon: SearchCheck, hint: "قائمة مستقلة للبحث والتحقق بالاسم أو المنصب" },
   { to: "/sheets", label: "استيراد من Google Sheets", icon: Sheet, hint: "رفع ملف xlsx أو csv وإدخال بياناته للبوابة", adminOnly: true },
   { to: "/settings", label: "الإعدادات", icon: Settings, hint: "الفعالية والفريق والصلاحيات" },
 
