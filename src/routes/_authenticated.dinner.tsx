@@ -11,15 +11,19 @@ import {
   Users,
   CheckCircle2,
   XCircle,
+  Download,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useRoles } from "@/hooks/useAuth";
+import { eventName } from "@/lib/nav";
+import eventLogo from "@/assets/event-logo-2026.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+
 
 export const Route = createFileRoute("/_authenticated/dinner")({
   component: DinnerPage,
