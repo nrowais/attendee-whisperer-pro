@@ -240,12 +240,12 @@ export function SessionDetail({
                                   }
                                 >
                                   {arrived ? (
-                                    <>
+                                  <>
                                       <Undo2 className="size-3.5" /> تراجع
                                     </>
                                   ) : (
                                     <>
-                                      <CheckCircle2 className="size-3.5" /> وصل
+                                      <CheckCircle2 className="size-3.5" /> وصل إلى الفعالية
                                     </>
                                   )}
                                 </Button>
