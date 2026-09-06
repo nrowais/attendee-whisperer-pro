@@ -89,8 +89,8 @@ function DinnerPage() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("dinner_guests")
-        .select("id, full_name, position, organization, notes, status, confirmed_at")
-        .order("full_name");
+.select("id, full_name, position, organization, notes, status, confirmed_at, sort_order")
+        .order("sort_order", { ascending: true });
       if (error) throw error;
       return (data ?? []) as Row[];
     },
