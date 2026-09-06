@@ -79,6 +79,23 @@ const pick = (row: Record<string, unknown>, keys: string[]) => {
   return null;
 };
 
+const esc = (v: unknown) =>
+  String(v ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+const logoUrl = () =>
+  typeof window !== "undefined" ? new URL(eventLogo, window.location.origin).href : eventLogo;
+
+const statusText: Record<Status, string> = {
+  confirmed: "مؤكد الحضور",
+  declined: "لم يؤكد",
+  pending: "بانتظار الرد",
+};
+
+
+
 function DinnerPage() {
   const { isAdmin, canEdit, canRegister } = useRoles();
   const canManage = isAdmin || canEdit;
