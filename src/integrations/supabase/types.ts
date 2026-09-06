@@ -150,6 +150,7 @@ export type Database = {
           notes: string | null
           organization: string | null
           position: string | null
+          sort_order: number | null
           status: string
           updated_at: string
         }
@@ -163,6 +164,7 @@ export type Database = {
           notes?: string | null
           organization?: string | null
           position?: string | null
+          sort_order?: number | null
           status?: string
           updated_at?: string
         }
@@ -176,6 +178,7 @@ export type Database = {
           notes?: string | null
           organization?: string | null
           position?: string | null
+          sort_order?: number | null
           status?: string
           updated_at?: string
         }
