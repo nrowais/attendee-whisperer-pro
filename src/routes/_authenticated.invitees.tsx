@@ -65,6 +65,11 @@ function InviteesWorkspace() {
               ),
             },
             {
+              value: "import",
+              label: "رفع ملف تحديث",
+              content: <InviteesImport />,
+            },
+            {
               value: "invitations",
               label: "الدعوات",
               content: (
