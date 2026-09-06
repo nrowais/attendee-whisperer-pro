@@ -16,6 +16,7 @@ import { Route as SpeakerRouteImport } from './routes/speaker'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated.activity'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated.calendar'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedDinnerRouteImport } from './routes/_authenticated.dinner'
 import { Route as AuthenticatedFleetRouteImport } from './routes/_authenticated.fleet'
 import { Route as AuthenticatedFlightAlertsRouteImport } from './routes/_authenticated.flight-alerts'
 import { Route as AuthenticatedGateRouteImport } from './routes/_authenticated.gate'
@@ -33,7 +34,6 @@ import { Route as AuthenticatedSheetsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSpeakersRouteImport } from './routes/_authenticated.speakers'
 import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated.tickets'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
-import { Route as AuthenticatedVerifyRouteImport } from './routes/_authenticated.verify'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicSheetsTableRouteImport } from './routes/api/public/sheets.$table'
 
@@ -69,6 +69,11 @@ const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDinnerRoute = AuthenticatedDinnerRouteImport.update({
+  id: '/dinner',
+  path: '/dinner',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedFleetRoute = AuthenticatedFleetRouteImport.update({
@@ -160,11 +165,6 @@ const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedVerifyRoute = AuthenticatedVerifyRouteImport.update({
-  id: '/verify',
-  path: '/verify',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   id: '/api/public/health',
   path: '/api/public/health',
@@ -183,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/activity': typeof AuthenticatedActivityRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dinner': typeof AuthenticatedDinnerRoute
   '/fleet': typeof AuthenticatedFleetRoute
   '/flight-alerts': typeof AuthenticatedFlightAlertsRoute
   '/gate': typeof AuthenticatedGateRoute
@@ -200,7 +201,6 @@ export interface FileRoutesByFullPath {
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
-  '/verify': typeof AuthenticatedVerifyRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
@@ -211,6 +211,7 @@ export interface FileRoutesByTo {
   '/activity': typeof AuthenticatedActivityRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dinner': typeof AuthenticatedDinnerRoute
   '/fleet': typeof AuthenticatedFleetRoute
   '/flight-alerts': typeof AuthenticatedFlightAlertsRoute
   '/gate': typeof AuthenticatedGateRoute
@@ -228,7 +229,6 @@ export interface FileRoutesByTo {
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
-  '/verify': typeof AuthenticatedVerifyRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
@@ -241,6 +241,7 @@ export interface FileRoutesById {
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/dinner': typeof AuthenticatedDinnerRoute
   '/_authenticated/fleet': typeof AuthenticatedFleetRoute
   '/_authenticated/flight-alerts': typeof AuthenticatedFlightAlertsRoute
   '/_authenticated/gate': typeof AuthenticatedGateRoute
@@ -258,7 +259,6 @@ export interface FileRoutesById {
   '/_authenticated/speakers': typeof AuthenticatedSpeakersRoute
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
-  '/_authenticated/verify': typeof AuthenticatedVerifyRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
@@ -271,6 +271,7 @@ export interface FileRouteTypes {
     | '/activity'
     | '/calendar'
     | '/dashboard'
+    | '/dinner'
     | '/fleet'
     | '/flight-alerts'
     | '/gate'
@@ -288,7 +289,6 @@ export interface FileRouteTypes {
     | '/speakers'
     | '/tickets'
     | '/users'
-    | '/verify'
     | '/api/public/health'
     | '/api/public/sheets/$table'
   fileRoutesByTo: FileRoutesByTo
@@ -299,6 +299,7 @@ export interface FileRouteTypes {
     | '/activity'
     | '/calendar'
     | '/dashboard'
+    | '/dinner'
     | '/fleet'
     | '/flight-alerts'
     | '/gate'
@@ -316,7 +317,6 @@ export interface FileRouteTypes {
     | '/speakers'
     | '/tickets'
     | '/users'
-    | '/verify'
     | '/api/public/health'
     | '/api/public/sheets/$table'
   id:
@@ -328,6 +328,7 @@ export interface FileRouteTypes {
     | '/_authenticated/activity'
     | '/_authenticated/calendar'
     | '/_authenticated/dashboard'
+    | '/_authenticated/dinner'
     | '/_authenticated/fleet'
     | '/_authenticated/flight-alerts'
     | '/_authenticated/gate'
@@ -345,7 +346,6 @@ export interface FileRouteTypes {
     | '/_authenticated/speakers'
     | '/_authenticated/tickets'
     | '/_authenticated/users'
-    | '/_authenticated/verify'
     | '/api/public/health'
     | '/api/public/sheets/$table'
   fileRoutesById: FileRoutesById
@@ -408,6 +408,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dinner': {
+      id: '/_authenticated/dinner'
+      path: '/dinner'
+      fullPath: '/dinner'
+      preLoaderRoute: typeof AuthenticatedDinnerRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/fleet': {
@@ -529,13 +536,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsersRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/verify': {
-      id: '/_authenticated/verify'
-      path: '/verify'
-      fullPath: '/verify'
-      preLoaderRoute: typeof AuthenticatedVerifyRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/api/public/health': {
       id: '/api/public/health'
       path: '/api/public/health'
@@ -557,6 +557,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDinnerRoute: typeof AuthenticatedDinnerRoute
   AuthenticatedFleetRoute: typeof AuthenticatedFleetRoute
   AuthenticatedFlightAlertsRoute: typeof AuthenticatedFlightAlertsRoute
   AuthenticatedGateRoute: typeof AuthenticatedGateRoute
@@ -574,13 +575,13 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSpeakersRoute: typeof AuthenticatedSpeakersRoute
   AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
-  AuthenticatedVerifyRoute: typeof AuthenticatedVerifyRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedActivityRoute: AuthenticatedActivityRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDinnerRoute: AuthenticatedDinnerRoute,
   AuthenticatedFleetRoute: AuthenticatedFleetRoute,
   AuthenticatedFlightAlertsRoute: AuthenticatedFlightAlertsRoute,
   AuthenticatedGateRoute: AuthenticatedGateRoute,
@@ -598,7 +599,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSpeakersRoute: AuthenticatedSpeakersRoute,
   AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
-  AuthenticatedVerifyRoute: AuthenticatedVerifyRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
