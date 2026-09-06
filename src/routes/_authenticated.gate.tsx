@@ -290,6 +290,12 @@ function GateScreen() {
           <div>
             <h1 className="font-display text-2xl font-bold">بوابة تسجيل الحضور</h1>
             <p className="mt-1 text-sm opacity-80">{data?.eventName ?? "حفل الافتتاح"}</p>
+            <Button asChild variant="secondary" size="sm" className="mt-3 gap-1">
+              <Link to="/dinner">
+                <UtensilsCrossed className="size-4" />
+                المدعوون للعشاء
+              </Link>
+            </Button>
           </div>
           <div className="flex gap-3">
             <Kpi label="داخل القاعة" value={present} icon={<CheckCircle2 className="size-4" />} />
