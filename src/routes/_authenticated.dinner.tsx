@@ -1,7 +1,17 @@
 import { useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Search, Upload, Trash2, Check, X, UserPlus } from "lucide-react";
+import {
+  Search,
+  Upload,
+  Trash2,
+  Check,
+  X,
+  UserPlus,
+  Users,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
@@ -243,6 +253,36 @@ function DinnerPage() {
         )}
       </div>
 
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="surface-card flex items-center gap-4 p-5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Users className="size-6" />
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">العدد الكلي</p>
+            <p className="font-display text-2xl font-bold text-foreground">{rows.length}</p>
+          </div>
+        </div>
+        <div className="surface-card flex items-center gap-4 p-5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
+            <CheckCircle2 className="size-6" />
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">عدد المؤكدين</p>
+            <p className="font-display text-2xl font-bold text-emerald-600">{counts.confirmed}</p>
+          </div>
+        </div>
+        <div className="surface-card flex items-center gap-4 p-5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <XCircle className="size-6" />
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">عدد غير المؤكدين</p>
+            <p className="font-display text-2xl font-bold text-destructive">{counts.declined}</p>
+          </div>
+        </div>
+      </div>
+
       {canRegister && (
         <div className="surface-card space-y-3 p-5">
           <h2 className="flex items-center gap-2 text-sm font-semibold">
@@ -286,11 +326,6 @@ function DinnerPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <Badge variant="secondary">الإجمالي: {rows.length}</Badge>
-          <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">
-            مؤكد: {counts.confirmed}
-          </Badge>
-          <Badge variant="destructive">غير مؤكد: {counts.declined}</Badge>
           <Badge variant="outline">بانتظار الرد: {counts.pending}</Badge>
           <Badge variant="secondary">النتائج: {results.length}</Badge>
         </div>
