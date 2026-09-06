@@ -1622,6 +1622,39 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_list: {
+        Row: {
+          batch_label: string | null
+          created_at: string
+          full_name: string
+          id: string
+          notes: string | null
+          organization: string | null
+          position: string | null
+          updated_at: string
+        }
+        Insert: {
+          batch_label?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          organization?: string | null
+          position?: string | null
+          updated_at?: string
+        }
+        Update: {
+          batch_label?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          organization?: string | null
+          position?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
