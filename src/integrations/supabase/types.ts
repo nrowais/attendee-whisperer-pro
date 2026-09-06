@@ -139,6 +139,48 @@ export type Database = {
           },
         ]
       }
+      dinner_guests: {
+        Row: {
+          batch_label: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          full_name: string
+          id: string
+          notes: string | null
+          organization: string | null
+          position: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          batch_label?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          organization?: string | null
+          position?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          batch_label?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          organization?: string | null
+          position?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       driver_cards: {
         Row: {
           card_no: number
