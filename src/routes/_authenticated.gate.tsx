@@ -10,6 +10,7 @@ import {
   Search,
   UserPlus,
   Users,
+  UtensilsCrossed,
   X,
 } from "lucide-react";
 
