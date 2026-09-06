@@ -160,7 +160,8 @@ function DinnerPage() {
       const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
 
       const payload = json
-        .map((row) => ({
+        .map((row, idx) => ({
+          sort_order: idx + 1,
           full_name: pick(row, ["الاسم", "اسم", "name"]) ?? "",
           position: pick(row, ["المنصب", "الصفه", "الوظيفه", "المسمي", "position", "title"]),
           organization: pick(row, ["الجهه", "المؤسسه", "الشركه", "organization", "company"]),
