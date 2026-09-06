@@ -337,8 +337,13 @@ function DinnerPage() {
             قائمة مدعوي حفل العشاء — تأكيد الدعوة أو عدم التأكيد، مع إمكانية إضافة ضيف جديد.
           </p>
         </div>
-        {canManage && (
-          <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" className="gap-1" onClick={exportPdf}>
+            <Download className="size-4" />
+            تصدير PDF
+          </Button>
+          {canManage && (
+            <>
             <input
               ref={fileRef}
               type="file"
