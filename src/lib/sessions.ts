@@ -332,6 +332,7 @@ export const opsGroups = [
 
 export function opsBreakdown(statuses: (string | null | undefined)[]) {
   const total = statuses.length;
-  const notArrived = statuses.filter((raw) => (raw ?? "not_arrived") === "not_arrived").length;
-  return { total, arrived: total - notArrived, notArrived };
+  const arrived = statuses.filter((raw) => raw === "at_venue").length;
+  const notArrived = total - arrived;
+  return { total, arrived, notArrived };
 }
