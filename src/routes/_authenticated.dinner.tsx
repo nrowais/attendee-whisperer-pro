@@ -376,9 +376,11 @@ function DinnerPage() {
                 مسح القائمة
               </Button>
             )}
-          </div>
-        )}
+            </>
+          )}
+        </div>
       </div>
+
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="surface-card flex items-center gap-4 p-5">
