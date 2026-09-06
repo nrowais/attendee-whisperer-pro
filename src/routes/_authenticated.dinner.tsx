@@ -46,6 +46,7 @@ type Status = "pending" | "confirmed" | "declined";
 type Row = {
   id: string;
   full_name: string;
+  sort_order: number;
   position: string | null;
   organization: string | null;
   notes: string | null;
@@ -89,8 +90,8 @@ function DinnerPage() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("dinner_guests")
-        .select("id, full_name, position, organization, notes, status, confirmed_at")
-        .order("full_name");
+.select("id, full_name, position, organization, notes, status, confirmed_at, sort_order")
+        .order("sort_order", { ascending: true });
       if (error) throw error;
       return (data ?? []) as Row[];
     },
@@ -139,6 +140,7 @@ function DinnerPage() {
         position: newPosition.trim() || null,
         organization: newOrg.trim() || null,
         status: "pending",
+        sort_order: rows.reduce((m, r) => Math.max(m, r.sort_order ?? 0), 0) + 1,
       });
       if (error) throw new Error(error.message);
     },
@@ -160,7 +162,8 @@ function DinnerPage() {
       const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
 
       const payload = json
-        .map((row) => ({
+        .map((row, idx) => ({
+          sort_order: idx + 1,
           full_name: pick(row, ["الاسم", "اسم", "name"]) ?? "",
           position: pick(row, ["المنصب", "الصفه", "الوظيفه", "المسمي", "position", "title"]),
           organization: pick(row, ["الجهه", "المؤسسه", "الشركه", "organization", "company"]),
@@ -172,9 +175,20 @@ function DinnerPage() {
 
       if (payload.length === 0) throw new Error("لم يتم العثور على عمود للأسماء في الملف");
 
-      const existing = new Set(rows.map((r) => normalize(r.full_name)));
-      const fresh = payload.filter((r) => !existing.has(normalize(r.full_name)));
-      if (fresh.length === 0) throw new Error("جميع الأسماء موجودة مسبقًا");
+      const existingByName = new Map(rows.map((r) => [normalize(r.full_name), r.id]));
+      const fresh = payload.filter((r) => !existingByName.has(normalize(r.full_name)));
+
+      // حفظ ترتيب الملف حتى للأسماء الموجودة مسبقًا دون تعديل بياناتها
+      for (const r of payload) {
+        const id = existingByName.get(normalize(r.full_name));
+        if (id) {
+          const { error } = await (supabase as any)
+            .from("dinner_guests")
+            .update({ sort_order: r.sort_order })
+            .eq("id", id);
+          if (error) throw new Error(error.message);
+        }
+      }
 
       for (let i = 0; i < fresh.length; i += 200) {
         const { error } = await (supabase as any)
@@ -185,7 +199,9 @@ function DinnerPage() {
       return fresh.length;
     },
     onSuccess: (count) => {
-      toast.success(`تمت إضافة ${count} اسمًا جديدًا`);
+      toast.success(
+        count > 0 ? `تمت إضافة ${count} اسمًا جديدًا وترتيب القائمة حسب الملف` : "تم ترتيب القائمة حسب الملف",
+      );
       qc.invalidateQueries({ queryKey: ["dinner-guests"] });
     },
     onError: (e: any) => toast.error(e?.message ?? "تعذّر رفع الملف"),
