@@ -46,6 +46,7 @@ type Status = "pending" | "confirmed" | "declined";
 type Row = {
   id: string;
   full_name: string;
+  sort_order: number;
   position: string | null;
   organization: string | null;
   notes: string | null;
@@ -139,6 +140,7 @@ function DinnerPage() {
         position: newPosition.trim() || null,
         organization: newOrg.trim() || null,
         status: "pending",
+        sort_order: rows.reduce((m, r) => Math.max(m, r.sort_order ?? 0), 0) + 1,
       });
       if (error) throw new Error(error.message);
     },
@@ -197,7 +199,9 @@ function DinnerPage() {
       return fresh.length;
     },
     onSuccess: (count) => {
-      toast.success(`تمت إضافة ${count} اسمًا جديدًا`);
+      toast.success(
+        count > 0 ? `تمت إضافة ${count} اسمًا جديدًا وترتيب القائمة حسب الملف` : "تم ترتيب القائمة حسب الملف",
+      );
       qc.invalidateQueries({ queryKey: ["dinner-guests"] });
     },
     onError: (e: any) => toast.error(e?.message ?? "تعذّر رفع الملف"),
