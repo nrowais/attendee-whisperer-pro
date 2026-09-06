@@ -326,11 +326,6 @@ function DinnerPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <Badge variant="secondary">الإجمالي: {rows.length}</Badge>
-          <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">
-            مؤكد: {counts.confirmed}
-          </Badge>
-          <Badge variant="destructive">غير مؤكد: {counts.declined}</Badge>
           <Badge variant="outline">بانتظار الرد: {counts.pending}</Badge>
           <Badge variant="secondary">النتائج: {results.length}</Badge>
         </div>
