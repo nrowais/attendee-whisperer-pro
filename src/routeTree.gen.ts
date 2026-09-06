@@ -34,7 +34,6 @@ import { Route as AuthenticatedSheetsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSpeakersRouteImport } from './routes/_authenticated.speakers'
 import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated.tickets'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
-import { Route as AuthenticatedVerifyRouteImport } from './routes/_authenticated.verify'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicSheetsTableRouteImport } from './routes/api/public/sheets.$table'
 
@@ -166,11 +165,6 @@ const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedVerifyRoute = AuthenticatedVerifyRouteImport.update({
-  id: '/verify',
-  path: '/verify',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   id: '/api/public/health',
   path: '/api/public/health',
@@ -207,7 +201,6 @@ export interface FileRoutesByFullPath {
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
-  '/verify': typeof AuthenticatedVerifyRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
@@ -236,7 +229,6 @@ export interface FileRoutesByTo {
   '/speakers': typeof AuthenticatedSpeakersRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/users': typeof AuthenticatedUsersRoute
-  '/verify': typeof AuthenticatedVerifyRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
@@ -267,7 +259,6 @@ export interface FileRoutesById {
   '/_authenticated/speakers': typeof AuthenticatedSpeakersRoute
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
-  '/_authenticated/verify': typeof AuthenticatedVerifyRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sheets/$table': typeof ApiPublicSheetsTableRoute
 }
@@ -298,7 +289,6 @@ export interface FileRouteTypes {
     | '/speakers'
     | '/tickets'
     | '/users'
-    | '/verify'
     | '/api/public/health'
     | '/api/public/sheets/$table'
   fileRoutesByTo: FileRoutesByTo
@@ -327,7 +317,6 @@ export interface FileRouteTypes {
     | '/speakers'
     | '/tickets'
     | '/users'
-    | '/verify'
     | '/api/public/health'
     | '/api/public/sheets/$table'
   id:
@@ -357,7 +346,6 @@ export interface FileRouteTypes {
     | '/_authenticated/speakers'
     | '/_authenticated/tickets'
     | '/_authenticated/users'
-    | '/_authenticated/verify'
     | '/api/public/health'
     | '/api/public/sheets/$table'
   fileRoutesById: FileRoutesById
@@ -548,13 +536,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsersRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/verify': {
-      id: '/_authenticated/verify'
-      path: '/verify'
-      fullPath: '/verify'
-      preLoaderRoute: typeof AuthenticatedVerifyRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/api/public/health': {
       id: '/api/public/health'
       path: '/api/public/health'
@@ -594,7 +575,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSpeakersRoute: typeof AuthenticatedSpeakersRoute
   AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
-  AuthenticatedVerifyRoute: typeof AuthenticatedVerifyRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -619,7 +599,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSpeakersRoute: AuthenticatedSpeakersRoute,
   AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
-  AuthenticatedVerifyRoute: AuthenticatedVerifyRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
