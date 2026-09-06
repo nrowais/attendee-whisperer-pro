@@ -11,6 +11,7 @@ import {
   ListChecks,
   LayoutList,
   Sheet,
+  SearchCheck,
   Settings,
 
   type LucideIcon,
