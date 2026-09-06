@@ -11,15 +11,19 @@ import {
   Users,
   CheckCircle2,
   XCircle,
+  Download,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useRoles } from "@/hooks/useAuth";
+import { eventName } from "@/lib/nav";
+import eventLogo from "@/assets/event-logo-2026.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+
 
 export const Route = createFileRoute("/_authenticated/dinner")({
   component: DinnerPage,
@@ -74,6 +78,23 @@ const pick = (row: Record<string, unknown>, keys: string[]) => {
   }
   return null;
 };
+
+const esc = (v: unknown) =>
+  String(v ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+const logoUrl = () =>
+  typeof window !== "undefined" ? new URL(eventLogo, window.location.origin).href : eventLogo;
+
+const statusText: Record<Status, string> = {
+  confirmed: "مؤكد الحضور",
+  declined: "لم يؤكد",
+  pending: "بانتظار الرد",
+};
+
+
 
 function DinnerPage() {
   const { isAdmin, canEdit, canRegister } = useRoles();
@@ -222,6 +243,91 @@ function DinnerPage() {
     onError: (e: any) => toast.error(e?.message ?? "تعذّر المسح"),
   });
 
+  function exportPdf() {
+    const list = results;
+    if (list.length === 0) {
+      toast.error("لا توجد بيانات للتصدير");
+      return;
+    }
+    const win = window.open("", "_blank", "width=1000,height=760");
+    if (!win) {
+      toast.error("يرجى السماح بالنوافذ المنبثقة لتصدير PDF");
+      return;
+    }
+    const now = new Date().toLocaleString("ar-SA-u-ca-gregory", {
+      dateStyle: "full",
+      timeStyle: "short",
+      timeZone: "Asia/Riyadh",
+    });
+    const body = list
+      .map(
+        (r, i) => `<tr class="${r.status}">
+        <td class="num">${i + 1}</td>
+        <td><strong>${esc(r.full_name)}</strong></td>
+        <td>${esc(r.position ?? "—")}</td>
+        <td>${esc(r.organization ?? "—")}</td>
+        <td>${esc(statusText[r.status])}</td>
+      </tr>`,
+      )
+      .join("");
+
+    const html = `<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8" />
+<title>تقرير المدعوين للعشاء</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  @page { size: A4 portrait; margin: 12mm; }
+  * { box-sizing: border-box; }
+  body { font-family: Cairo, "Segoe UI", sans-serif; color: #14213d; margin: 0; }
+  header { display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 3px solid #14213d; padding-bottom: 12px; margin-bottom: 16px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { font-size: 12px; color: #64748b; margin: 0; }
+  .brand { font-size: 13px; font-weight: 700; color: #e8751a; margin-top: 6px; }
+  .logo-badge { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 6px 10px; }
+  .logo-badge img { height: 56px; display: block; }
+  .meta { display: flex; gap: 18px; font-size: 12px; color: #64748b; margin-bottom: 12px;
+    border-right: 4px solid #e8751a; padding-right: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th { background: #14213d; color: #fff; text-align: right; padding: 8px 10px; font-weight: 600; }
+  tbody td { border-bottom: 1px solid #e2e8f0; padding: 7px 10px; text-align: right; }
+  tbody tr.confirmed td { background: #ecfdf5; }
+  tbody tr.declined td { background: #fef2f2; }
+  td.num { color: #94a3b8; width: 34px; }
+  thead { display: table-header-group; }
+  tr { page-break-inside: avoid; }
+  footer { margin-top: 16px; font-size: 11px; color: #94a3b8; text-align: center;
+    border-top: 2px solid #e8751a; padding-top: 8px; }
+</style></head>
+<body>
+  <header>
+    <div>
+      <h1>تقرير المدعوين لحفل العشاء</h1>
+      <p class="sub">${esc(now)}</p>
+      <div class="brand">${eventName}</div>
+    </div>
+    <div class="logo-badge"><img src="${logoUrl()}" alt="شعار الفعالية" /></div>
+  </header>
+  <div class="meta">
+    <span>العدد الكلي: <strong>${rows.length}</strong></span>
+    <span>المؤكدون: <strong>${counts.confirmed}</strong></span>
+    <span>غير المؤكدين: <strong>${counts.declined}</strong></span>
+    <span>بانتظار الرد: <strong>${counts.pending}</strong></span>
+  </div>
+  <table><thead><tr>
+    <th>#</th><th>الاسم</th><th>المنصب</th><th>الجهة</th><th>الحالة</th>
+  </tr></thead><tbody>${body}</tbody></table>
+  <footer>تم إنشاء هذا التقرير آلياً من بوابة ${eventName}<br/>نفذ بواسطة نايف الرويس</footer>
+  <script>window.onload = function () { setTimeout(function () { window.print(); }, 700); };<\/script>
+</body></html>`;
+
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    toast.success("جاري تجهيز ملف PDF");
+  }
+
   return (
     <div className="space-y-6" dir="rtl">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -231,8 +337,13 @@ function DinnerPage() {
             قائمة مدعوي حفل العشاء — تأكيد الدعوة أو عدم التأكيد، مع إمكانية إضافة ضيف جديد.
           </p>
         </div>
-        {canManage && (
-          <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" className="gap-1" onClick={exportPdf}>
+            <Download className="size-4" />
+            تصدير PDF
+          </Button>
+          {canManage && (
+            <>
             <input
               ref={fileRef}
               type="file"
@@ -265,9 +376,11 @@ function DinnerPage() {
                 مسح القائمة
               </Button>
             )}
-          </div>
-        )}
+            </>
+          )}
+        </div>
       </div>
+
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="surface-card flex items-center gap-4 p-5">
