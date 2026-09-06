@@ -173,9 +173,20 @@ function DinnerPage() {
 
       if (payload.length === 0) throw new Error("لم يتم العثور على عمود للأسماء في الملف");
 
-      const existing = new Set(rows.map((r) => normalize(r.full_name)));
-      const fresh = payload.filter((r) => !existing.has(normalize(r.full_name)));
-      if (fresh.length === 0) throw new Error("جميع الأسماء موجودة مسبقًا");
+      const existingByName = new Map(rows.map((r) => [normalize(r.full_name), r.id]));
+      const fresh = payload.filter((r) => !existingByName.has(normalize(r.full_name)));
+
+      // حفظ ترتيب الملف حتى للأسماء الموجودة مسبقًا دون تعديل بياناتها
+      for (const r of payload) {
+        const id = existingByName.get(normalize(r.full_name));
+        if (id) {
+          const { error } = await (supabase as any)
+            .from("dinner_guests")
+            .update({ sort_order: r.sort_order })
+            .eq("id", id);
+          if (error) throw new Error(error.message);
+        }
+      }
 
       for (let i = 0; i < fresh.length; i += 200) {
         const { error } = await (supabase as any)
