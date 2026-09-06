@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AttendanceBoard } from "@/components/portal/AttendanceBoard";
 import { SeatMap } from "@/components/portal/SeatMap";
 import { CrudPage } from "@/components/portal/CrudPage";
+import { InviteesImport } from "@/components/portal/InviteesImport";
 import { Workspace } from "@/components/portal/Workspace";
 import { useSpeakerOverlap } from "@/hooks/useSpeakerOverlap";
 import {
@@ -63,6 +64,11 @@ function InviteesWorkspace() {
                   overlapCheck={isSpeaker}
                 />
               ),
+            },
+            {
+              value: "import",
+              label: "رفع ملف تحديث",
+              content: <InviteesImport />,
             },
             {
               value: "invitations",
