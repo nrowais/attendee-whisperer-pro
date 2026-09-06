@@ -224,7 +224,7 @@ export function SessionDetail({
                         <div className="flex items-center gap-2">
                           {p.speaker_id && canEditOps ? (
                             (() => {
-                              const arrived = (ops?.status ?? "not_arrived") !== "not_arrived";
+                              const arrived = ops?.status === "at_venue";
                               return (
                                 <Button
                                   size="sm"
