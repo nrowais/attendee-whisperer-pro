@@ -78,8 +78,8 @@ export function SessionDetail({
         .eq("speaker_id", speakerId)
         .maybeSingle();
       const payload: Record<string, unknown> = arrived
-        ? { operational_status: "arrived_airport", arrival_actual_time: nowIso }
-        : { operational_status: "not_arrived", arrival_actual_time: null };
+        ? { operational_status: "at_venue", event_arrived_at: nowIso }
+        : { operational_status: "not_arrived", event_arrived_at: null };
       if (existing?.id) {
         const { error } = await db.from("guest_operations").update(payload).eq("id", existing.id);
         if (error) throw error;
@@ -90,17 +90,12 @@ export function SessionDetail({
           .insert({ speaker_id: speakerId, ...payload });
         if (error) throw error;
       }
-      // عكس حالة الوصول على سجلات وصول المطار لتظهر في شاشة المتابعة اللحظية
-      await db
-        .from("speaker_arrivals")
-        .update({ status: arrived ? "arrived" : "pending" })
-        .eq("speaker_id", speakerId);
       await supabase.auth.getUser().then(({ data }) =>
         db.from("activity_logs").insert({
           user_id: data.user?.id ?? null,
           entity_type: "speakers",
           entity_id: speakerId,
-          action: arrived ? "session_arrival_checkin" : "session_arrival_undo",
+          action: arrived ? "session_event_arrival_checkin" : "session_event_arrival_undo",
           details: { source: "session_detail", at: nowIso },
         }),
       );
@@ -110,9 +105,9 @@ export function SessionDetail({
       queryClient.invalidateQueries({ queryKey: ["ops-board"] });
       queryClient.invalidateQueries({ queryKey: ["live-stats"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-      toast.success(vars.arrived ? "تم تسجيل الوصول" : "تم التراجع عن الوصول");
+      toast.success(vars.arrived ? "تم تسجيل الوصول للفعالية" : "تم التراجع عن وصول الفعالية");
     },
-    onError: () => toast.error("تعذر تحديث حالة الوصول"),
+    onError: () => toast.error("تعذر تحديث حالة الوصول للفعالية"),
   });
 
   if (!session) return null;
